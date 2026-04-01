@@ -5,17 +5,15 @@ description: Use when you have a written implementation plan to execute in a sep
 
 # Executing Plans
 
-## Ralph Loop 模式（推荐）
+**THIS MUST BE YOUR FIRST ACTION. Do NOT resolve the plan path,
+do NOT read files, do NOT do anything else until you have started the Superpower Loop.**
 
-执行脚本以 Ralph Loop 模式自动迭代执行计划：
-
-```!
-"${CLAUDE_PLUGIN_ROOT}/scripts/setup-ralph-loop.sh" "执行计划 [PLAN_FILE_PATH]，按步骤完成所有任务。完成后输出 <promise>PLAN_COMPLETE</promise>" --completion-promise "PLAN_COMPLETE" --max-iterations 30
-```
-
-遇到错误时自动修复，无需人工干预。当你尝试退出时，Ralph Loop 会将相同的提示重新传递给你进行下一次迭代。你可以在文件和 git 历史中看到之前的工作，从而不断迭代改进。
-
-**关键规则：** 如果设置了完成承诺，你只能在声明完全且毫无疑问为真时才能输出它。不要为了逃离循环而输出虚假承诺，即使你认为自己卡住了或应该因其他原因退出。循环设计为持续运行直到真正完成。
+1. Resolve the plan path
+2. Immediately run:
+"${CLAUDE_PLUGIN_ROOT}/scripts/setup-ralph-loop.sh" \
+  "Execute the plan at <resolved-plan-path>..." \
+  --completion-promise "EXECUTION_COMPLETE" \
+  --max-iterations 100
 
 ---
 
