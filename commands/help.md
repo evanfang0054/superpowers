@@ -31,14 +31,14 @@ The technique is described as "deterministically bad in an undeterministic world
 
 ## Available Commands
 
-### /ralph-loop <PROMPT> [OPTIONS]
+### /superpowers:ralph-loop <PROMPT> [OPTIONS]
 
 Start a Ralph loop in your current session.
 
 **Usage:**
 ```
-/ralph-loop "Refactor the cache layer" --max-iterations 20
-/ralph-loop "Add tests" --completion-promise "TESTS COMPLETE"
+/superpowers:ralph-loop "Refactor the cache layer" --max-iterations 20
+/superpowers:ralph-loop "Add tests" --completion-promise "TESTS COMPLETE"
 ```
 
 **Options:**
@@ -96,7 +96,7 @@ The "loop" doesn't mean Claude talks to itself. It means:
 ### Interactive Bug Fix
 
 ```
-/ralph-loop "Fix the token refresh logic in auth.ts. Output <promise>FIXED</promise> when all tests pass." --completion-promise "FIXED" --max-iterations 10
+/superpowers:ralph-loop "Fix the token refresh logic in auth.ts. Output <promise>FIXED</promise> when all tests pass." --completion-promise "FIXED" --max-iterations 10
 ```
 
 You'll see Ralph:

@@ -1,5 +1,19 @@
 # Superpowers Release Notes
 
+## v5.0.9 (2026-04-02)
+
+### Changes
+
+- 修复了日志需要空一行、loop相关提示
+
+## v5.0.8 (2026-04-02)
+
+### Changes
+
+- 补充ralph了进来完善loop
+
+- 哈哈哈哈
+
 ## v5.0.7 (2026-03-31)
 
 ### GitHub Copilot CLI Support
