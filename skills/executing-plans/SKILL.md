@@ -12,7 +12,7 @@ do NOT read files, do NOT do anything else until you have started the 
 2. Immediately run:
 "${CLAUDE_PLUGIN_ROOT}/scripts/setup-ralph-loop.sh" \
   "Execute the plan at <resolved-plan-path>..." \
-  --completion-promise "EXECUTION_COMPLETE" \
+  --completion-promise "COMPLETE" \
   --max-iterations 100
 
 ---

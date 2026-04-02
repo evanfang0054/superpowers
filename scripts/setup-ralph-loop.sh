@@ -18,7 +18,7 @@ while [[ $# -gt 0 ]]; do
 Ralph Loop - Interactive self-referential development loop
 
 USAGE:
-  /ralph-loop [PROMPT...] [OPTIONS]
+  /superpowers:ralph-loop [PROMPT...] [OPTIONS]
 
 ARGUMENTS:
   PROMPT...    Initial prompt to start the loop (can be multiple words without quotes)
@@ -40,10 +40,10 @@ DESCRIPTION:
   - Learning how Ralph works
 
 EXAMPLES:
-  /ralph-loop Build a todo API --completion-promise 'DONE' --max-iterations 20
-  /ralph-loop --max-iterations 10 Fix the auth bug
-  /ralph-loop Refactor cache layer  (runs forever)
-  /ralph-loop --completion-promise 'TASK COMPLETE' Create a REST API
+  /superpowers:ralph-loop Build a todo API --completion-promise 'DONE' --max-iterations 20
+  /supepowers:ralph-loop --max-iterations 10 Fix the auth bug
+  /superpowers:ralph-loop Refactor cache layer  (runs forever)
+  /superpowers:ralph-loop --completion-promise 'TASK COMPLETE' Create a REST API
 
 STOPPING:
   Only by reaching --max-iterations or detecting --completion-promise
@@ -119,11 +119,11 @@ if [[ -z "$PROMPT" ]]; then
   echo "   Ralph needs a task description to work on." >&2
   echo "" >&2
   echo "   Examples:" >&2
-  echo "     /ralph-loop Build a REST API for todos" >&2
-  echo "     /ralph-loop Fix the auth bug --max-iterations 20" >&2
-  echo "     /ralph-loop --completion-promise 'DONE' Refactor code" >&2
+  echo "     /superpowers:ralph-loop Build a REST API for todos" >&2
+  echo "     /superpowers:ralph-loop Fix the auth bug --max-iterations 20" >&2
+  echo "     /superpowers:ralph-loop --completion-promise 'DONE' Refactor code" >&2
   echo "" >&2
-  echo "   For all options: /ralph-loop --help" >&2
+  echo "   For all options: /superpowers:ralph-loop --help" >&2
   exit 1
 fi
 

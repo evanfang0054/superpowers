@@ -10,7 +10,23 @@ set -euo pipefail
 HOOK_INPUT=$(cat)
 
 # Check if ralph-loop is active
-RALPH_STATE_FILE=".claude/ralph-loop.local.md"
+# Locate project root and state file
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+
+# If not in a git repo, search upward for the state file
+if [[ -z "$PROJECT_ROOT" ]]; then
+  SEARCH_DIR="$(pwd)"
+  while [[ "$SEARCH_DIR" != "/" ]]; do
+    if [[ -f "$SEARCH_DIR/.claude/ralph-loop.local.md" ]]; then
+      PROJECT_ROOT="$SEARCH_DIR"
+      break
+    fi
+    SEARCH_DIR="$(dirname "$SEARCH_DIR")"
+  done
+fi
+
+# Final state file path
+RALPH_STATE_FILE="${PROJECT_ROOT:-.}/.claude/ralph-loop.local.md"
 
 if [[ ! -f "$RALPH_STATE_FILE" ]]; then
   # No active loop - allow exit
@@ -41,7 +57,7 @@ if [[ ! "$ITERATION" =~ ^[0-9]+$ ]]; then
   echo "   Problem: 'iteration' field is not a valid number (got: '$ITERATION')" >&2
   echo "" >&2
   echo "   This usually means the state file was manually edited or corrupted." >&2
-  echo "   Ralph loop is stopping. Run /ralph-loop again to start fresh." >&2
+  echo "   Ralph loop is stopping. Run /superpowers:ralph-loop again to start fresh." >&2
   rm "$RALPH_STATE_FILE"
   exit 0
 fi
@@ -52,7 +68,7 @@ if [[ ! "$MAX_ITERATIONS" =~ ^[0-9]+$ ]]; then
   echo "   Problem: 'max_iterations' field is not a valid number (got: '$MAX_ITERATIONS')" >&2
   echo "" >&2
   echo "   This usually means the state file was manually edited or corrupted." >&2
-  echo "   Ralph loop is stopping. Run /ralph-loop again to start fresh." >&2
+  echo "   Ralph loop is stopping. Run /superpowers:ralph-loop again to start fresh." >&2
   rm "$RALPH_STATE_FILE"
   exit 0
 fi
@@ -158,7 +174,7 @@ if [[ -z "$PROMPT_TEXT" ]]; then
   echo "     • State file was manually edited" >&2
   echo "     • File was corrupted during writing" >&2
   echo "" >&2
-  echo "   Ralph loop is stopping. Run /ralph-loop again to start fresh." >&2
+  echo "   Ralph loop is stopping. Run /superpowers:ralph-loop again to start fresh." >&2
   rm "$RALPH_STATE_FILE"
   exit 0
 fi
