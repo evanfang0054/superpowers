@@ -13,6 +13,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 CONFIG="$REPO_ROOT/.version-bump.json"
+RELEASE_NOTES="$REPO_ROOT/RELEASE-NOTES.md"
 
 if [[ ! -f "$CONFIG" ]]; then
   echo "error: .version-bump.json not found at $CONFIG" >&2
@@ -49,6 +50,57 @@ declared_files() {
 # Read the audit exclude patterns from config.
 audit_excludes() {
   jq -r '.audit.exclude[]' "$CONFIG" 2>/dev/null
+}
+
+# 让用户输入更新日志
+get_user_changelog() {
+    echo "" >&2
+    echo "📝 请输入本次更新的内容:" >&2
+    echo "   每行一条记录，直接按 Enter（空行）结束输入" >&2
+    echo "" >&2
+    
+    local changes=""
+    while IFS= read -r line; do
+        [ -z "$line" ] && break
+        if [[ "$line" != -* ]]; then
+            line="- $line"
+        fi
+        changes="${changes}${line}"$'\n'
+    done
+    
+    echo "$changes"
+}
+
+# 更新 RELEASE-NOTES.md
+update_release_notes() {
+    local new_version="$1"
+    local changelog="$2"
+    local date_str
+    date_str=$(date "+%Y-%m-%d")
+    
+    if [ -z "$changelog" ]; then
+        changelog="- Minor updates"
+    fi
+    
+    # 创建新的 release notes 条目（末尾加空行与下一版本分隔）
+    local new_entry="## v$new_version ($date_str)
+
+### Changes
+
+$changelog
+"
+    
+    # 读取现有内容并在标题后插入新条目
+    local header="# Superpowers Release Notes"
+    local existing_content
+    existing_content=$(tail -n +3 "$RELEASE_NOTES")
+    
+    echo "$header" > "$RELEASE_NOTES"
+    echo "" >> "$RELEASE_NOTES"
+    echo "$new_entry" >> "$RELEASE_NOTES"
+    echo "$existing_content" >> "$RELEASE_NOTES"
+    
+    echo "  ✓ Updated RELEASE-NOTES.md"
 }
 
 # --- commands ---
@@ -172,6 +224,10 @@ cmd_bump() {
     exit 1
   fi
 
+  # 获取用户输入的更新日志
+  local changelog
+  changelog=$(get_user_changelog)
+
   echo "Bumping all declared files to $new_version..."
   echo ""
 
@@ -186,6 +242,10 @@ cmd_bump() {
     write_json_field "$fullpath" "$field" "$new_version"
     printf "  %-45s  %s -> %s\n" "$path ($field)" "$old_ver" "$new_version"
   done < <(declared_files)
+
+  # 更新 release notes
+  echo ""
+  update_release_notes "$new_version" "$changelog"
 
   echo ""
   echo "Done. Running audit to check for missed files..."
