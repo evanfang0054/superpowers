@@ -1,5 +1,11 @@
 # Superpowers Release Notes
 
+## v5.0.10 (2026-04-02)
+
+### Changes
+
+- 更新executing-plans中的loo默认提示
+
 ## v5.0.9 (2026-04-02)
 
 ### Changes

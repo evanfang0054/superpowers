@@ -10,10 +10,15 @@ do NOT read files, do NOT do anything else until you have started the 
 
 1. Resolve the plan path
 2. Immediately run:
-"${CLAUDE_PLUGIN_ROOT}/scripts/setup-ralph-loop.sh" \
-  "Execute the plan at <resolved-plan-path>..." \
-  --completion-promise "COMPLETE" \
-  --max-iterations 100
+"${CLAUDE_PLUGIN_ROOT}/scripts/setup-ralph-loop.sh" \
+  "Execute the plan at <resolved-plan-path>.
+   Rules:
+   1. Pick the highest-priority task and implement ONLY that one. You decide priority—not necessarily the first in the list.
+   2. After completing the task, update the plan document to record what was done.
+   3. If the plan is fully complete, output <promise>COMPLETE</promise>.
+   4. When encountering unfamiliar or new APIs, use context7 to query the latest documentation." \
+  --completion-promise "COMPLETE" \
+  --max-iterations 40
 
 ---
 
