@@ -13,8 +13,10 @@ HOOK_INPUT=$(cat)
 # Locate project root and state file
 PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
 
-# If not in a git repo, search upward for the state file
-if [[ -z "$PROJECT_ROOT" ]]; then
+# Even in a git repo, verify the state file exists; if not, search upward.
+# This handles git worktrees where --show-toplevel returns the worktree path,
+# but the state file lives in the main repo's .claude directory.
+if [[ -z "$PROJECT_ROOT" ]] || [[ ! -f "$PROJECT_ROOT/.claude/ralph-loop.local.md" ]]; then
   SEARCH_DIR="$(pwd)"
   while [[ "$SEARCH_DIR" != "/" ]]; do
     if [[ -f "$SEARCH_DIR/.claude/ralph-loop.local.md" ]]; then

@@ -1,5 +1,11 @@
 # Superpowers Release Notes
 
+## v5.0.11 (2026-04-02)
+
+### Changes
+
+- 修复stop-hoo脚本获取路径问题
+
 ## v5.0.10 (2026-04-02)
 
 ### Changes
