@@ -1,6 +1,8 @@
 {
   "name": "superpowers",
-  "version": "5.0.7",
+  "version": "5.0.9",
   "type": "module",
-  "main": ".opencode/plugins/superpowers.js"
+  "scripts": {
+    "release": "./scripts/bump-version.sh"
+  }
 }
