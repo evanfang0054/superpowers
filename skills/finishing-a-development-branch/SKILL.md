@@ -198,3 +198,15 @@ git worktree remove <worktree-path>
 
 **Pairs with:**
 - **using-git-worktrees** - Cleans up worktree created by that skill
+- **session-learnings** - Record insights discovered during this branch
+
+## Capture Learnings
+
+**Before completing**, reflect on what you learned during this branch:
+
+- Did you discover a reusable pattern?
+- Did you hit a pitfall that wasted time?
+- Did the user state a preference you should remember?
+- Did you find an undocumented project convention?
+
+If yes, use the `session-learnings` skill to record it before finishing.

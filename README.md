@@ -127,7 +127,7 @@ gemini extensions update superpowers
 - **verification-before-completion** - 确保问题真正修复
 
 **协作**
-- **brainstorming** - 苏格拉底式设计细化
+- **brainstorming** - 苏格拉底式设计细化（含 6 个强制性问题框架）
 - **writing-plans** - 详细的实现计划
 - **executing-plans** - 带检查点的批量执行
 - **dispatching-parallel-agents** - 并发子代理工作流
@@ -136,6 +136,14 @@ gemini extensions update superpowers
 - **using-git-worktrees** - 并行开发分支
 - **finishing-a-development-branch** - 合并/PR 决策工作流
 - **subagent-driven-development** - 快速迭代，两阶段审查（规格合规性，然后代码质量）
+
+**文档与运维**
+- **documentation-sync** - 代码变更后自动同步文档
+- **post-deploy-monitoring** - 部署后健康检查和监控
+- **retrospective** - 工程回顾，分析工作成果和改进点
+
+**知识管理**
+- **session-learnings** - 跨 Session 知识积累和复用
 
 **元技能**
 - **writing-skills** - 按照最佳实践创建新技能（包含测试方法论）

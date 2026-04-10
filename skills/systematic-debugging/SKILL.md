@@ -294,3 +294,22 @@ From debugging sessions:
 - Random fixes approach: 2-3 hours of thrashing
 - First-time fix rate: 95% vs 40%
 - New bugs introduced: Near zero vs common
+
+## Capture Learnings
+
+**After resolving the bug**, if you discovered something non-obvious, record it:
+
+```bash
+# Using the log-learning script
+${CLAUDE_PLUGIN_ROOT}/scripts/log-learning.sh pitfall "SHORT_KEY" "WHAT_YOU_LEARNED" 8 error
+
+# Or manually
+mkdir -p .superpowers
+echo '{"ts":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","type":"pitfall","key":"SHORT_KEY","insight":"WHAT_YOU_LEARNED","confidence":8,"source":"error"}' >> .superpowers/learnings.jsonl
+```
+
+**Record when:**
+- Root cause was non-obvious (took investigation to find)
+- Bug was caused by project-specific convention
+- Fix required understanding undocumented behavior
+- Same mistake could happen again without this knowledge

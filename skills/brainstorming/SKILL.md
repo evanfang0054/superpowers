@@ -144,6 +144,34 @@ Wait for the user's response. If they request changes, make them and re-run the 
 - **Incremental validation** - Present design, get approval before moving on
 - **Be flexible** - Go back and clarify when something doesn't make sense
 
+## Six Forcing Questions (Product Ideas)
+
+When brainstorming a **new product idea** or **major new feature** (not bug fixes or small improvements), use these six forcing questions to validate the idea before diving into design. These questions expose assumptions and prevent building things nobody wants.
+
+**When to use:** User says "I have an idea", "is this worth building", "help me think through this", or describes a new product/feature concept.
+
+**How to use:** Ask these questions one at a time during the "Ask clarifying questions" phase. Not every question needs a long answer — some can be quick. But each must be addressed.
+
+| # | Question | What It Exposes |
+|---|----------|-----------------|
+| 1 | **Demand Reality** — Who specifically has this problem, and how do you know? Have you talked to them? | Prevents building for imagined users |
+| 2 | **Status Quo** — How do people solve this problem today? What's wrong with that? | Reveals if the pain is real and if alternatives exist |
+| 3 | **Desperate Specificity** — Who would be *desperate* for this? Describe them precisely. | Forces narrow focus vs. "everyone would want this" |
+| 4 | **Narrowest Wedge** — What's the smallest possible version that solves the core problem? | Prevents scope creep before validation |
+| 5 | **Observation** — What have you personally observed that makes you believe this is needed? | Distinguishes insight from assumption |
+| 6 | **Future-Fit** — If this works, what does it grow into? If it fails, what did you learn? | Tests strategic thinking and learning mindset |
+
+**After the six questions:** If the idea survives scrutiny, proceed to normal brainstorming (approaches, design, spec). If the questions reveal weak foundations, help the user either:
+- Pivot to a stronger version of the idea
+- Identify what research/validation is needed first
+- Decide to shelve the idea
+
+**Skip these questions for:**
+- Bug fixes
+- Small improvements to existing features
+- Technical refactoring
+- Implementation of already-validated requirements
+
 ## Visual Companion
 
 A browser-based companion for showing mockups, diagrams, and visual options during brainstorming. Available as a tool — not a mode. Accepting the companion means it's available for questions that benefit from visual treatment; it does NOT mean every question goes through the browser.
@@ -162,3 +190,13 @@ A question about a UI topic is not automatically a visual question. "What does p
 
 If they agree to the companion, read the detailed guide before proceeding:
 `skills/brainstorming/visual-companion.md`
+
+## Capture Learnings
+
+**After design approval**, if you discovered something worth remembering:
+
+- User stated a strong preference (naming, style, architecture approach)
+- Discovered a project convention not documented elsewhere
+- Made an architectural decision with non-obvious rationale
+
+Record it using `session-learnings` skill so future sessions respect these decisions.

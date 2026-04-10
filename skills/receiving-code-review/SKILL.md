@@ -211,3 +211,13 @@ When replying to inline review comments on GitHub, reply in the comment thread (
 Verify. Question. Then implement.
 
 No performative agreement. Technical rigor always.
+
+## Capture Learnings
+
+**After addressing review feedback**, if you learned something valuable:
+
+- User corrected your approach → `preference` type (high confidence)
+- Discovered coding convention → `pattern` type
+- Made a mistake to avoid → `pitfall` type
+
+User feedback is high-signal. Record it using `session-learnings` skill.

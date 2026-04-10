@@ -369,3 +369,14 @@ Otherwise → not TDD
 ```
 
 No exceptions without your human partner's permission.
+
+## Capture Learnings
+
+**After completing TDD cycle**, if you discovered something about testing in this project:
+
+- Test framework quirks or configuration
+- Mocking patterns that work well here
+- Test data setup conventions
+- Fixtures or helpers that exist
+
+Record it using `session-learnings` skill (type: `tool` or `pattern`).

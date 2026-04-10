@@ -1,5 +1,11 @@
 # Superpowers Release Notes
 
+## v5.0.12 (2026-04-10)
+
+### Changes
+
+- 融合了gstack内容，做了最新的迭代
+
 ## v5.0.11 (2026-04-02)
 
 ### Changes

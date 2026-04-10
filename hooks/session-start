@@ -17,6 +17,24 @@ fi
 # Read using-superpowers content
 using_superpowers_content=$(cat "${PLUGIN_ROOT}/skills/using-superpowers/SKILL.md" 2>&1 || echo "Error reading using-superpowers skill")
 
+# Read project learnings if they exist
+learnings_content=""
+if [ -f ".superpowers/learnings.jsonl" ]; then
+    learnings_count=$(wc -l < .superpowers/learnings.jsonl | tr -d ' ')
+    if [ "$learnings_count" -gt 0 ]; then
+        # Get formatted summary using search script
+        if [ -x "${PLUGIN_ROOT}/scripts/search-learnings.sh" ]; then
+            formatted_learnings=$("${PLUGIN_ROOT}/scripts/search-learnings.sh" --summary 2>/dev/null || true)
+        else
+            # Fallback to raw JSON
+            formatted_learnings=$(tail -10 .superpowers/learnings.jsonl 2>/dev/null || true)
+        fi
+        if [ -n "$formatted_learnings" ]; then
+            learnings_content="\n\n## Project Learnings\n\n${formatted_learnings}\n\nReview these before making changes. Use 'session-learnings' skill to add new learnings."
+        fi
+    fi
+fi
+
 # Escape string for JSON embedding using bash parameter substitution.
 # Each ${s//old/new} is a single C-level pass - orders of magnitude
 # faster than the character-by-character loop this replaces.
@@ -32,7 +50,8 @@ escape_for_json() {
 
 using_superpowers_escaped=$(escape_for_json "$using_superpowers_content")
 warning_escaped=$(escape_for_json "$warning_message")
-session_context="<EXTREMELY_IMPORTANT>\nYou have superpowers.\n\n**Below is the full content of your 'superpowers:using-superpowers' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\n\n${using_superpowers_escaped}\n\n${warning_escaped}\n</EXTREMELY_IMPORTANT>"
+learnings_escaped=$(escape_for_json "$learnings_content")
+session_context="<EXTREMELY_IMPORTANT>\nYou have superpowers.\n\n**Below is the full content of your 'superpowers:using-superpowers' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\n\n${using_superpowers_escaped}\n\n${warning_escaped}${learnings_escaped}\n</EXTREMELY_IMPORTANT>"
 
 # Output context injection as JSON.
 # Cursor hooks expect additional_context (snake_case).
