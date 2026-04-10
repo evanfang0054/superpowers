@@ -1,6 +1,8 @@
 .worktrees/
 .private-journal/
-.claude/
+.claude/*
+!.claude/README.md
+!.claude/settings.local.json.example
 .DS_Store
 node_modules/
 inspo
