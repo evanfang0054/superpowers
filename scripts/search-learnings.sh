@@ -39,7 +39,8 @@ fi
 # Format learnings with Python (reads file directly, filter via env var)
 format_learnings() {
     local filter="${1:-}"
-    LEARNINGS_FILTER="$filter" python3 - "$LEARNINGS_FILE" << 'PYTHON'
+    local type_filter="${2:-}"
+    LEARNINGS_FILTER="$filter" LEARNINGS_TYPE_FILTER="$type_filter" python3 - "$LEARNINGS_FILE" << 'PYTHON'
 import json
 import sys
 import os
@@ -48,6 +49,7 @@ from collections import defaultdict
 
 file_path = sys.argv[1] if len(sys.argv) > 1 else '.superpowers/learnings.jsonl'
 filter_text = os.environ.get('LEARNINGS_FILTER', '').lower()
+type_filter = os.environ.get('LEARNINGS_TYPE_FILTER', '').lower()
 
 try:
     with open(file_path, 'r') as f:
@@ -66,7 +68,11 @@ for line in lines:
         if 'key' not in e or 'type' not in e:
             continue
         
-        # Apply filter if specified
+        # Apply type filter if specified
+        if type_filter and e.get('type', '').lower() != type_filter:
+            continue
+        
+        # Apply keyword filter if specified
         if filter_text:
             text_to_search = json.dumps(e).lower()
             if filter_text not in text_to_search:
@@ -160,7 +166,7 @@ case "$1" in
         fi
         type="$2"
         echo "=== Learnings of type: $type ==="
-        format_learnings "\"type\":\"$type\""
+        format_learnings "" "$type"
         ;;
     --help|-h)
         echo "Usage: $0 <keyword> | --type <type> | --recent [N] | --all | --summary"

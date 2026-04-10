@@ -1,0 +1,1 @@
+I just finished implementing a new authentication feature and pushed my changes. The code is working but I realized the README still shows the old API endpoints. Can you help me update the documentation to match what I shipped?

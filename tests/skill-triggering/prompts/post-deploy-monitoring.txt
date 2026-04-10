@@ -1,0 +1,1 @@
+I just deployed the new version to production. Can you help me monitor the site for a few minutes to make sure everything is working correctly? I want to check for any console errors or performance issues.

@@ -1,0 +1,1 @@
+It's Friday afternoon and I want to do a quick retrospective on what we accomplished this week. Can you help me review the commits and summarize what went well and what we should improve?

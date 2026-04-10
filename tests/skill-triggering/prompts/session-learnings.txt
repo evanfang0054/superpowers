@@ -1,0 +1,1 @@
+I just spent an hour debugging why the tests were failing. Turns out this project requires running `pnpm prepare` before the tests will pass because of some git hooks setup. I don't want to forget this next time - can you help me record this somewhere?
