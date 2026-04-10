@@ -14,7 +14,9 @@ Rules:
 1. Pick the highest-priority task and implement ONLY that one. You decide priority—not necessarily the first in the list.
 2. After completing the task, update the plan document to record what was done.
 3. When encountering unfamiliar or new APIs, use context7 to query the latest documentation.
-4. If the plan is fully complete, output <promise>COMPLETE</promise>.
+4. Stay in the current directory—do not cd into other directories unless absolutely necessary.
+5. Do not create git worktrees—work directly in the current workspace.
+6. If the plan is fully complete, output <promise>COMPLETE</promise>.
 " \
   --completion-promise "COMPLETE" \
   --max-iterations 40
