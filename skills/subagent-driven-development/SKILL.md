@@ -1,9 +1,47 @@
 ---
 name: subagent-driven-development
 description: Use when executing implementation plans with independent tasks in the current session
+argument-hint: "任务描述或Plan路径 [RULES='额外规则']"
 ---
 
 # Subagent-Driven Development
+
+```!
+"${CLAUDE_PLUGIN_ROOT}/scripts/setup-ralph-loop.sh" \
+  "Task: $ARGUMENTS
+
+You are the ORCHESTRATOR. Your job is to coordinate subagents, NOT implement code yourself.
+
+=== ORCHESTRATOR WORKFLOW (per iteration) ===
+1. Read the plan/task, extract pending tasks
+2. For the NEXT pending task:
+   a. Dispatch IMPLEMENTER subagent (use ./implementer-prompt.md template)
+   b. If implementer asks questions, answer them and re-dispatch
+   c. When implementer reports DONE, dispatch SPEC REVIEWER subagent (./spec-reviewer-prompt.md)
+   d. If spec review fails, have implementer fix and re-review
+   e. When spec passes, dispatch CODE QUALITY REVIEWER subagent (./code-quality-reviewer-prompt.md)
+   f. If quality review fails, have implementer fix and re-review
+   g. When quality passes, mark task complete
+3. Move to next task
+
+=== MANDATORY Rules (DO NOT SKIP) ===
+1. You are COORDINATOR ONLY - never write implementation code yourself
+2. Each task requires THREE subagents: implementer → spec reviewer → code quality reviewer
+3. Subagents must follow superpowers:test-driven-development (TDD)
+4. Do NOT skip any review stage
+5. Do NOT proceed if any review has open issues
+6. When ALL tasks complete, dispatch FINAL CODE REVIEWER for entire implementation
+7. After final review, you MUST run superpowers:finishing-a-development-branch
+8. ONLY after finishing-a-development-branch is executed, output <promise>COMPLETE</promise>
+
+=== User Additional Rules (if provided) ===
+$RULES
+" \
+  --completion-promise "COMPLETE" \
+  --max-iterations 60
+```
+
+---
 
 Execute plan by dispatching fresh subagent per task, with two-stage review after each: spec compliance review first, then code quality review.
 
@@ -264,8 +302,8 @@ Done!
 
 ## Integration
 
-**Required workflow skills:**
-- **superpowers:using-git-worktrees** - REQUIRED: Set up isolated workspace before starting
+**Related workflow skills:**
+- **superpowers:using-git-worktrees** - OPTIONAL: Set up isolated workspace if user requests isolation (not required by default)
 - **superpowers:writing-plans** - Creates the plan this skill executes
 - **superpowers:requesting-code-review** - Code review template for reviewer subagents
 - **superpowers:finishing-a-development-branch** - Complete development after all tasks
