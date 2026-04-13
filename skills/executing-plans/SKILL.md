@@ -1,22 +1,28 @@
 ---
 name: executing-plans
 description: Use when you have a written implementation plan to execute in a separate session with review checkpoints
-argument-hint: "PROMPT"
+argument-hint: "任务描述或Plan路径 [RULES='额外规则']"
 ---
 
 # Executing Plans
 
 ```!
 "${CLAUDE_PLUGIN_ROOT}/scripts/setup-ralph-loop.sh" \
-  "$ARGUMENTS
+  "Task: $ARGUMENTS
 
-Rules:
+=== MANDATORY Rules (DO NOT SKIP) ===
 1. Pick the highest-priority task and implement ONLY that one. You decide priority—not necessarily the first in the list.
-2. After completing the task, update the plan document to record what was done.
-3. When encountering unfamiliar or new APIs, use context7 to query the latest documentation.
-4. Stay in the current directory—do not cd into other directories unless absolutely necessary.
-5. Do not create git worktrees—work directly in the current workspace.
-6. If the plan is fully complete, output <promise>COMPLETE</promise>.
+2. For EVERY task: follow superpowers:test-driven-development (write failing test FIRST, then implement).
+3. After completing each task, run superpowers:requesting-code-review before moving to the next task.
+4. After completing the task, update the plan document to record what was done.
+5. When encountering unfamiliar or new APIs, use context7 to query the latest documentation.
+6. Stay in the current directory—do not cd into other directories unless absolutely necessary.
+7. Do not create git worktrees—work directly in the current workspace.
+8. When ALL plan tasks are done, you MUST run superpowers:finishing-a-development-branch to complete the branch.
+9. ONLY after finishing-a-development-branch is executed, output <promise>COMPLETE</promise>.
+
+=== User Additional Rules (if provided) ===
+$RULES
 " \
   --completion-promise "COMPLETE" \
   --max-iterations 40
@@ -83,7 +89,7 @@ After all tasks complete and verified:
 
 ## Integration
 
-**Required workflow skills:**
-- **superpowers:using-git-worktrees** - REQUIRED: Set up isolated workspace before starting
+**Related workflow skills:**
+- **superpowers:using-git-worktrees** - OPTIONAL: Set up isolated workspace if user requests isolation (not required by default)
 - **superpowers:writing-plans** - Creates the plan this skill executes
 - **superpowers:finishing-a-development-branch** - Complete development after all tasks
