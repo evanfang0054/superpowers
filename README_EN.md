@@ -102,17 +102,17 @@ Start a new session in your chosen platform and ask for something that should tr
 
 1. **brainstorming** - Activates before writing code. Refines rough ideas through questions, explores alternatives, presents design in sections for validation. Saves design document.
 
-2. **using-git-worktrees** - Optional. Activates when user requests workspace isolation. Creates isolated workspace on new branch, runs project setup, verifies clean test baseline.
+2. **writing-plans** - Activates with approved design. Breaks work into bite-sized tasks (2-5 minutes each). Every task has exact file paths, complete code, verification steps.
 
-3. **writing-plans** - Activates with approved design. Breaks work into bite-sized tasks (2-5 minutes each). Every task has exact file paths, complete code, verification steps.
+3. **subagent-driven-development** or **executing-plans** - Activates with plan. Both driven by ralph-loop to ensure completion. subagent-driven-development acts as orchestrator dispatching subagents (implementer → spec review → quality review), executing-plans runs directly in main session. Both support user-defined additional rules.
 
-4. **subagent-driven-development** or **executing-plans** - Activates with plan. Both driven by ralph-loop to ensure completion. subagent-driven-development acts as orchestrator dispatching subagents (implementer → spec review → quality review), executing-plans runs directly in main session. Both support user-defined additional rules.
+4. **test-driven-development** - Activates during implementation. Enforces RED-GREEN-REFACTOR: write failing test, watch it fail, write minimal code, watch it pass, commit. Deletes code written before tests.
 
-5. **test-driven-development** - Activates during implementation. Enforces RED-GREEN-REFACTOR: write failing test, watch it fail, write minimal code, watch it pass, commit. Deletes code written before tests.
+5. **requesting-code-review** - Activates between tasks. Reviews against plan, reports issues by severity. Critical issues block progress.
 
-6. **requesting-code-review** - Activates between tasks. Reviews against plan, reports issues by severity. Critical issues block progress.
+6. **finishing-a-development-branch** - Activates when tasks complete. Verifies tests, presents options (merge/PR/keep/discard), cleans up worktree if used.
 
-7. **finishing-a-development-branch** - Activates when tasks complete. Verifies tests, presents options (merge/PR/keep/discard), cleans up worktree if used.
+> **Optional: using-git-worktrees** - Use only when user explicitly requests workspace isolation. Creates isolated workspace on new branch. Not used by default.
 
 **The agent checks for relevant skills before any task.** Mandatory workflows, not suggestions.
 

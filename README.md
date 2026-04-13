@@ -101,17 +101,17 @@ gemini extensions update superpowers
 
 1. **brainstorming（头脑风暴）** - 在写代码之前激活。通过提问细化粗略想法，探索替代方案，分段展示设计供验证。保存设计文档。
 
-2. **using-git-worktrees（使用 Git 工作树）** - 可选。当用户需要隔离工作空间时激活。在新分支上创建隔离的工作空间，运行项目设置，验证测试基线。
+2. **writing-plans（编写计划）** - 在设计批准后激活。将工作分解为小任务（每个 2-5 分钟）。每个任务都有精确的文件路径、完整的代码和验证步骤。
 
-3. **writing-plans（编写计划）** - 在设计批准后激活。将工作分解为小任务（每个 2-5 分钟）。每个任务都有精确的文件路径、完整的代码和验证步骤。
+3. **subagent-driven-development（子代理驱动开发）** 或 **executing-plans（执行计划）** - 有计划时激活。两者均由 ralph-loop 驱动确保完成。subagent-driven-development 作为协调者派发子代理（实现 → 规格审查 → 质量审查），executing-plans 在主 session 内直接执行。均支持用户自定义额外规则。
 
-4. **subagent-driven-development（子代理驱动开发）** 或 **executing-plans（执行计划）** - 有计划时激活。两者均由 ralph-loop 驱动确保完成。subagent-driven-development 作为协调者派发子代理（实现 → 规格审查 → 质量审查），executing-plans 在主 session 内直接执行。均支持用户自定义额外规则。
+4. **test-driven-development（测试驱动开发）** - 在实现过程中激活。强制执行红-绿-重构循环：编写失败的测试，观察失败，编写最少代码，观察通过，提交。删除在测试之前编写的代码。
 
-5. **test-driven-development（测试驱动开发）** - 在实现过程中激活。强制执行红-绿-重构循环：编写失败的测试，观察失败，编写最少代码，观察通过，提交。删除在测试之前编写的代码。
+5. **requesting-code-review（请求代码审查）** - 在任务之间激活。根据计划审查，按严重程度报告问题。关键问题会阻止进度。
 
-6. **requesting-code-review（请求代码审查）** - 在任务之间激活。根据计划审查，按严重程度报告问题。关键问题会阻止进度。
+6. **finishing-a-development-branch（完成开发分支）** - 在任务完成时激活。验证测试，提供选项（合并/PR/保留/丢弃），如使用工作树则清理。
 
-7. **finishing-a-development-branch（完成开发分支）** - 在任务完成时激活。验证测试，提供选项（合并/PR/保留/丢弃），如使用工作树则清理。
+> **可选：using-git-worktrees** - 仅当用户明确要求工作空间隔离时使用。在新分支上创建隔离的工作空间。默认不使用。
 
 **AI 助手在执行任何任务前都会检查相关技能。** 这是强制性的工作流程，而非建议。
 

@@ -1,6 +1,6 @@
 ---
 name: using-git-worktrees
-description: Use when user explicitly requests workspace isolation - creates isolated git worktrees with smart directory selection and safety verification. Not required by default for implementation workflows.
+description: ONLY use when user EXPLICITLY requests workspace isolation (e.g., "use worktree", "isolate workspace"). DO NOT use by default. Most tasks should work directly in the current workspace without worktrees. Creates isolated git worktrees with smart directory selection and safety verification.
 ---
 
 # Using Git Worktrees
