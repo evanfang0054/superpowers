@@ -101,17 +101,17 @@ gemini extensions update superpowers
 
 1. **brainstorming（头脑风暴）** - 在写代码之前激活。通过提问细化粗略想法，探索替代方案，分段展示设计供验证。保存设计文档。
 
-2. **using-git-worktrees（使用 Git 工作树）** - 在设计批准后激活。在新分支上创建隔离的工作空间，运行项目设置，验证测试基线。
+2. **using-git-worktrees（使用 Git 工作树）** - 可选。当用户需要隔离工作空间时激活。在新分支上创建隔离的工作空间，运行项目设置，验证测试基线。
 
 3. **writing-plans（编写计划）** - 在设计批准后激活。将工作分解为小任务（每个 2-5 分钟）。每个任务都有精确的文件路径、完整的代码和验证步骤。
 
-4. **subagent-driven-development（子代理驱动开发）** 或 **executing-plans（执行计划）** - 有计划时激活。为每个任务分派新的子代理，进行两阶段审查（规格合规性，然后代码质量），或分批执行并设置人工检查点。
+4. **subagent-driven-development（子代理驱动开发）** 或 **executing-plans（执行计划）** - 有计划时激活。两者均由 ralph-loop 驱动确保完成。subagent-driven-development 作为协调者派发子代理（实现 → 规格审查 → 质量审查），executing-plans 在主 session 内直接执行。均支持用户自定义额外规则。
 
 5. **test-driven-development（测试驱动开发）** - 在实现过程中激活。强制执行红-绿-重构循环：编写失败的测试，观察失败，编写最少代码，观察通过，提交。删除在测试之前编写的代码。
 
 6. **requesting-code-review（请求代码审查）** - 在任务之间激活。根据计划审查，按严重程度报告问题。关键问题会阻止进度。
 
-7. **finishing-a-development-branch（完成开发分支）** - 在任务完成时激活。验证测试，提供选项（合并/PR/保留/丢弃），清理工作树。
+7. **finishing-a-development-branch（完成开发分支）** - 在任务完成时激活。验证测试，提供选项（合并/PR/保留/丢弃），如使用工作树则清理。
 
 **AI 助手在执行任何任务前都会检查相关技能。** 这是强制性的工作流程，而非建议。
 
@@ -129,13 +129,13 @@ gemini extensions update superpowers
 **协作**
 - **brainstorming** - 苏格拉底式设计细化（含 6 个强制性问题框架）
 - **writing-plans** - 详细的实现计划
-- **executing-plans** - 带检查点的批量执行
+- **executing-plans** - Ralph-loop 驱动执行，强制 TDD/Review/完成流程，支持自定义规则
 - **dispatching-parallel-agents** - 并发子代理工作流
 - **requesting-code-review** - 预审查清单
 - **receiving-code-review** - 响应反馈
 - **using-git-worktrees** - 并行开发分支
 - **finishing-a-development-branch** - 合并/PR 决策工作流
-- **subagent-driven-development** - 快速迭代，两阶段审查（规格合规性，然后代码质量）
+- **subagent-driven-development** - Ralph-loop 驱动协调者模式，派发子代理 + 两阶段审查
 
 **文档与运维**
 - **documentation-sync** - 代码变更后自动同步文档
