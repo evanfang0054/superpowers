@@ -1,5 +1,11 @@
 # Superpowers Release Notes
 
+## v5.0.13 (2026-04-13)
+
+### Changes
+
+- 大幅优化更新
+
 ## v5.0.12 (2026-04-10)
 
 ### Changes
