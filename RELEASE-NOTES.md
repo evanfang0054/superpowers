@@ -1,5 +1,11 @@
 # Superpowers Release Notes
 
+## v5.0.14 (2026-04-14)
+
+### Changes
+
+- 补充session ID记录
+
 ## v5.0.13 (2026-04-13)
 
 ### Changes

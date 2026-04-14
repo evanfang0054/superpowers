@@ -2,6 +2,15 @@
   "hooks": {
     "SessionStart": [
       {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'SESSION_ID=$(cat | jq -r .session_id); echo \"export CLAUDE_SESSION_ID=$SESSION_ID\" >> \"$CLAUDE_ENV_FILE\"'"
+          }
+        ]
+      },
+      {
         "matcher": "startup|clear|compact",
         "hooks": [
           {

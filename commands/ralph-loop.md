@@ -22,7 +22,7 @@ Execute the setup script to initialize the Ralph loop:
 6. When task is GENUINELY complete, output <promise>COMPLETE</promise>.
 " \
   --completion-promise "COMPLETE" \
-  --max-iterations 40
+  --max-iterations 60
 ```
 
 When you try to exit, the Ralph loop will feed the SAME PROMPT back to you for the next iteration. You'll see your previous work in files and git history, allowing you to iterate and improve.

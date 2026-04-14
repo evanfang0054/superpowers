@@ -1,7 +1,7 @@
 ---
 name: subagent-driven-development
 description: Use when executing implementation plans with independent tasks in the current session
-argument-hint: "任务描述或Plan路径 [RULES='额外规则']"
+argument-hint: "任务描述或Plan路径"
 ---
 
 # Subagent-Driven Development
@@ -33,9 +33,6 @@ You are the ORCHESTRATOR. Your job is to coordinate subagents, NOT implement cod
 6. When ALL tasks complete, dispatch FINAL CODE REVIEWER for entire implementation
 7. After final review, you MUST run superpowers:finishing-a-development-branch
 8. ONLY after finishing-a-development-branch is executed, output <promise>COMPLETE</promise>
-
-=== User Additional Rules (if provided) ===
-$RULES
 " \
   --completion-promise "COMPLETE" \
   --max-iterations 60

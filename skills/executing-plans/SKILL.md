@@ -1,7 +1,7 @@
 ---
 name: executing-plans
 description: Use when you have a written implementation plan to execute in a separate session with review checkpoints
-argument-hint: "任务描述或Plan路径 [RULES='额外规则']"
+argument-hint: "任务描述或Plan路径]"
 ---
 
 # Executing Plans
@@ -20,12 +20,9 @@ argument-hint: "任务描述或Plan路径 [RULES='额外规则']"
 7. Do not create git worktrees—work directly in the current workspace.
 8. When ALL plan tasks are done, you MUST run superpowers:finishing-a-development-branch to complete the branch.
 9. ONLY after finishing-a-development-branch is executed, output <promise>COMPLETE</promise>.
-
-=== User Additional Rules (if provided) ===
-$RULES
 " \
   --completion-promise "COMPLETE" \
-  --max-iterations 40
+  --max-iterations 60
 ```
 
 ---
