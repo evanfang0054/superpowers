@@ -127,6 +127,21 @@ if [[ -z "$PROMPT" ]]; then
   exit 1
 fi
 
+# Check if ralph loop is already active
+if [[ -f ".claude/ralph-loop.local.md" ]]; then
+  echo "❌ Error: A Ralph loop is already active!" >&2
+  echo "" >&2
+  echo "   An existing ralph-loop.local.md file was found." >&2
+  echo "   You cannot start a new loop while one is running." >&2
+  echo "" >&2
+  echo "   To cancel the existing loop first, run:" >&2
+  echo "     /cancel-ralph" >&2
+  echo "" >&2
+  echo "   Or view current loop status:" >&2
+  echo "     head -10 .claude/ralph-loop.local.md" >&2
+  exit 1
+fi
+
 # Create state file for stop hook (markdown with YAML frontmatter)
 mkdir -p .claude
 
