@@ -98,6 +98,61 @@ gemini extensions update superpowers
 
 Start a new session in your chosen platform and ask for something that should trigger a skill (for example, "help me plan this feature" or "let's debug this issue"). The agent should automatically invoke the relevant superpowers skill.
 
+## Workflow Overview
+
+Superpowers uses a layered architecture: **Decision Layer** ensures "doing the right thing", **Execution Layer** ensures "doing things right", **Quality Layer** ensures "doing things well".
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           Decision Layer                                     │
+│                    "Should we build? What direction?"                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌─────────────┐      ┌─────────────────┐      ┌─────────────────┐        │
+│   │office-hours │ ───► │ plan-ceo-review │ ───► │ plan-eng-review │        │
+│   │"Worth it?"  │      │  "10-star?"     │      │  "Feasible?"    │        │
+│   └─────────────┘      └─────────────────┘      └─────────────────┘        │
+│         │                                              │                    │
+│         │ 🟢 Go                                        │ ✅ Locked          │
+│         ▼                                              ▼                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           Execution Layer                                    │
+│                      "How to design? How to build?"                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌─────────────┐      ┌───────────────┐      ┌─────────────────────────┐  │
+│   │brainstorming│ ───► │ writing-plans │ ───► │ subagent-driven-dev /   │  │
+│   │  "Design?"  │      │ "Break tasks" │      │ executing-plans         │  │
+│   └─────────────┘      └───────────────┘      └─────────────────────────┘  │
+│                                                         │                   │
+│   ┌─────────────────────────────────────────────────────┼───────────────┐  │
+│   │                  Implementation Loop                 ▼               │  │
+│   │  ┌─────┐    ┌───────────┐    ┌──────────────┐    ┌─────────┐       │  │
+│   │  │ TDD │ ─► │code-review│ ─► │ verification │ ─► │finishing│       │  │
+│   │  └─────┘    └───────────┘    └──────────────┘    └─────────┘       │  │
+│   └─────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            Quality Layer                                     │
+│                          "Is it good enough?"                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌─────────────┐      ┌─────────────────────┐      ┌─────────────────┐    │
+│   │ qa-testing  │ ───► │ post-deploy-monitor │ ───► │  retrospective  │    │
+│   │ "Find/fix"  │      │   "Monitor deploy"  │      │   "Improve"     │    │
+│   └─────────────┘      └─────────────────────┘      └─────────────────┘    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Core philosophy:** Decision layer guards the "front door" (ensure right direction), Execution layer runs the "workshop" (ensure disciplined implementation), Quality layer guards the "back door" (ensure delivery quality).
+
 ## The Basic Workflow
 
 1. **brainstorming** - Activates before writing code. Refines rough ideas through questions, explores alternatives, presents design in sections for validation. Saves design document.
@@ -127,6 +182,11 @@ Start a new session in your chosen platform and ask for something that should tr
 - **systematic-debugging** - 4-phase root cause process (includes root-cause-tracing, defense-in-depth, condition-based-waiting techniques)
 - **verification-before-completion** - Ensure it's actually fixed
 
+**Decision Layer** (inspired by gstack)
+- **office-hours** - YC office hours mode, answers "should we build this?", six forcing questions
+- **plan-ceo-review** - CEO-level strategic review, 10-star thinking, challenge premises
+- **plan-eng-review** - Eng manager architecture review, lock in technical approach
+
 **Collaboration** 
 - **brainstorming** - Socratic design refinement
 - **writing-plans** - Detailed implementation plans
@@ -137,6 +197,9 @@ Start a new session in your chosen platform and ask for something that should tr
 - **using-git-worktrees** - Parallel development branches
 - **finishing-a-development-branch** - Merge/PR decision workflow
 - **subagent-driven-development** - Ralph-loop driven orchestrator mode, dispatches subagents + two-stage review
+
+**Quality Assurance**
+- **qa-testing** - Systematically QA test web apps, auto-fix bugs with atomic commits
 
 **Meta**
 - **writing-skills** - Create new skills following best practices (includes testing methodology)
