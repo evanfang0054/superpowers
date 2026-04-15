@@ -1,5 +1,11 @@
 # Superpowers Release Notes
 
+## v5.0.15 (2026-04-15)
+
+### Changes
+
+- 新增决策层与 qa 测试技能
+
 ## v5.0.14 (2026-04-14)
 
 ### Changes
