@@ -45,6 +45,27 @@ def classify_tool_failure(tool: str, error: str, tool_input: dict) -> str:
 
 
 
+def is_expected_test_failure(tool_call: dict, messages: list[dict]) -> bool:
+    """Detect red-phase test failures that should not be treated as severe execution errors."""
+    if tool_call.get("tool") != "Bash" or tool_call.get("success", True):
+        return False
+
+    command = tool_call.get("input", {}).get("command", "").lower()
+    if not any(marker in command for marker in (" test", "pytest", "vitest", "bun test")):
+        return False
+
+    relevant_messages = [
+        message for message in messages
+        if message.get("message_origin_hint") not in {"hook_feedback", "resume_summary", "skill_payload", "empty"}
+    ]
+    for message in reversed(relevant_messages[-6:]):
+        content = message.get("content", "").lower()
+        if any(marker in content for marker in ("红灯", "按预期失败", "failing test first", "verify it fails")):
+            return True
+    return False
+
+
+
 def summarize_tool_input(tool_input: dict) -> str:
     """Create a short, readable summary of tool input for reports."""
     if not tool_input:
@@ -84,8 +105,9 @@ def build_failure_suggestion(tool: str, category: str, sample_error: str) -> str
     return f"Review {tool} failure handling and add pre-flight validation"
 
 
-def analyze_tool_usage(tool_calls: list) -> dict:
+def analyze_tool_usage(tool_calls: list, messages: list | None = None) -> dict:
     """Analyze tool usage patterns."""
+    messages = messages or []
     if not tool_calls:
         return {"total": 0, "success_rate": 1.0, "by_tool": {}, "failures": []}
 
@@ -100,10 +122,13 @@ def analyze_tool_usage(tool_calls: list) -> dict:
             by_tool[tool]["success"] += 1
         else:
             error = tc.get("error", "Unknown error")
+            category = classify_tool_failure(tool, error, tc.get("input", {}))
+            if is_expected_test_failure(tc, messages):
+                category = "expected_test_failure"
             by_tool[tool]["failures"].append({
                 "error": error,
                 "input": tc.get("input", {}),
-                "category": classify_tool_failure(tool, error, tc.get("input", {})),
+                "category": category,
                 "id": tc.get("id"),
                 "timestamp": tc.get("timestamp"),
                 "input_summary": summarize_tool_input(tc.get("input", {})),
@@ -266,6 +291,9 @@ def analyze_skill_usage(messages: list, skills_used: list) -> dict:
 
         content = msg.get("content", "")
         content_lower = content.lower()
+        origin = msg.get("message_origin_hint", "")
+        if origin in {"hook_feedback", "resume_summary", "skill_payload", "empty"}:
+            continue
         if is_noise_message(content_lower):
             continue
 
@@ -298,6 +326,45 @@ def analyze_skill_usage(messages: list, skills_used: list) -> dict:
     }
 
 
+def append_session_provenance(lines: list[str], session_data: dict) -> None:
+    """Append session provenance details when available."""
+    requested_project = session_data.get("requested_project_path")
+    actual_session_file = session_data.get("actual_session_file_path") or session_data.get("file_path")
+    actual_project_dir = session_data.get("actual_project_dir")
+    session_source = session_data.get("session_source")
+
+    if not any([requested_project, actual_session_file, actual_project_dir, session_source]):
+        return
+
+    lines.append("## Session Provenance")
+    lines.append("")
+    lines.append("| Field | Value |")
+    lines.append("|-------|-------|")
+    if requested_project:
+        lines.append(f"| Requested Project | `{requested_project}` |")
+    if actual_session_file:
+        lines.append(f"| Actual Session File | `{actual_session_file}` |")
+    if actual_project_dir:
+        lines.append(f"| Actual Project Directory | `{actual_project_dir}` |")
+    if session_source:
+        lines.append(f"| Session Source | `{session_source}` |")
+    lines.append("")
+
+
+
+def dedupe_recommendations(items: list[str]) -> list[str]:
+    """Deduplicate recommendations while preserving order."""
+    deduped = []
+    seen = set()
+    for item in items:
+        if item in seen:
+            continue
+        seen.add(item)
+        deduped.append(item)
+    return deduped
+
+
+
 def generate_report(session_data: dict, analysis: dict) -> str:
     """Generate markdown analysis report."""
     lines = []
@@ -325,6 +392,8 @@ def generate_report(session_data: dict, analysis: dict) -> str:
     lines.append(f"| Skills Used | {', '.join(session_data.get('skills_used', [])) or 'None'} |")
     lines.append("")
     
+    append_session_provenance(lines, session_data)
+
     # Tool Usage Details
     if tool_analysis.get("by_tool"):
         lines.append("## Tool Usage")
@@ -412,6 +481,8 @@ def generate_report(session_data: dict, analysis: dict) -> str:
     if tool_analysis.get("success_rate", 1.0) < 0.9:
         recommendations.append("- [ ] Add pre-flight validation before tool calls")
     
+    recommendations = dedupe_recommendations(recommendations)
+
     if not recommendations:
         recommendations.append("- [x] Session looks healthy - no major issues detected")
     
@@ -449,7 +520,7 @@ def main():
     skills_used = session_data.get("skills_used", [])
     
     analysis = {
-        "tool_usage": analyze_tool_usage(tool_calls),
+        "tool_usage": analyze_tool_usage(tool_calls, messages),
         "patterns": detect_patterns(messages, tool_calls),
         "skill_usage": analyze_skill_usage(messages, skills_used),
     }
