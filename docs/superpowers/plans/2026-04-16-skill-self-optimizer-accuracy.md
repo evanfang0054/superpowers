@@ -293,7 +293,7 @@ def analyze_skill_usage(messages: list, skills_used: list) -> dict:
 Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer.AnalyzeSessionTests -v`
 Expected: PASS with the new expected-test-failure and message-origin filtering tests green.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add skills/skill-self-optimizer/scripts/analyze-session.py skills/skill-self-optimizer/tests/test_session_optimizer.py
@@ -417,7 +417,7 @@ def generate_report(session_data: dict, analysis: dict) -> str:
 Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer.AnalyzeSessionTests -v`
 Expected: PASS with provenance and recommendation dedupe tests green.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add skills/skill-self-optimizer/scripts/analyze-session.py skills/skill-self-optimizer/tests/test_session_optimizer.py

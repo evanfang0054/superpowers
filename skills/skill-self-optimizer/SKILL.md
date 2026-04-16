@@ -128,9 +128,9 @@ python ${SKILL_PATH}/scripts/analyze-session.py \
 ## Session Provenance
 | Field | Value |
 |-------|-------|
-| Requested Project | `-Users-arwen-Desktop-Arwen-evanfang-superpowers` |
-| Actual Session File | `~/.claude/projects/-Users-arwen-Desktop-Arwen-evanfang-hapi/ac3a4...jsonl` |
-| Actual Project Directory | `~/.claude/projects/-Users-arwen-Desktop-Arwen-evanfang-hapi` |
+| Requested Project | `-Users-example-Desktop-project-superpowers` |
+| Actual Session File | `~/.claude/projects/-Users-example-Desktop-project-target/ac3a4...jsonl` |
+| Actual Project Directory | `~/.claude/projects/-Users-example-Desktop-project-target` |
 | Session Source | `fallback-global-search` |
 
 ## Issues Found
