@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Make `skill-self-optimizer` reliably resolve near-miss session IDs, separate expected TDD failures from actionable repeated failures, generate more specific remediation guidance, and document the new behavior.
+**Goal:** Make `harness-optimizerr` reliably resolve near-miss session IDs, separate expected TDD failures from actionable repeated failures, generate more specific remediation guidance, and document the new behavior.
 
 **Architecture:** Extend `extract-session.py` with exact-then-prefix session lookup while preserving provenance metadata. Refine `analyze-session.py` so actionable failures are grouped by failure category, expected TDD failures are reported as low-severity observations instead of high-severity repeated failures, and suggestions point to the correct layer. Lock the behavior with focused `unittest` coverage, then update `SKILL.md` so usage instructions match the implementation.
 
@@ -12,20 +12,20 @@
 
 ## File Structure
 
-- Modify: `skills/skill-self-optimizer/scripts/extract-session.py`
+- Modify: `skills/harness-optimizerr/scripts/extract-session.py`
   - Add prefix-based session lookup and ambiguous-candidate reporting without changing existing provenance fields.
-- Modify: `skills/skill-self-optimizer/scripts/analyze-session.py`
+- Modify: `skills/harness-optimizerr/scripts/analyze-session.py`
   - Rework repeated-failure detection to group actionable failures by category, keep expected TDD failures separate, and improve suggestion text.
-- Modify: `skills/skill-self-optimizer/tests/test_session_optimizer.py`
+- Modify: `skills/harness-optimizerr/tests/test_session_optimizer.py`
   - Add regression coverage for unique prefix matches, ambiguous prefix matches, expected test failure handling, category-based repeated failures, and more specific remediation suggestions.
-- Modify: `skills/skill-self-optimizer/SKILL.md`
+- Modify: `skills/harness-optimizerr/SKILL.md`
   - Update the documented extraction behavior, repeated-failure definition, and report examples.
 
 ### Task 1: Add prefix-aware session lookup
 
 **Files:**
-- Modify: `skills/skill-self-optimizer/tests/test_session_optimizer.py`
-- Modify: `skills/skill-self-optimizer/scripts/extract-session.py`
+- Modify: `skills/harness-optimizerr/tests/test_session_optimizer.py`
+- Modify: `skills/harness-optimizerr/scripts/extract-session.py`
 
 - [x] **Step 1: Write the failing tests**
 
@@ -59,7 +59,7 @@
 
 - [x] **Step 2: Run test to verify it fails**
 
-Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer.ExtractSessionTests.test_find_session_file_accepts_unique_prefix_match skills.skill-self-optimizer.tests.test_session_optimizer.ExtractSessionTests.test_find_session_file_reports_ambiguous_prefix_candidates -v`
+Run: `python -m unittest skills.harness-optimizerr.tests.test_session_optimizer.ExtractSessionTests.test_find_session_file_accepts_unique_prefix_match skills.harness-optimizerr.tests.test_session_optimizer.ExtractSessionTests.test_find_session_file_reports_ambiguous_prefix_candidates -v`
 Expected: FAIL because `find_session_file()` only supports exact `<session-id>.jsonl` matches and never raises an ambiguity error.
 
 - [x] **Step 3: Write minimal implementation**
@@ -108,21 +108,21 @@ def find_session_file(session_id: str, project_dir: Path | None = None) -> dict 
 
 - [x] **Step 4: Run test to verify it passes**
 
-Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer.ExtractSessionTests.test_find_session_file_accepts_unique_prefix_match skills.skill-self-optimizer.tests.test_session_optimizer.ExtractSessionTests.test_find_session_file_reports_ambiguous_prefix_candidates -v`
+Run: `python -m unittest skills.harness-optimizerr.tests.test_session_optimizer.ExtractSessionTests.test_find_session_file_accepts_unique_prefix_match skills.harness-optimizerr.tests.test_session_optimizer.ExtractSessionTests.test_find_session_file_reports_ambiguous_prefix_candidates -v`
 Expected: PASS with one unique-prefix lookup success and one explicit ambiguity failure.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add skills/skill-self-optimizer/tests/test_session_optimizer.py skills/skill-self-optimizer/scripts/extract-session.py
-git commit -m "fix(skill-self-optimizer): support prefix session lookup"
+git add skills/harness-optimizerr/tests/test_session_optimizer.py skills/harness-optimizerr/scripts/extract-session.py
+git commit -m "fix(harness-optimizerr): support prefix session lookup"
 ```
 
 ### Task 2: Surface ambiguous prefix errors in CLI output
 
 **Files:**
-- Modify: `skills/skill-self-optimizer/tests/test_session_optimizer.py`
-- Modify: `skills/skill-self-optimizer/scripts/extract-session.py`
+- Modify: `skills/harness-optimizerr/tests/test_session_optimizer.py`
+- Modify: `skills/harness-optimizerr/scripts/extract-session.py`
 
 - [x] **Step 1: Write the failing test**
 
@@ -149,7 +149,7 @@ git commit -m "fix(skill-self-optimizer): support prefix session lookup"
 
 - [x] **Step 2: Run test to verify it fails**
 
-Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer.ExtractSessionTests.test_main_reports_ambiguous_prefix_candidates -v`
+Run: `python -m unittest skills.harness-optimizerr.tests.test_session_optimizer.ExtractSessionTests.test_main_reports_ambiguous_prefix_candidates -v`
 Expected: FAIL because `main()` currently assumes `find_session_file()` only returns `None` or a match and does not catch `ValueError`.
 
 - [x] **Step 3: Write minimal implementation**
@@ -168,21 +168,21 @@ Expected: FAIL because `main()` currently assumes `find_session_file()` only ret
 
 - [x] **Step 4: Run test to verify it passes**
 
-Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer.ExtractSessionTests.test_main_reports_ambiguous_prefix_candidates -v`
+Run: `python -m unittest skills.harness-optimizerr.tests.test_session_optimizer.ExtractSessionTests.test_main_reports_ambiguous_prefix_candidates -v`
 Expected: PASS with stderr containing the candidate error and exit code `1`.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add skills/skill-self-optimizer/tests/test_session_optimizer.py skills/skill-self-optimizer/scripts/extract-session.py
-git commit -m "fix(skill-self-optimizer): report ambiguous session prefixes"
+git add skills/harness-optimizerr/tests/test_session_optimizer.py skills/harness-optimizerr/scripts/extract-session.py
+git commit -m "fix(harness-optimizerr): report ambiguous session prefixes"
 ```
 
 ### Task 3: Keep expected TDD failures out of repeated-failure alerts
 
 **Files:**
-- Modify: `skills/skill-self-optimizer/tests/test_session_optimizer.py`
-- Modify: `skills/skill-self-optimizer/scripts/analyze-session.py`
+- Modify: `skills/harness-optimizerr/tests/test_session_optimizer.py`
+- Modify: `skills/harness-optimizerr/scripts/analyze-session.py`
 
 - [x] **Step 1: Write the failing tests**
 
@@ -259,7 +259,7 @@ git commit -m "fix(skill-self-optimizer): report ambiguous session prefixes"
 
 - [x] **Step 2: Run test to verify it fails**
 
-Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer.AnalyzeSessionTests.test_expected_test_failures_do_not_create_repeated_failure_pattern skills.skill-self-optimizer.tests.test_session_optimizer.AnalyzeSessionTests.test_generate_report_marks_expected_test_failure_as_observation -v`
+Run: `python -m unittest skills.harness-optimizerr.tests.test_session_optimizer.AnalyzeSessionTests.test_expected_test_failures_do_not_create_repeated_failure_pattern skills.harness-optimizerr.tests.test_session_optimizer.AnalyzeSessionTests.test_generate_report_marks_expected_test_failure_as_observation -v`
 Expected: FAIL because `detect_patterns()` currently counts all failed `Bash` commands equally and the report still renders `expected_test_failure` using the generic `Failure:` heading.
 
 - [x] **Step 3: Write minimal implementation**
@@ -302,21 +302,21 @@ def detect_patterns(messages: list, tool_calls: list) -> list:
 
 - [x] **Step 4: Run test to verify it passes**
 
-Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer.AnalyzeSessionTests.test_expected_test_failures_do_not_create_repeated_failure_pattern skills.skill-self-optimizer.tests.test_session_optimizer.AnalyzeSessionTests.test_generate_report_marks_expected_test_failure_as_observation -v`
+Run: `python -m unittest skills.harness-optimizerr.tests.test_session_optimizer.AnalyzeSessionTests.test_expected_test_failures_do_not_create_repeated_failure_pattern skills.harness-optimizerr.tests.test_session_optimizer.AnalyzeSessionTests.test_generate_report_marks_expected_test_failure_as_observation -v`
 Expected: PASS with no repeated-failure pattern for expected test failures and a report section labeled as an observation.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add skills/skill-self-optimizer/tests/test_session_optimizer.py skills/skill-self-optimizer/scripts/analyze-session.py
-git commit -m "fix(skill-self-optimizer): separate expected test failures"
+git add skills/harness-optimizerr/tests/test_session_optimizer.py skills/harness-optimizerr/scripts/analyze-session.py
+git commit -m "fix(harness-optimizerr): separate expected test failures"
 ```
 
 ### Task 4: Group repeated failures by actionable category
 
 **Files:**
-- Modify: `skills/skill-self-optimizer/tests/test_session_optimizer.py`
-- Modify: `skills/skill-self-optimizer/scripts/analyze-session.py`
+- Modify: `skills/harness-optimizerr/tests/test_session_optimizer.py`
+- Modify: `skills/harness-optimizerr/scripts/analyze-session.py`
 
 - [x] **Step 1: Write the failing tests**
 
@@ -370,7 +370,7 @@ git commit -m "fix(skill-self-optimizer): separate expected test failures"
 
 - [x] **Step 2: Run test to verify it fails**
 
-Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer.AnalyzeSessionTests.test_detect_patterns_groups_repeated_failures_by_category skills.skill-self-optimizer.tests.test_session_optimizer.AnalyzeSessionTests.test_build_failure_suggestion_for_edit_match_ambiguity -v`
+Run: `python -m unittest skills.harness-optimizerr.tests.test_session_optimizer.AnalyzeSessionTests.test_detect_patterns_groups_repeated_failures_by_category skills.harness-optimizerr.tests.test_session_optimizer.AnalyzeSessionTests.test_build_failure_suggestion_for_edit_match_ambiguity -v`
 Expected: FAIL because duplicate-match Edit failures are still categorized as `unknown_failure` and repeated-failure descriptions still use only the tool name.
 
 - [x] **Step 3: Write minimal implementation**
@@ -413,20 +413,20 @@ Expected: FAIL because duplicate-match Edit failures are still categorized as `u
 
 - [x] **Step 4: Run test to verify it passes**
 
-Run: `python -m unittest skills/skill-self-optimizer/tests/test_session_optimizer.py -v`
+Run: `python -m unittest skills/harness-optimizerr/tests/test_session_optimizer.py -v`
 Expected: PASS with `edit_match_ambiguity` surfaced directly in the repeated-failure description and remediation text.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add skills/skill-self-optimizer/tests/test_session_optimizer.py skills/skill-self-optimizer/scripts/analyze-session.py
-git commit -m "fix(skill-self-optimizer): group failures by category"
+git add skills/harness-optimizerr/tests/test_session_optimizer.py skills/harness-optimizerr/scripts/analyze-session.py
+git commit -m "fix(harness-optimizerr): group failures by category"
 ```
 
 ### Task 5: Update SKILL.md to match the implementation
 
 **Files:**
-- Modify: `skills/skill-self-optimizer/SKILL.md`
+- Modify: `skills/harness-optimizerr/SKILL.md`
 
 - [x] **Step 1: Write the doc update**
 
@@ -465,21 +465,21 @@ Expected: No stale wording like “同一工具连续失败 3+ 次” remains in
 - [ ] **Step 3: Commit**
 
 ```bash
-git add skills/skill-self-optimizer/SKILL.md
-git commit -m "docs(skill-self-optimizer): document refined analysis behavior"
+git add skills/harness-optimizerr/SKILL.md
+git commit -m "docs(harness-optimizerr): document refined analysis behavior"
 ```
 
 ### Task 6: Run the focused verification suite
 
 **Files:**
-- Modify: `skills/skill-self-optimizer/tests/test_session_optimizer.py` (only if a final fix is needed)
-- Read: `skills/skill-self-optimizer/scripts/extract-session.py`
-- Read: `skills/skill-self-optimizer/scripts/analyze-session.py`
-- Read: `skills/skill-self-optimizer/SKILL.md`
+- Modify: `skills/harness-optimizerr/tests/test_session_optimizer.py` (only if a final fix is needed)
+- Read: `skills/harness-optimizerr/scripts/extract-session.py`
+- Read: `skills/harness-optimizerr/scripts/analyze-session.py`
+- Read: `skills/harness-optimizerr/SKILL.md`
 
-- [x] **Step 1: Run the full skill-self-optimizer test module**
+- [x] **Step 1: Run the full harness-optimizerr test module**
 
-Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer -v`
+Run: `python -m unittest skills.harness-optimizerr.tests.test_session_optimizer -v`
 Expected: PASS with all `ExtractSessionTests` and `AnalyzeSessionTests` green.
 
 - [ ] **Step 2: If a test fails, make the minimal fix and rerun**
@@ -489,14 +489,14 @@ Expected: PASS with all `ExtractSessionTests` and `AnalyzeSessionTests` green.
 # then rerun the same unittest command until the suite is green.
 ```
 
-Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer -v`
+Run: `python -m unittest skills.harness-optimizerr.tests.test_session_optimizer -v`
 Expected: PASS after the minimal follow-up fix.
 
 - [ ] **Step 3: Commit the final green state**
 
 ```bash
-git add skills/skill-self-optimizer/scripts/extract-session.py skills/skill-self-optimizer/scripts/analyze-session.py skills/skill-self-optimizer/tests/test_session_optimizer.py skills/skill-self-optimizer/SKILL.md
-git commit -m "test(skill-self-optimizer): cover refined extraction and analysis behavior"
+git add skills/harness-optimizerr/scripts/extract-session.py skills/harness-optimizerr/scripts/analyze-session.py skills/harness-optimizerr/tests/test_session_optimizer.py skills/harness-optimizerr/SKILL.md
+git commit -m "test(harness-optimizerr): cover refined extraction and analysis behavior"
 ```
 
 ## Acceptance Checklist

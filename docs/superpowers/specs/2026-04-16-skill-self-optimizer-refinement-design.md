@@ -1,12 +1,12 @@
 # Skill Self-Optimizer 精准修复设计
 
 - 日期：2026-04-16
-- 主题：修复 `skill-self-optimizer` 在 session 定位、失败聚合和建议生成上的误报问题，并同步测试与文档
+- 主题：修复 `harness-optimizerr` 在 session 定位、失败聚合和建议生成上的误报问题，并同步测试与文档
 - 相关输入：`.superpowers/session-analysis/ac3a4a38-1ae1-4fcc-901d-929eef8e7661-report.md`
 
 ## 1. 背景
 
-当前 `skill-self-optimizer` 已能提取 Claude Code 历史会话并生成分析报告，但在本次样本中暴露出四个直接影响可用性的问题：
+当前 `harness-optimizerr` 已能提取 Claude Code 历史会话并生成分析报告，但在本次样本中暴露出四个直接影响可用性的问题：
 
 1. 用户提供的 session id 少一位时，`extract-session.py` 只能精确匹配，导致直接报错。
 2. `analyze-session.py` 会把 TDD 红灯阶段的预期测试失败混入高严重度 `repeated_failures`。
@@ -36,7 +36,7 @@
 
 - 不修改其他 skill 的触发逻辑或内容。
 - 不引入新的分析维度或评分体系。
-- 不重构 `skill-self-optimizer` 的整体架构。
+- 不重构 `harness-optimizerr` 的整体架构。
 - 不新增独立测试文件；沿用现有 `test_session_optimizer.py`。
 
 ## 3. 方案选型
@@ -143,7 +143,7 @@
 
 ## 5. 测试设计
 
-沿用 `skills/skill-self-optimizer/tests/test_session_optimizer.py`，新增失败测试覆盖：
+沿用 `skills/harness-optimizerr/tests/test_session_optimizer.py`，新增失败测试覆盖：
 
 ### 5.1 extract-session.py
 

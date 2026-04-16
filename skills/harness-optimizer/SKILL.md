@@ -1,5 +1,5 @@
 ---
-name: skill-self-optimizer
+name: harness-optimizer
 description: "Use when用户提供 Claude Code 会话 ID，想复盘某次会话、生成分析报告，或基于该会话优化某个明确指定的项目、workflow、skill 或 harness。特别适用于需要区分分析样本来源与真正优化对象的场景，例如“根据这个会话优化我的项目”而不是默认优化分析器自身。"
 ---
 
@@ -9,11 +9,11 @@ description: "Use when用户提供 Claude Code 会话 ID，想复盘某次会话
 
 从 Claude Code 历史会话中提取证据，生成分析报告，并把建议优先对齐到**用户明确指定的优化对象**。
 
-**核心原则：** session 是分析样本，不等于优化对象。除非证据明确指向分析器或 `skill-self-optimizer` 本身，否则默认应先优化用户指定的项目、workflow、skill 体系或 harness。
+**核心原则：** session 是分析样本，不等于优化对象。除非证据明确指向分析器或 `harness-optimizer` 本身，否则默认应先优化用户指定的项目、workflow、skill 体系或 harness。
 
 **核心流程：** Session 提取 → 效果分析 → 识别真实优化对象 → 输出面向目标对象的建议 → 必要时再回收为自优化项
 
-**启动时宣布：** "我正在使用 skill-self-optimizer 分析会话数据..."
+**启动时宣布：** "我正在使用 harness-optimizer 分析会话数据..."
 
 ## When to Use
 
@@ -27,7 +27,7 @@ description: "Use when用户提供 Claude Code 会话 ID，想复盘某次会话
 
 **目标对象判定：**
 - 如果用户明确说“优化这个项目 / 这个仓库 / 这套 superpowers”，优先输出该对象的优化建议
-- 如果用户明确说“优化这个 skill”或“优化分析器本身”，才把 `skill-self-optimizer` 当成主要优化对象
+- 如果用户明确说“优化这个 skill”或“优化分析器本身”，才把 `harness-optimizer` 当成主要优化对象
 - 如果 session 命中了别的项目目录，要在报告里显式标注跨项目风险，避免把样本项目的问题误写成当前项目的问题
 
 ## Session 数据位置

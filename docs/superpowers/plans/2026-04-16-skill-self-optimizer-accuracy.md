@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Make `skill-self-optimizer` produce trustworthy session analysis by preserving session provenance, filtering hook/summary noise, recognizing expected TDD test failures, and deduplicating recommendations.
+**Goal:** Make `harness-optimizerr` produce trustworthy session analysis by preserving session provenance, filtering hook/summary noise, recognizing expected TDD test failures, and deduplicating recommendations.
 
 **Architecture:** Extend extraction to emit provenance and message-origin metadata, then refactor analysis to classify noisy versus actionable failures before generating the markdown report. Validate the behavior with focused unit tests and a regression rerun against session `ac3a4a38-1ae1-4fcc-901d-929eef8e7661`.
 
@@ -12,13 +12,13 @@
 
 ## File Structure
 
-- Modify: `skills/skill-self-optimizer/scripts/extract-session.py`
+- Modify: `skills/harness-optimizerr/scripts/extract-session.py`
   - Add session provenance fields and message origin hints to extracted JSON.
-- Modify: `skills/skill-self-optimizer/scripts/analyze-session.py`
+- Modify: `skills/harness-optimizerr/scripts/analyze-session.py`
   - Add richer failure classification, trigger noise filtering, recommendation dedupe, and provenance-aware reporting.
-- Modify: `skills/skill-self-optimizer/tests/test_session_optimizer.py`
+- Modify: `skills/harness-optimizerr/tests/test_session_optimizer.py`
   - Add unit coverage for provenance extraction, noisy message filtering, expected test failure handling, and deduplicated recommendations.
-- Modify: `skills/skill-self-optimizer/SKILL.md`
+- Modify: `skills/harness-optimizerr/SKILL.md`
   - Update the documented output/report shape so it matches the new analysis behavior.
 - Read during verification: `.superpowers/session-analysis/ac3a4a38-1ae1-4fcc-901d-929eef8e7661.json`
   - Use as the regression fixture input for the final report rerun.
@@ -28,8 +28,8 @@
 ### Task 1: Add provenance metadata to extraction
 
 **Files:**
-- Modify: `skills/skill-self-optimizer/scripts/extract-session.py`
-- Test: `skills/skill-self-optimizer/tests/test_session_optimizer.py`
+- Modify: `skills/harness-optimizerr/scripts/extract-session.py`
+- Test: `skills/harness-optimizerr/tests/test_session_optimizer.py`
 
 - [x] **Step 1: Write the failing tests**
 
@@ -78,7 +78,7 @@
 
 - [x] **Step 2: Run tests to verify they fail**
 
-Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer.ExtractSessionTests -v`
+Run: `python -m unittest skills.harness-optimizerr.tests.test_session_optimizer.ExtractSessionTests -v`
 Expected: FAIL because `find_session_file()` still returns only a `Path`, and `extract_session()` does not accept provenance arguments or emit `message_origin_hint`.
 
 - [x] **Step 3: Write the minimal implementation**
@@ -186,21 +186,21 @@ def extract_session(
 
 - [x] **Step 4: Run tests to verify they pass**
 
-Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer.ExtractSessionTests -v`
+Run: `python -m unittest skills.harness-optimizerr.tests.test_session_optimizer.ExtractSessionTests -v`
 Expected: PASS with the two new provenance tests green and the previous extraction tests still passing.
 
 - [x] **Step 5: Commit**
 
 ```bash
-git add skills/skill-self-optimizer/scripts/extract-session.py skills/skill-self-optimizer/tests/test_session_optimizer.py
+git add skills/harness-optimizerr/scripts/extract-session.py skills/harness-optimizerr/tests/test_session_optimizer.py
 git commit -m "feat: capture session provenance in optimizer extraction"
 ```
 
 ### Task 2: Classify expected test failures and noisy triggers
 
 **Files:**
-- Modify: `skills/skill-self-optimizer/scripts/analyze-session.py`
-- Test: `skills/skill-self-optimizer/tests/test_session_optimizer.py`
+- Modify: `skills/harness-optimizerr/scripts/analyze-session.py`
+- Test: `skills/harness-optimizerr/tests/test_session_optimizer.py`
 
 - [x] **Step 1: Write the failing tests**
 
@@ -241,7 +241,7 @@ git commit -m "feat: capture session provenance in optimizer extraction"
 
 - [x] **Step 2: Run tests to verify they fail**
 
-Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer.AnalyzeSessionTests -v`
+Run: `python -m unittest skills.harness-optimizerr.tests.test_session_optimizer.AnalyzeSessionTests -v`
 Expected: FAIL because `analyze_tool_usage()` does not inspect message context, and `analyze_skill_usage()` does not yet honor `message_origin_hint`.
 
 - [x] **Step 3: Write the minimal implementation**
@@ -290,21 +290,21 @@ def analyze_skill_usage(messages: list, skills_used: list) -> dict:
 
 - [x] **Step 4: Run tests to verify they pass**
 
-Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer.AnalyzeSessionTests -v`
+Run: `python -m unittest skills.harness-optimizerr.tests.test_session_optimizer.AnalyzeSessionTests -v`
 Expected: PASS with the new expected-test-failure and message-origin filtering tests green.
 
 - [x] **Step 5: Commit**
 
 ```bash
-git add skills/skill-self-optimizer/scripts/analyze-session.py skills/skill-self-optimizer/tests/test_session_optimizer.py
+git add skills/harness-optimizerr/scripts/analyze-session.py skills/harness-optimizerr/tests/test_session_optimizer.py
 git commit -m "feat: reduce optimizer noise from tdd and hook context"
 ```
 
 ### Task 3: Deduplicate recommendations and report session provenance
 
 **Files:**
-- Modify: `skills/skill-self-optimizer/scripts/analyze-session.py`
-- Test: `skills/skill-self-optimizer/tests/test_session_optimizer.py`
+- Modify: `skills/harness-optimizerr/scripts/analyze-session.py`
+- Test: `skills/harness-optimizerr/tests/test_session_optimizer.py`
 
 - [x] **Step 1: Write the failing tests**
 
@@ -362,7 +362,7 @@ git commit -m "feat: reduce optimizer noise from tdd and hook context"
 
 - [x] **Step 2: Run tests to verify they fail**
 
-Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer.AnalyzeSessionTests -v`
+Run: `python -m unittest skills.harness-optimizerr.tests.test_session_optimizer.AnalyzeSessionTests -v`
 Expected: FAIL because the report has no provenance section and recommendation lines are emitted once per failure bucket.
 
 - [x] **Step 3: Write the minimal implementation**
@@ -414,26 +414,26 @@ def generate_report(session_data: dict, analysis: dict) -> str:
 
 - [x] **Step 4: Run tests to verify they pass**
 
-Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer.AnalyzeSessionTests -v`
+Run: `python -m unittest skills.harness-optimizerr.tests.test_session_optimizer.AnalyzeSessionTests -v`
 Expected: PASS with provenance and recommendation dedupe tests green.
 
 - [x] **Step 5: Commit**
 
 ```bash
-git add skills/skill-self-optimizer/scripts/analyze-session.py skills/skill-self-optimizer/tests/test_session_optimizer.py
+git add skills/harness-optimizerr/scripts/analyze-session.py skills/harness-optimizerr/tests/test_session_optimizer.py
 git commit -m "feat: surface provenance in optimizer reports"
 ```
 
 ### Task 4: Update skill documentation and rerun the regression report
 
 **Files:**
-- Modify: `skills/skill-self-optimizer/SKILL.md`
+- Modify: `skills/harness-optimizerr/SKILL.md`
 - Read: `.superpowers/session-analysis/ac3a4a38-1ae1-4fcc-901d-929eef8e7661.json`
 - Update: `.superpowers/session-analysis/ac3a4a38-1ae1-4fcc-901d-929eef8e7661-report.md`
 
 - [x] **Step 1: Write the failing documentation/test expectation**
 
-Add this assertion to `skills/skill-self-optimizer/tests/test_session_optimizer.py`:
+Add this assertion to `skills/harness-optimizerr/tests/test_session_optimizer.py`:
 
 ```python
     def test_generate_report_surfaces_session_source_and_tdd_noise_handling(self):
@@ -469,12 +469,12 @@ Add this assertion to `skills/skill-self-optimizer/tests/test_session_optimizer.
 
 - [x] **Step 2: Run tests to verify it fails**
 
-Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer.AnalyzeSessionTests.test_generate_report_surfaces_session_source_and_tdd_noise_handling -v`
+Run: `python -m unittest skills.harness-optimizerr.tests.test_session_optimizer.AnalyzeSessionTests.test_generate_report_surfaces_session_source_and_tdd_noise_handling -v`
 Expected: FAIL until the report and documentation reflect the new reporting model consistently.
 
 - [x] **Step 3: Write the minimal implementation**
 
-Update `skills/skill-self-optimizer/SKILL.md` so the documented report shape includes provenance and distinguishes expected TDD failures from actionable failures:
+Update `skills/harness-optimizerr/SKILL.md` so the documented report shape includes provenance and distinguishes expected TDD failures from actionable failures:
 
 ```markdown
 ## Session Provenance
@@ -491,7 +491,7 @@ Update `skills/skill-self-optimizer/SKILL.md` so the documented report shape inc
 Then rerun the regression report with the exact command below:
 
 ```bash
-python skills/skill-self-optimizer/scripts/analyze-session.py \
+python skills/harness-optimizerr/scripts/analyze-session.py \
   --input .superpowers/session-analysis/ac3a4a38-1ae1-4fcc-901d-929eef8e7661.json \
   --output .superpowers/session-analysis/ac3a4a38-1ae1-4fcc-901d-929eef8e7661-report.md
 ```
@@ -501,8 +501,8 @@ python skills/skill-self-optimizer/scripts/analyze-session.py \
 Run both commands:
 
 ```bash
-python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer -v
-python skills/skill-self-optimizer/scripts/analyze-session.py \
+python -m unittest skills.harness-optimizerr.tests.test_session_optimizer -v
+python skills/harness-optimizerr/scripts/analyze-session.py \
   --input .superpowers/session-analysis/ac3a4a38-1ae1-4fcc-901d-929eef8e7661.json \
   --output .superpowers/session-analysis/ac3a4a38-1ae1-4fcc-901d-929eef8e7661-report.md
 ```
@@ -516,7 +516,7 @@ Expected:
 - [x] **Step 5: Commit**
 
 ```bash
-git add skills/skill-self-optimizer/SKILL.md skills/skill-self-optimizer/tests/test_session_optimizer.py .superpowers/session-analysis/ac3a4a38-1ae1-4fcc-901d-929eef8e7661-report.md
+git add skills/harness-optimizerr/SKILL.md skills/harness-optimizerr/tests/test_session_optimizer.py .superpowers/session-analysis/ac3a4a38-1ae1-4fcc-901d-929eef8e7661-report.md
 git commit -m "docs: align optimizer skill output with noise-aware analysis"
 ```
 

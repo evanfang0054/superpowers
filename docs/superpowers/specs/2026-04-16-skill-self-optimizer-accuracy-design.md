@@ -1,12 +1,12 @@
 # Skill Self-Optimizer 准确性优化设计
 
 - 日期：2026-04-16
-- 主题：提升 `skill-self-optimizer` 对历史会话的分析可信度，避免误报驱动错误的 skill 改造
+- 主题：提升 `harness-optimizerr` 对历史会话的分析可信度，避免误报驱动错误的 skill 改造
 - 相关输入：`.superpowers/session-analysis/ac3a4a38-1ae1-4fcc-901d-929eef8e7661.json`、`.superpowers/session-analysis/ac3a4a38-1ae1-4fcc-901d-929eef8e7661-report.md`
 
 ## 1. 背景
 
-当前 `skill-self-optimizer` 能从 Claude Code 历史会话中提取消息、工具调用和已使用 skill，并生成汇总报告。但在分析 `ac3a4a38-1ae1-4fcc-901d-929eef8e7661` 这个会话时，报告把多类“开发过程中的正常噪音”混入了真实问题，导致输出看似具体，但不适合直接指导 skill 改造。
+当前 `harness-optimizerr` 能从 Claude Code 历史会话中提取消息、工具调用和已使用 skill，并生成汇总报告。但在分析 `ac3a4a38-1ae1-4fcc-901d-929eef8e7661` 这个会话时，报告把多类“开发过程中的正常噪音”混入了真实问题，导致输出看似具体，但不适合直接指导 skill 改造。
 
 本次优化目标不是让报告更“严厉”，而是让它更可靠：只在证据足够时才把问题归因到 skill 或流程缺陷，否则明确标记为探索成本、TDD 红灯、hook 噪音或跨项目上下文污染。
 
@@ -14,7 +14,7 @@
 
 ### 2.1 主目标
 
-把 `skill-self-optimizer` 从粗粒度会话摘要器提升为可用于指导仓库内 skill 改造的可靠分析器。
+把 `harness-optimizerr` 从粗粒度会话摘要器提升为可用于指导仓库内 skill 改造的可靠分析器。
 
 ### 2.2 成功标准
 
