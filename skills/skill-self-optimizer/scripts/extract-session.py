@@ -101,7 +101,21 @@ def list_sessions(project_dir: Path, limit: int = 10) -> list[dict]:
     return sessions
 
 
-def find_session_file(session_id: str, project_dir: Path | None = None) -> Path | None:
+def classify_message_origin(role: str, content: str) -> str:
+    """Classify message content so analysis can filter session noise later."""
+    lowered = content.strip().lower()
+    if lowered.startswith("stop hook feedback:"):
+        return "hook_feedback"
+    if lowered.startswith("this session is being continued from a previous conversation"):
+        return "resume_summary"
+    if lowered.startswith("base directory for this skill:") or "<command-message>" in lowered:
+        return "skill_payload"
+    if not content.strip():
+        return "empty"
+    return "user_input" if role == "user" else "assistant_input"
+
+
+def find_session_file(session_id: str, project_dir: Path | None = None) -> dict | None:
     """Find a session file, optionally falling back to all Claude project directories."""
     candidate_dirs = []
     if project_dir:
@@ -115,15 +129,24 @@ def find_session_file(session_id: str, project_dir: Path | None = None) -> Path 
         )
 
     target_name = f"{session_id}.jsonl"
-    for directory in candidate_dirs:
+    for index, directory in enumerate(candidate_dirs):
         candidate = directory / target_name
         if candidate.exists():
-            return candidate
+            return {
+                "path": candidate,
+                "actual_project_dir": directory,
+                "session_source": "requested-project" if index == 0 and project_dir else "fallback-global-search",
+            }
 
     return None
 
 
-def extract_session(session_file: Path) -> dict:
+def extract_session(
+    session_file: Path,
+    requested_project_path: str | None = None,
+    actual_project_dir: str | Path | None = None,
+    session_source: str = "requested-project",
+) -> dict:
     """Extract and structure data from a session JSONL file."""
     messages = []
     tool_calls = []
@@ -189,6 +212,7 @@ def extract_session(session_file: Path) -> dict:
                     "role": msg_type,
                     "content": content[:2000] if content else "",  # Truncate long content
                     "timestamp": timestamp,
+                    "message_origin_hint": classify_message_origin(msg_type, content if isinstance(content, str) else ""),
                 })
                 
                 # Detect skill usage from content
@@ -228,6 +252,10 @@ def extract_session(session_file: Path) -> dict:
     return {
         "session_id": session_file.stem,
         "file_path": str(session_file),
+        "actual_session_file_path": str(session_file),
+        "requested_project_path": requested_project_path,
+        "actual_project_dir": str(actual_project_dir) if actual_project_dir else str(session_file.parent),
+        "session_source": session_source,
         "start_time": start_time,
         "end_time": end_time,
         "duration_minutes": duration_minutes,
@@ -285,12 +313,17 @@ def main():
         print("Error: --session-id required (use --list to see available sessions)", file=sys.stderr)
         sys.exit(1)
 
-    session_file = find_session_file(args.session_id, project_dir)
-    if not session_file:
+    session_match = find_session_file(args.session_id, project_dir)
+    if not session_match:
         print(f"Error: Session file not found: {args.session_id}.jsonl", file=sys.stderr)
         sys.exit(1)
 
-    result = extract_session(session_file)
+    result = extract_session(
+        session_match["path"],
+        requested_project_path=args.project_path,
+        actual_project_dir=session_match["actual_project_dir"],
+        session_source=session_match["session_source"],
+    )
     
     # Output
     output_json = json.dumps(result, indent=2, ensure_ascii=False)

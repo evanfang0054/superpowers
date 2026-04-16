@@ -189,7 +189,7 @@ def extract_session(
 Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer.ExtractSessionTests -v`
 Expected: PASS with the two new provenance tests green and the previous extraction tests still passing.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add skills/skill-self-optimizer/scripts/extract-session.py skills/skill-self-optimizer/tests/test_session_optimizer.py
@@ -513,7 +513,7 @@ Expected:
 - The report no longer treats hook/summary-derived trigger evidence as a real missed trigger
 - The report does not emit duplicate recommendations
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add skills/skill-self-optimizer/SKILL.md skills/skill-self-optimizer/tests/test_session_optimizer.py .superpowers/session-analysis/ac3a4a38-1ae1-4fcc-901d-929eef8e7661-report.md
