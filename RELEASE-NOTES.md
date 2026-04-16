@@ -1,5 +1,11 @@
 # Superpowers Release Notes
 
+## v5.0.17 (2026-04-16)
+
+### Changes
+
+- 新增会话分析、skill自我闭环优化
+
 ## v5.0.16 (2026-04-16)
 
 ### Changes
