@@ -29,9 +29,9 @@ BASE_SHA=$(git rev-parse HEAD~1)  # or origin/main
 HEAD_SHA=$(git rev-parse HEAD)
 ```
 
-**2. Dispatch code-reviewer subagent:**
+**2. Dispatch code-reviewer agent:**
 
-Use Task tool with superpowers:code-reviewer type, fill template at `code-reviewer.md`
+Invoke the `code-reviewer` agent (defined in `agents/code-reviewer.md`). It runs in the current workspace—no worktree needed.
 
 **Placeholders:**
 - `{WHAT_WAS_IMPLEMENTED}` - What you just built

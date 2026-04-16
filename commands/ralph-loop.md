@@ -19,7 +19,7 @@ Execute the setup script to initialize the Ralph loop:
 3. When encountering unfamiliar or new APIs, use context7 to query the latest documentation.
 4. Stay in the current directory—do not cd unless absolutely necessary.
 5. If blocked, clearly state what's blocking and what you need.
-6. When task is GENUINELY complete, output <promise>COMPLETE</promise>.
+6. When task is GENUINELY complete, emit the completion signal exactly once (do not quote or mention it earlier).
 " \
   --completion-promise "COMPLETE" \
   --max-iterations 60
@@ -27,4 +27,4 @@ Execute the setup script to initialize the Ralph loop:
 
 When you try to exit, the Ralph loop will feed the SAME PROMPT back to you for the next iteration. You'll see your previous work in files and git history, allowing you to iterate and improve.
 
-CRITICAL RULE: If a completion promise is set, you may ONLY output it when the statement is completely and unequivocally TRUE. Do not output false promises to escape the loop, even if you think you're stuck or should exit for other reasons. The loop is designed to continue until genuine completion.
+CRITICAL RULE: If a completion promise is set, you may ONLY emit the completion signal when the statement is completely and unequivocally TRUE. Never emit a false completion signal to escape the loop, even if you think you're stuck or should exit for other reasons. The loop is designed to continue until genuine completion.

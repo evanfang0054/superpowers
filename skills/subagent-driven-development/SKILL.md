@@ -32,7 +32,7 @@ You are the ORCHESTRATOR. Your job is to coordinate subagents, NOT implement cod
 5. Do NOT proceed if any review has open issues
 6. When ALL tasks complete, dispatch FINAL CODE REVIEWER for entire implementation
 7. After final review, you MUST run superpowers:finishing-a-development-branch
-8. ONLY after finishing-a-development-branch is executed, output <promise>COMPLETE</promise>
+8. ONLY after finishing-a-development-branch is executed, emit the completion signal exactly once (do not quote or mention it earlier).
 " \
   --completion-promise "COMPLETE" \
   --max-iterations 60
@@ -300,7 +300,7 @@ Done!
 ## Integration
 
 **Related workflow skills:**
-- **superpowers:using-git-worktrees** - OPTIONAL: Set up isolated workspace if user requests isolation (not required by default)
+- **superpowers:using-git-worktrees** - OPTIONAL: Set up isolated workspace if user requests isolation (not required by default). If worktrees are disallowed, run review flow directly in the current workspace.
 - **superpowers:writing-plans** - Creates the plan this skill executes
 - **superpowers:requesting-code-review** - Code review template for reviewer subagents
 - **superpowers:finishing-a-development-branch** - Complete development after all tasks
