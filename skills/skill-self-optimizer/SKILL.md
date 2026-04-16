@@ -125,18 +125,26 @@ python ${SKILL_PATH}/scripts/analyze-session.py \
 - Tasks Completed: 3/4
 - Skills Used: brainstorming, systematic-debugging
 
+## Session Provenance
+| Field | Value |
+|-------|-------|
+| Requested Project | `-Users-arwen-Desktop-Arwen-evanfang-superpowers` |
+| Actual Session File | `~/.claude/projects/-Users-arwen-Desktop-Arwen-evanfang-hapi/ac3a4...jsonl` |
+| Actual Project Directory | `~/.claude/projects/-Users-arwen-Desktop-Arwen-evanfang-hapi` |
+| Session Source | `fallback-global-search` |
+
 ## Issues Found
-1. **repeated_failures** in Edit tool (5 times)
-   - Root cause: File not found errors
-   - Suggestion: Check file paths before editing
+1. **expected_test_failure** in Bash tool (4 times)
+   - Context: TDD red phase / test verification
+   - Handling: Count separately, do not treat as high-severity execution failure
 
 2. **skill_not_triggered**: test-driven-development
-   - Context: User asked to add tests
+   - Context: Real user request only; hook/summary/skill payload noise excluded
    - Suggestion: Improve skill description
 
 ## Optimization Recommendations
-- [ ] Add path validation before Edit calls
-- [ ] Expand TDD skill trigger phrases
+- [ ] Track expected TDD failures separately from actionable execution failures
+- [ ] Check file/session/project paths before execution
 ```
 
 **不要把工具层占位错误当成真实问题：**

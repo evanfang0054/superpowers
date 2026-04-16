@@ -431,7 +431,7 @@ git commit -m "feat: surface provenance in optimizer reports"
 - Read: `.superpowers/session-analysis/ac3a4a38-1ae1-4fcc-901d-929eef8e7661.json`
 - Update: `.superpowers/session-analysis/ac3a4a38-1ae1-4fcc-901d-929eef8e7661-report.md`
 
-- [ ] **Step 1: Write the failing documentation/test expectation**
+- [x] **Step 1: Write the failing documentation/test expectation**
 
 Add this assertion to `skills/skill-self-optimizer/tests/test_session_optimizer.py`:
 
@@ -467,12 +467,12 @@ Add this assertion to `skills/skill-self-optimizer/tests/test_session_optimizer.
         self.assertIn('fallback-global-search', report)
 ```
 
-- [ ] **Step 2: Run tests to verify it fails**
+- [x] **Step 2: Run tests to verify it fails**
 
 Run: `python -m unittest skills.skill-self-optimizer.tests.test_session_optimizer.AnalyzeSessionTests.test_generate_report_surfaces_session_source_and_tdd_noise_handling -v`
 Expected: FAIL until the report and documentation reflect the new reporting model consistently.
 
-- [ ] **Step 3: Write the minimal implementation**
+- [x] **Step 3: Write the minimal implementation**
 
 Update `skills/skill-self-optimizer/SKILL.md` so the documented report shape includes provenance and distinguishes expected TDD failures from actionable failures:
 
@@ -496,7 +496,7 @@ python skills/skill-self-optimizer/scripts/analyze-session.py \
   --output .superpowers/session-analysis/ac3a4a38-1ae1-4fcc-901d-929eef8e7661-report.md
 ```
 
-- [ ] **Step 4: Run verification to confirm the final behavior**
+- [x] **Step 4: Run verification to confirm the final behavior**
 
 Run both commands:
 

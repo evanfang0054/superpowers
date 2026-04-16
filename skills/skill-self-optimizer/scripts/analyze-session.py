@@ -247,6 +247,10 @@ def is_noise_message(content: str) -> bool:
     stripped = content.strip().lower()
     if not stripped:
         return True
+    if stripped.startswith("stop hook feedback:"):
+        return True
+    if stripped.startswith("this session is being continued from a previous conversation"):
+        return True
 
     noise_markers = (
         "<command-message>",
@@ -426,7 +430,8 @@ def generate_report(session_data: dict, analysis: dict) -> str:
         
         for failure in repeated_failures:
             if failure not in [p.get("tool") for p in patterns if p["type"] == "repeated_failures"]:
-                lines.append(f"### {issue_num}. 🔴 Failure: {failure['tool']}")
+                severity_icon = "🟡" if failure["category"] == "expected_test_failure" else "🔴"
+                lines.append(f"### {issue_num}. {severity_icon} Failure: {failure['tool']}")
                 lines.append(f"- **Category:** {failure['category']}")
                 lines.append(f"- **Count:** {failure['count']} failures")
                 lines.append(f"- **Sample errors:** {'; '.join(failure['errors'][:2])}")
@@ -438,6 +443,8 @@ def generate_report(session_data: dict, analysis: dict) -> str:
                 if evidence.get("input_summary"):
                     lines.append(f"- **Evidence Input:** `{evidence['input_summary']}`")
                 if failure.get("suggestion"):
+                    if failure["category"] == "expected_test_failure":
+                        lines.append("- **Handling:** Count separately, do not treat as high-severity execution failure")
                     lines.append(f"- **Suggestion:** {failure['suggestion']}")
                 lines.append("")
                 issue_num += 1
