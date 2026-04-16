@@ -155,7 +155,13 @@ if [[ "$COMPLETION_PROMISE" != "null" ]] && [[ -n "$COMPLETION_PROMISE" ]]; then
   if [[ -n "$PROMISE_TEXT" ]] && [[ "$PROMISE_TEXT" = "$COMPLETION_PROMISE" ]]; then
     echo "✅ Ralph loop: Detected <promise>$COMPLETION_PROMISE</promise>"
     rm "$RALPH_STATE_FILE"
-    exit 0
+    # Prompt Claude to capture session learnings before exiting
+    # exit 2 blocks stop and sends stderr as feedback to Claude
+    echo "" >&2
+    echo "🧠 Ralph loop complete! Use the session-learnings skill to capture important insights from this session." >&2
+    echo "   Tip: Only log non-obvious discoveries, pitfalls, or architectural insights—skip trivial details." >&2
+    echo "   You may end the session normally after logging." >&2
+    exit 2
   fi
 fi
 
