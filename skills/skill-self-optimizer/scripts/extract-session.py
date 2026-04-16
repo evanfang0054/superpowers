@@ -138,6 +138,21 @@ def find_session_file(session_id: str, project_dir: Path | None = None) -> dict 
                 "session_source": "requested-project" if index == 0 and project_dir else "fallback-global-search",
             }
 
+    prefix_matches = []
+    for index, directory in enumerate(candidate_dirs):
+        for candidate in sorted(directory.glob(f"{session_id}*.jsonl")):
+            prefix_matches.append({
+                "path": candidate,
+                "actual_project_dir": directory,
+                "session_source": "requested-project" if index == 0 and project_dir else "fallback-global-search",
+            })
+
+    if len(prefix_matches) == 1:
+        return prefix_matches[0]
+    if len(prefix_matches) > 1:
+        candidates = ", ".join(match["path"].stem for match in prefix_matches[:5])
+        raise ValueError(f"Multiple session matches for prefix {session_id}: {candidates}")
+
     return None
 
 
@@ -313,7 +328,12 @@ def main():
         print("Error: --session-id required (use --list to see available sessions)", file=sys.stderr)
         sys.exit(1)
 
-    session_match = find_session_file(args.session_id, project_dir)
+    try:
+        session_match = find_session_file(args.session_id, project_dir)
+    except ValueError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        sys.exit(1)
+
     if not session_match:
         print(f"Error: Session file not found: {args.session_id}.jsonl", file=sys.stderr)
         sys.exit(1)

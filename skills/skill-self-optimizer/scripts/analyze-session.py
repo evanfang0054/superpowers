@@ -25,6 +25,10 @@ def classify_tool_failure(tool: str, error: str, tool_input: dict) -> str:
 
     if tool == "Read" and tool_input.get("pages", None) == "" and "invalid pages parameter" in error_lower:
         return "invalid_read_pages_placeholder"
+    if tool == "Edit" and "found 2 matches" in error_lower:
+        return "edit_match_ambiguity"
+    if tool == "Edit" and "no changes to make" in error_lower:
+        return "edit_match_ambiguity"
     if tool == "Skill" and "setup-ralph-loop.sh" in error:
         return "skill_shell_wrapper_failure"
     if tool == "Skill" and "orchestrator" in error_lower:
@@ -94,6 +98,8 @@ def build_failure_suggestion(tool: str, category: str, sample_error: str) -> str
     """Generate concrete optimization suggestions for known failure classes."""
     if category == "invalid_read_pages_placeholder":
         return "Ignore empty `pages` placeholders for non-PDF Read calls, or normalize them out during extraction"
+    if category == "edit_match_ambiguity":
+        return "Widen the edit context, make the target snippet unique, or use replace_all when every match should change"
     if category in {"skill_shell_wrapper_failure", "skill_orchestrator_wrapper_failure"}:
         return "Inspect the skill shell wrapper/template invocation; validate fenced shell blocks and interpolated arguments before launch"
     if category == "invalid_tool_input":
@@ -181,25 +187,30 @@ def analyze_tool_usage(tool_calls: list, messages: list | None = None) -> dict:
 def detect_patterns(messages: list, tool_calls: list) -> list:
     """Detect problematic patterns in the session."""
     patterns = []
-    
+
     # 1. Repeated tool failures
-    tool_failures = defaultdict(list)
+    category_failures = defaultdict(list)
     for i, tc in enumerate(tool_calls):
         if not tc.get("success", True):
-            tool_failures[tc.get("tool", "unknown")].append(i)
-    
-    for tool, indices in tool_failures.items():
+            tool = tc.get("tool", "unknown")
+            category = classify_tool_failure(tool, tc.get("error", ""), tc.get("input", {}))
+            if is_expected_test_failure(tc, messages):
+                category = "expected_test_failure"
+            if category == "expected_test_failure":
+                continue
+            category_failures[(tool, category)].append(i)
+
+    for (tool, category), indices in category_failures.items():
         if len(indices) >= 3:
-            # Check if consecutive
-            consecutive = sum(1 for i in range(len(indices)-1) if indices[i+1] - indices[i] <= 2)
+            consecutive = sum(1 for i in range(len(indices) - 1) if indices[i + 1] - indices[i] <= 2)
             if consecutive >= 2:
                 patterns.append({
                     "type": "repeated_failures",
                     "severity": "high",
-                    "description": f"{tool} failed {len(indices)} times with consecutive failures",
-                    "suggestion": f"Check inputs before calling {tool}; add validation or pre-flight checks",
+                    "description": f"{category} repeated {len(indices)} times in {tool}",
+                    "suggestion": build_failure_suggestion(tool, category, ""),
                 })
-    
+
     # 2. User corrections (looking for patterns like "no, I meant...", "that's wrong")
     correction_phrases = [
         "no,", "that's wrong", "not what i", "i meant", "incorrect",
@@ -211,7 +222,7 @@ def detect_patterns(messages: list, tool_calls: list) -> list:
             content_lower = msg.get("content", "").lower()
             if any(phrase in content_lower for phrase in correction_phrases):
                 user_corrections += 1
-    
+
     if user_corrections >= 2:
         patterns.append({
             "type": "user_corrections",
@@ -219,7 +230,7 @@ def detect_patterns(messages: list, tool_calls: list) -> list:
             "description": f"User corrected {user_corrections} times during session",
             "suggestion": "Ask clarifying questions before taking action; confirm understanding",
         })
-    
+
     # 3. Long response without tool use (might indicate overthinking)
     assistant_msgs = [m for m in messages if m["role"] == "assistant"]
     long_responses = 0
@@ -227,7 +238,7 @@ def detect_patterns(messages: list, tool_calls: list) -> list:
         content = msg.get("content", "")
         if len(content) > 3000:
             long_responses += 1
-    
+
     if long_responses >= 3:
         patterns.append({
             "type": "verbose_responses",
@@ -235,10 +246,10 @@ def detect_patterns(messages: list, tool_calls: list) -> list:
             "description": f"{long_responses} very long responses (>3000 chars)",
             "suggestion": "Consider being more concise; break into smaller steps",
         })
-    
+
     # 4. High token consumption pattern
     # (This would need token data which might not be in all extractions)
-    
+
     return patterns
 
 
@@ -430,8 +441,10 @@ def generate_report(session_data: dict, analysis: dict) -> str:
         
         for failure in repeated_failures:
             if failure not in [p.get("tool") for p in patterns if p["type"] == "repeated_failures"]:
-                severity_icon = "🟡" if failure["category"] == "expected_test_failure" else "🔴"
-                lines.append(f"### {issue_num}. {severity_icon} Failure: {failure['tool']}")
+                is_observation = failure["category"] == "expected_test_failure"
+                severity_icon = "🟡" if is_observation else "🔴"
+                issue_label = "Failure observation" if is_observation else "Failure"
+                lines.append(f"### {issue_num}. {severity_icon} {issue_label}: {failure['tool']}")
                 lines.append(f"- **Category:** {failure['category']}")
                 lines.append(f"- **Count:** {failure['count']} failures")
                 lines.append(f"- **Sample errors:** {'; '.join(failure['errors'][:2])}")
@@ -443,7 +456,7 @@ def generate_report(session_data: dict, analysis: dict) -> str:
                 if evidence.get("input_summary"):
                     lines.append(f"- **Evidence Input:** `{evidence['input_summary']}`")
                 if failure.get("suggestion"):
-                    if failure["category"] == "expected_test_failure":
+                    if is_observation:
                         lines.append("- **Handling:** Count separately, do not treat as high-severity execution failure")
                     lines.append(f"- **Suggestion:** {failure['suggestion']}")
                 lines.append("")

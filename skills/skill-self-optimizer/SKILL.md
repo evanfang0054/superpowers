@@ -85,7 +85,9 @@ python ${SKILL_PATH}/scripts/extract-session.py \
 
 **当 session ID 已知但项目目录不确定时：**
 - 可以先照常传 `--project-path=<encoded-project-path>`
-- 如果传错，提取脚本现在也应回退到 `~/.claude/projects/*` 中全局查找该 session
+- 如果精确匹配失败，提取脚本会先尝试请求目录中的前缀匹配，再回退到 `~/.claude/projects/*` 中全局查找
+- 如果只有一个前缀候选，会自动命中并继续分析
+- 如果前缀候选不止一个，脚本会列出候选并要求补全 session id
 - 分析结果应在报告里注明真实命中的 `file_path`
 
 ## Step 3: 分析效果
@@ -110,7 +112,7 @@ python ${SKILL_PATH}/scripts/analyze-session.py \
 ### 问题模式识别
 
 **常见问题：**
-- `repeated_failures`: 同一工具连续失败 3+ 次
+- `repeated_failures`: 同一 failure category 在短时间内重复出现 3+ 次（不含 `expected_test_failure`）
 - `skill_not_triggered`: 应该使用 skill 但没有触发
 - `excessive_tokens`: 单次任务消耗 > 50k tokens
 - `user_corrections`: 用户频繁纠正
@@ -138,13 +140,17 @@ python ${SKILL_PATH}/scripts/analyze-session.py \
    - Context: TDD red phase / test verification
    - Handling: Count separately, do not treat as high-severity execution failure
 
-2. **skill_not_triggered**: test-driven-development
+2. **edit_match_ambiguity** repeated 3 times in Edit
+   - Suggestion: Widen the edit context, make the target snippet unique, or use replace_all when every match should change
+
+3. **skill_not_triggered**: test-driven-development
    - Context: Real user request only; hook/summary/skill payload noise excluded
    - Suggestion: Improve skill description
 
 ## Optimization Recommendations
 - [ ] Track expected TDD failures separately from actionable execution failures
 - [ ] Check file/session/project paths before execution
+- [ ] Widen edit-match context or switch to `replace_all` when every occurrence should change
 ```
 
 **不要把工具层占位错误当成真实问题：**
