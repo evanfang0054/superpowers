@@ -367,6 +367,48 @@ def append_session_provenance(lines: list[str], session_data: dict) -> None:
 
 
 
+def build_project_scope_warnings(session_data: dict) -> list[dict]:
+    """Return warnings when extracted session provenance does not match the requested project scope."""
+    requested_project = session_data.get("requested_project_path")
+    actual_project_dir = session_data.get("actual_project_dir")
+    session_source = session_data.get("session_source")
+
+    if not requested_project or not actual_project_dir:
+        return []
+
+    requested_normalized = str(requested_project).strip()
+    actual_normalized = str(actual_project_dir).strip()
+    actual_leaf = actual_normalized.rstrip("/").split("/")[-1]
+
+    if actual_normalized == requested_normalized or actual_leaf == requested_normalized:
+        return []
+
+    if session_source != "fallback-global-search":
+        return []
+
+    return [{
+        "title": "Cross-project analysis warning",
+        "details": [
+            "当前会话是通过 fallback-global-search 命中的，真实 session 不在用户请求的项目目录下。",
+            "优化建议应优先面向用户指定项目，而不是把命中的外部项目现象直接当成当前项目问题。",
+            "不要默认把优化对象理解成当前分析 skill 自身；只有当证据明确指向分析器或该 skill 时才回收为自优化项。",
+        ],
+    }]
+
+
+
+def build_project_scope_recommendations(session_data: dict) -> list[str]:
+    """Return recommendation items for cross-project session matches."""
+    if not build_project_scope_warnings(session_data):
+        return []
+
+    return [
+        "- [ ] 先确认用户要优化的目标对象（项目 / workflow / skill / harness），再决定建议归属",
+        "- [ ] 将跨项目命中的 session 现象标记为样本证据，不要直接当成当前项目缺陷",
+    ]
+
+
+
 def dedupe_recommendations(items: list[str]) -> list[str]:
     """Deduplicate recommendations while preserving order."""
     deduped = []
@@ -408,6 +450,16 @@ def generate_report(session_data: dict, analysis: dict) -> str:
     lines.append("")
     
     append_session_provenance(lines, session_data)
+
+    project_scope_warnings = build_project_scope_warnings(session_data)
+    if project_scope_warnings:
+        lines.append("## Project Scope Warnings")
+        lines.append("")
+        for warning in project_scope_warnings:
+            lines.append(f"### {warning['title']}")
+            for detail in warning["details"]:
+                lines.append(f"- {detail}")
+            lines.append("")
 
     # Tool Usage Details
     if tool_analysis.get("by_tool"):
@@ -500,7 +552,9 @@ def generate_report(session_data: dict, analysis: dict) -> str:
     # From success rate
     if tool_analysis.get("success_rate", 1.0) < 0.9:
         recommendations.append("- [ ] Add pre-flight validation before tool calls")
-    
+
+    recommendations.extend(build_project_scope_recommendations(session_data))
+
     recommendations = dedupe_recommendations(recommendations)
 
     if not recommendations:
