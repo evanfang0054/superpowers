@@ -31,7 +31,7 @@ Claude Code 会话存储在：
 
 每个项目路径会被编码（斜杠变连字符），例如：
 ```
-/Users/arwen/Desktop/project → -Users-arwen-Desktop-project
+/Users/user/Desktop/project → -Users-user-Desktop-project
 ```
 
 ## Step 1: 获取 Session ID
@@ -57,9 +57,11 @@ ls -lt ~/.claude/projects/<project-path>/*.jsonl | head -20
 ```bash
 python ${SKILL_PATH}/scripts/extract-session.py \
   --session-id <session-id> \
-  --project-path <encoded-project-path> \
+  --project-path=<encoded-project-path> \
   --output .superpowers/session-analysis/<session-id>.json
 ```
+
+**注意：** 当 `project-path` 本身以 `-` 开头（Claude 编码路径通常如此）时，必须使用 `--project-path=<value>` 这种等号写法，避免被 argparse 误识别为新选项。
 
 **输出格式：**
 ```json
@@ -80,6 +82,11 @@ python ${SKILL_PATH}/scripts/extract-session.py \
   "total_tokens": 50000
 }
 ```
+
+**当 session ID 已知但项目目录不确定时：**
+- 可以先照常传 `--project-path=<encoded-project-path>`
+- 如果传错，提取脚本现在也应回退到 `~/.claude/projects/*` 中全局查找该 session
+- 分析结果应在报告里注明真实命中的 `file_path`
 
 ## Step 3: 分析效果
 
@@ -131,6 +138,10 @@ python ${SKILL_PATH}/scripts/analyze-session.py \
 - [ ] Add path validation before Edit calls
 - [ ] Expand TDD skill trigger phrases
 ```
+
+**不要把工具层占位错误当成真实问题：**
+- `Read` 非 PDF 文件时若出现 `pages: ""`，这是调用层占位值，不应在报告中当成高优先级失败
+- `Skill` 若报 `shell command failed`，优先检查 skill shell wrapper、模板插值和脚本路径，而不是笼统归类成 runtime failure
 
 ## Step 4: 生成优化建议
 

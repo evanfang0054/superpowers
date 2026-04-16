@@ -7,3 +7,6 @@
 node_modules/
 inspo
 triage/
+skills/skill-self-optimizer/tests
+skills/skill-self-optimizer/scripts/__pycache__
+.superpowers/session-analysis

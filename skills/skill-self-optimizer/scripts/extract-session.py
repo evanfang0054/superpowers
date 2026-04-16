@@ -28,8 +28,13 @@ def encode_project_path(path: str) -> str:
 def find_project_dir(project_path: str | None = None) -> Path | None:
     """Find the project directory in Claude's storage."""
     projects_dir = get_claude_projects_dir()
-    
+
     if project_path:
+        if "/" not in project_path and "\\" not in project_path:
+            raw_candidate = projects_dir / project_path
+            if raw_candidate.exists():
+                return raw_candidate
+
         encoded = encode_project_path(project_path)
         candidate = projects_dir / encoded
         if candidate.exists():
@@ -54,19 +59,19 @@ def find_project_dir(project_path: str | None = None) -> Path | None:
 def list_sessions(project_dir: Path, limit: int = 10) -> list[dict]:
     """List available sessions in a project directory."""
     sessions = []
-    
+
     for f in sorted(project_dir.glob("*.jsonl"), key=lambda x: x.stat().st_mtime, reverse=True):
         if limit and len(sessions) >= limit:
             break
-        
+
         session_id = f.stem
         stat = f.stat()
-        
+
         # Read first and last lines for timestamps
         first_ts = None
         last_ts = None
         message_count = 0
-        
+
         try:
             with open(f, 'r') as fp:
                 for line in fp:
@@ -82,7 +87,7 @@ def list_sessions(project_dir: Path, limit: int = 10) -> list[dict]:
                         continue
         except Exception:
             pass
-        
+
         sessions.append({
             "session_id": session_id,
             "file_path": str(f),
@@ -92,8 +97,30 @@ def list_sessions(project_dir: Path, limit: int = 10) -> list[dict]:
             "first_timestamp": first_ts,
             "last_timestamp": last_ts,
         })
-    
+
     return sessions
+
+
+def find_session_file(session_id: str, project_dir: Path | None = None) -> Path | None:
+    """Find a session file, optionally falling back to all Claude project directories."""
+    candidate_dirs = []
+    if project_dir:
+        candidate_dirs.append(project_dir)
+
+    projects_dir = get_claude_projects_dir()
+    if projects_dir.exists():
+        candidate_dirs.extend(
+            d for d in sorted(projects_dir.iterdir())
+            if d.is_dir() and d not in candidate_dirs
+        )
+
+    target_name = f"{session_id}.jsonl"
+    for directory in candidate_dirs:
+        candidate = directory / target_name
+        if candidate.exists():
+            return candidate
+
+    return None
 
 
 def extract_session(session_file: Path) -> dict:
@@ -134,12 +161,17 @@ def extract_session(session_file: Path) -> dict:
                                 text_parts.append(part.get("text", ""))
                             elif part.get("type") == "tool_use":
                                 # Extract tool call info
-                                tool_calls.append({
+                                tool_call = {
                                     "tool": part.get("name", "unknown"),
                                     "input": part.get("input", {}),
                                     "timestamp": timestamp,
                                     "id": part.get("id"),
-                                })
+                                }
+                                tool_calls.append(tool_call)
+                                if tool_call["tool"] == "Skill":
+                                    skill_name = tool_call["input"].get("skill")
+                                    if skill_name:
+                                        skills_used.add(skill_name)
                             elif part.get("type") == "tool_result":
                                 # Match with tool call by ID
                                 tool_id = part.get("tool_use_id")
@@ -252,12 +284,12 @@ def main():
     if not args.session_id:
         print("Error: --session-id required (use --list to see available sessions)", file=sys.stderr)
         sys.exit(1)
-    
-    session_file = project_dir / f"{args.session_id}.jsonl"
-    if not session_file.exists():
-        print(f"Error: Session file not found: {session_file}", file=sys.stderr)
+
+    session_file = find_session_file(args.session_id, project_dir)
+    if not session_file:
+        print(f"Error: Session file not found: {args.session_id}.jsonl", file=sys.stderr)
         sys.exit(1)
-    
+
     result = extract_session(session_file)
     
     # Output

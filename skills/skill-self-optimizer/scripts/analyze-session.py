@@ -9,20 +9,89 @@ Usage:
 import argparse
 import json
 import sys
-from collections import Counter, defaultdict
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
+
+
+IGNORED_FAILURE_CATEGORIES = {
+    "invalid_read_pages_placeholder",
+}
+
+
+def classify_tool_failure(tool: str, error: str, tool_input: dict) -> str:
+    """Classify failure mode for a tool call."""
+    error_lower = error.lower()
+
+    if tool == "Read" and tool_input.get("pages", None) == "" and "invalid pages parameter" in error_lower:
+        return "invalid_read_pages_placeholder"
+    if tool == "Skill" and "setup-ralph-loop.sh" in error:
+        return "skill_shell_wrapper_failure"
+    if tool == "Skill" and "orchestrator" in error_lower:
+        return "skill_orchestrator_wrapper_failure"
+    if "invalid" in error_lower or "expected one argument" in error_lower:
+        return "invalid_tool_input"
+    if "not found" in error_lower:
+        return "missing_resource"
+    if "shell command failed" in error_lower:
+        return "shell_wrapper_failure"
+    if "hook" in error_lower:
+        return "hook_runtime_failure"
+    if tool == "Skill":
+        return "skill_runtime_failure"
+    if any(marker in error_lower for marker in ("traceback", "exception", "runtime")):
+        return "runtime_failure"
+    return "unknown_failure"
+
+
+
+def summarize_tool_input(tool_input: dict) -> str:
+    """Create a short, readable summary of tool input for reports."""
+    if not tool_input:
+        return "{}"
+
+    priority_keys = [
+        "skill", "file_path", "session_id", "project_path", "path", "pattern", "command", "pages",
+    ]
+    parts = []
+    for key in priority_keys:
+        value = tool_input.get(key)
+        if value in (None, "", [], {}):
+            continue
+        rendered = repr(value)
+        if len(rendered) > 60:
+            rendered = rendered[:57] + "..."
+        parts.append(f"{key}={rendered}")
+        if len(parts) >= 3:
+            break
+
+    if not parts:
+        return "{...}"
+    return ", ".join(parts)
+
+def build_failure_suggestion(tool: str, category: str, sample_error: str) -> str:
+    """Generate concrete optimization suggestions for known failure classes."""
+    if category == "invalid_read_pages_placeholder":
+        return "Ignore empty `pages` placeholders for non-PDF Read calls, or normalize them out during extraction"
+    if category in {"skill_shell_wrapper_failure", "skill_orchestrator_wrapper_failure"}:
+        return "Inspect the skill shell wrapper/template invocation; validate fenced shell blocks and interpolated arguments before launch"
+    if category == "invalid_tool_input":
+        return f"Validate {tool} inputs before calling the tool"
+    if category == "missing_resource":
+        return "Check file/session/project paths before execution"
+    if category == "shell_wrapper_failure":
+        return "Capture the wrapped shell command separately and surface the failing template or script path"
+    return f"Review {tool} failure handling and add pre-flight validation"
 
 
 def analyze_tool_usage(tool_calls: list) -> dict:
     """Analyze tool usage patterns."""
     if not tool_calls:
         return {"total": 0, "success_rate": 1.0, "by_tool": {}, "failures": []}
-    
+
     total = len(tool_calls)
     successful = len([t for t in tool_calls if t.get("success", True)])
-    
-    # Group by tool
+
     by_tool = defaultdict(lambda: {"total": 0, "success": 0, "failures": []})
     for tc in tool_calls:
         tool = tc.get("tool", "unknown")
@@ -30,12 +99,16 @@ def analyze_tool_usage(tool_calls: list) -> dict:
         if tc.get("success", True):
             by_tool[tool]["success"] += 1
         else:
+            error = tc.get("error", "Unknown error")
             by_tool[tool]["failures"].append({
-                "error": tc.get("error", "Unknown error"),
+                "error": error,
                 "input": tc.get("input", {}),
+                "category": classify_tool_failure(tool, error, tc.get("input", {})),
+                "id": tc.get("id"),
+                "timestamp": tc.get("timestamp"),
+                "input_summary": summarize_tool_input(tc.get("input", {})),
             })
-    
-    # Calculate rates
+
     tool_stats = {}
     for tool, stats in by_tool.items():
         rate = stats["success"] / stats["total"] if stats["total"] > 0 else 1.0
@@ -45,23 +118,38 @@ def analyze_tool_usage(tool_calls: list) -> dict:
             "success_rate": round(rate, 2),
             "failure_count": len(stats["failures"]),
         }
-    
-    # Identify repeated failures
-    failures = []
+
+    unique_failures = []
+    seen = set()
     for tool, stats in by_tool.items():
-        if len(stats["failures"]) >= 2:
-            failures.append({
+        for failure in stats["failures"]:
+            key = (tool, failure["category"])
+            if key in seen:
+                continue
+            seen.add(key)
+            related_failures = [f for f in stats["failures"] if f["category"] == failure["category"]]
+            sample_failure = related_failures[0]
+            if failure["category"] in IGNORED_FAILURE_CATEGORIES:
+                continue
+            unique_failures.append({
                 "tool": tool,
-                "count": len(stats["failures"]),
-                "errors": [f["error"][:100] for f in stats["failures"][:3]],
+                "count": len(related_failures),
+                "category": failure["category"],
+                "errors": [f["error"][:100] for f in related_failures[:3]],
+                "suggestion": build_failure_suggestion(tool, failure["category"], sample_failure.get("error", "")),
+                "evidence": {
+                    "tool_use_id": sample_failure.get("id"),
+                    "timestamp": sample_failure.get("timestamp"),
+                    "input_summary": sample_failure.get("input_summary"),
+                },
             })
-    
+
     return {
         "total": total,
         "successful": successful,
         "success_rate": round(successful / total, 2) if total > 0 else 1.0,
         "by_tool": tool_stats,
-        "repeated_failures": failures,
+        "repeated_failures": unique_failures,
     }
 
 
@@ -129,31 +217,83 @@ def detect_patterns(messages: list, tool_calls: list) -> list:
     return patterns
 
 
+def is_noise_message(content: str) -> bool:
+    """Ignore command payloads and hook/system wrappers when analyzing triggers."""
+    stripped = content.strip().lower()
+    if not stripped:
+        return True
+
+    noise_markers = (
+        "<command-message>",
+        "<command-name>",
+        "<command-args>",
+        "<local-command-caveat>",
+        "base directory for this skill:",
+        "# test-driven development",
+        "# systematic debugging",
+    )
+    return any(marker in stripped for marker in noise_markers)
+
+
+
+def detect_trigger_confidence(content: str, trigger: str) -> str:
+    """Estimate confidence that a trigger should have fired."""
+    strong_signals = ["failing", "error", "bug", "broken", "write tests", "add tests"]
+    signal_count = sum(1 for signal in strong_signals if signal in content)
+    if trigger in {"write tests", "add tests"} or signal_count >= 2:
+        return "high"
+    if signal_count == 1:
+        return "medium"
+    return "low"
+
+
+
 def analyze_skill_usage(messages: list, skills_used: list) -> dict:
     """Analyze skill triggering patterns."""
-    # Detect potential skill triggers that weren't caught
     potential_triggers = {
         "brainstorming": ["design", "architect", "plan feature", "how should"],
         "systematic-debugging": ["bug", "error", "failing", "broken", "doesn't work"],
         "test-driven-development": ["test", "tdd", "write tests", "add tests"],
         "session-learnings": ["remember", "learn from", "don't forget"],
     }
-    
+
+    used_skills = set(skills_used)
     missed_triggers = []
+    seen = set()
     for msg in messages:
-        if msg["role"] == "user":
-            content_lower = msg.get("content", "").lower()
-            for skill, triggers in potential_triggers.items():
-                if skill not in skills_used:
-                    if any(trigger in content_lower for trigger in triggers):
-                        missed_triggers.append({
-                            "skill": skill,
-                            "trigger_phrase": next(t for t in triggers if t in content_lower),
-                            "context": content_lower[:100],
-                        })
-    
+        if msg["role"] != "user":
+            continue
+
+        content = msg.get("content", "")
+        content_lower = content.lower()
+        if is_noise_message(content_lower):
+            continue
+
+        for skill, triggers in potential_triggers.items():
+            if skill in used_skills or f"superpowers:{skill}" in used_skills:
+                continue
+
+            trigger = next((t for t in triggers if t in content_lower), None)
+            if not trigger:
+                continue
+
+            key = (skill, trigger, content_lower[:100])
+            if key in seen:
+                continue
+            seen.add(key)
+            missed_triggers.append({
+                "skill": skill,
+                "trigger_phrase": trigger,
+                "confidence": detect_trigger_confidence(content_lower, trigger),
+                "context": content_lower[:100],
+                "evidence": {
+                    "timestamp": msg.get("timestamp"),
+                    "message_excerpt": content[:160],
+                },
+            })
+
     return {
-        "skills_triggered": skills_used,
+        "skills_triggered": sorted(used_skills),
         "potential_missed_triggers": missed_triggers,
     }
 
@@ -217,15 +357,31 @@ def generate_report(session_data: dict, analysis: dict) -> str:
         
         for failure in repeated_failures:
             if failure not in [p.get("tool") for p in patterns if p["type"] == "repeated_failures"]:
-                lines.append(f"### {issue_num}. 🔴 Repeated failures: {failure['tool']}")
+                lines.append(f"### {issue_num}. 🔴 Failure: {failure['tool']}")
+                lines.append(f"- **Category:** {failure['category']}")
                 lines.append(f"- **Count:** {failure['count']} failures")
                 lines.append(f"- **Sample errors:** {'; '.join(failure['errors'][:2])}")
+                evidence = failure.get("evidence", {})
+                if evidence.get("tool_use_id"):
+                    lines.append(f"- **Evidence Tool ID:** `{evidence['tool_use_id']}`")
+                if evidence.get("timestamp"):
+                    lines.append(f"- **Evidence Timestamp:** {evidence['timestamp']}")
+                if evidence.get("input_summary"):
+                    lines.append(f"- **Evidence Input:** `{evidence['input_summary']}`")
+                if failure.get("suggestion"):
+                    lines.append(f"- **Suggestion:** {failure['suggestion']}")
                 lines.append("")
                 issue_num += 1
-        
+
         for missed in missed_triggers[:3]:  # Limit to 3
             lines.append(f"### {issue_num}. 🟡 Skill not triggered: {missed['skill']}")
             lines.append(f"- **Trigger phrase found:** \"{missed['trigger_phrase']}\"")
+            lines.append(f"- **Confidence:** {missed['confidence']}")
+            evidence = missed.get("evidence", {})
+            if evidence.get("timestamp"):
+                lines.append(f"- **Evidence Timestamp:** {evidence['timestamp']}")
+            if evidence.get("message_excerpt"):
+                lines.append(f"- **Evidence Context:** {evidence['message_excerpt']}")
             lines.append(f"- **Suggestion:** Consider expanding skill description")
             lines.append("")
             issue_num += 1
@@ -240,9 +396,15 @@ def generate_report(session_data: dict, analysis: dict) -> str:
     for pattern in patterns:
         recommendations.append(f"- [ ] {pattern['suggestion']}")
     
+    # From repeated failures
+    for failure in repeated_failures:
+        suggestion = failure.get("suggestion")
+        if suggestion:
+            recommendations.append(f"- [ ] {suggestion}")
+
     # From missed triggers
     if missed_triggers:
-        skills_to_improve = set(m["skill"] for m in missed_triggers)
+        skills_to_improve = set(m["skill"] for m in missed_triggers if m["confidence"] != "low")
         for skill in skills_to_improve:
             recommendations.append(f"- [ ] Review and expand `{skill}` skill description for better triggering")
     

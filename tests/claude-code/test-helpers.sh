@@ -10,13 +10,31 @@ run_claude() {
     local output_file=$(mktemp)
 
     # Build command
-    local cmd="claude -p \"$prompt\""
+    local cmd="claude -p \"$prompt\" --permission-mode bypassPermissions"
     if [ -n "$allowed_tools" ]; then
         cmd="$cmd --allowed-tools=$allowed_tools"
     fi
 
     # Run Claude in headless mode with timeout
-    if timeout "$timeout" bash -c "$cmd" > "$output_file" 2>&1; then
+    local timeout_cmd=""
+    if command -v timeout >/dev/null 2>&1; then
+        timeout_cmd="timeout"
+    elif command -v gtimeout >/dev/null 2>&1; then
+        timeout_cmd="gtimeout"
+    fi
+
+    if [ -n "$timeout_cmd" ]; then
+        if "$timeout_cmd" "$timeout" bash -c "$cmd" > "$output_file" 2>&1; then
+            cat "$output_file"
+            rm -f "$output_file"
+            return 0
+        else
+            local exit_code=$?
+            cat "$output_file" >&2
+            rm -f "$output_file"
+            return $exit_code
+        fi
+    elif python3 -c 'import subprocess, sys; sys.exit(subprocess.run(sys.argv[2], shell=True, timeout=int(sys.argv[1])).returncode)' "$timeout" "$cmd" > "$output_file" 2>&1; then
         cat "$output_file"
         rm -f "$output_file"
         return 0
