@@ -1,6 +1,6 @@
 ---
 name: executing-plans
-description: Use when you have a written implementation plan to execute in a separate session with review checkpoints
+description: Use when you have a written implementation plan to execute iteratively in the current session with review checkpoints
 argument-hint: "任务描述或 Plan 路径"
 ---
 
@@ -18,8 +18,14 @@ argument-hint: "任务描述或 Plan 路径"
 5. When encountering unfamiliar or new APIs, use context7 to query the latest documentation.
 6. Stay in the current directory—do not cd into other directories unless absolutely necessary.
 7. Do not create git worktrees—work directly in the current workspace.
-8. When ALL plan tasks are done, you MUST run superpowers:finishing-a-development-branch to complete the branch.
-9. ONLY after finishing-a-development-branch is executed, emit the completion signal exactly once (do not quote or mention it earlier).
+8. Before rerunning a failed command caused by path / package-root / no-match issues, first confirm the correct target path, package root, or command shape. Do not thrash by repeating the same unstable command.
+9. If the same tool-call or command-shape failure repeats twice, stop execution and diagnose the workflow/tool usage itself before continuing.
+10. Never pass empty optional tool arguments. Example: omit Read.pages unless you are reading a PDF and have a real page range like "1-5".
+11. The Ralph loop replays this SAME prompt inside the current session. Keep progress in files and task state instead of rewriting the task.
+12. The completion promise uses exact string matching. Do not quote, mention, or emit it before all required work is complete.
+13. If you are approaching the iteration limit and are still blocked, document what is blocking progress, what you already tried, and the most likely next step.
+14. When ALL plan tasks are done, you MUST run superpowers:finishing-a-development-branch to complete the branch.
+15. ONLY after finishing-a-development-branch is executed, emit the completion signal exactly once as `<promise>COMPLETE</promise>`.
 " \
   --completion-promise "COMPLETE" \
   --max-iterations 60
@@ -29,7 +35,7 @@ argument-hint: "任务描述或 Plan 路径"
 
 ## Overview
 
-Load plan, review critically, execute all tasks, report when complete.
+Load plan, review critically, execute all tasks iteratively in the current session, report when complete.
 
 **Announce at start:** "I'm using the executing-plans skill to implement this plan."
 
@@ -65,8 +71,10 @@ After all tasks complete and verified:
 - Plan has critical gaps preventing starting
 - You don't understand an instruction
 - Verification fails repeatedly
+- The same tool-call or command-shape failure repeats twice
+- A failed command looks like a path / package-root / target-selection mistake rather than a product bug
 
-**Ask for clarification rather than guessing.**
+**Ask for clarification rather than guessing. Diagnose command shape before rerunning.**
 
 ## When to Revisit Earlier Steps
 

@@ -108,6 +108,7 @@ python ${SKILL_PATH}/scripts/extract-session.py \
 - 报告必须区分：样本 session 来自哪里、用户真正要优化的对象是什么
 - 如果命中了跨项目 session，要明确提醒这是样本来源，不等于当前要修改的项目
 - 如果证据不足，要明确写 `insufficient evidence`
+- 如果发现重复失败主要是无效 tool 参数、命令 shape 不稳定或重复重跑，优先把它们归类为 workflow / skill orchestration 问题，除非证据明确只属于样本项目
 
 **推荐子 agent 任务描述：**
 ```text
@@ -162,6 +163,7 @@ python ${SKILL_PATH}/scripts/extract-session.py \
 - 不要因为分析样本来自别的目录，就直接改样本目录
 - 不要把 `harness-optimizer` 默认当成修复目标
 - 只有当报告证据明确指出问题就在 `harness-optimizer` 自身时，才回收为自优化
+- 如果重复失败主要表现为无效 tool 参数、重复命令重跑、路径或 package-root 判断错误，优先在当前项目的 workflow / skill 文案中做最小纠偏，而不是把下游 repo 当主修复对象
 
 **主 agent 的职责：**
 1. 读取子 agent 报告
