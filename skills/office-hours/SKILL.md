@@ -8,6 +8,7 @@ description: |
   Output: decision conclusion (go/validate/hold), then hand off to brainstorming.
   Use when asked "is this worth building", "I have an idea", "help me decide".
   Use before brainstorming — focuses on decision, not design.
+disable-model-invocation: true
 ---
 
 # YC Office Hours — Decision Layer
