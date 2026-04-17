@@ -7,11 +7,11 @@ description: "Use when用户提供 Claude Code 会话 ID，想复盘某次会话
 
 ## Overview
 
-从 Claude Code 历史会话中提取证据，生成分析报告，并把建议优先对齐到**用户明确指定的优化对象**。
+从 Claude Code 历史会话中提取证据，由**子 agent**基于 JSON 样本生成分析报告，再由**主 agent**把建议优先对齐到**用户明确指定的优化对象**并实施优化。
 
 **核心原则：** session 是分析样本，不等于优化对象。除非证据明确指向分析器或 `harness-optimizer` 本身，否则默认应先优化用户指定的项目、workflow、skill 体系或 harness。
 
-**核心流程：** Session 提取 → 效果分析 → 识别真实优化对象 → 输出面向目标对象的建议 → 必要时再回收为自优化项
+**核心流程：** Session 提取 → 子 agent 分析并生成报告 → 识别真实优化对象 → 主 agent 基于报告优化目标对象 → 必要时再回收为自优化项
 
 **启动时宣布：** "我正在使用 harness-optimizer 分析会话数据..."
 
@@ -26,9 +26,9 @@ description: "Use when用户提供 Claude Code 会话 ID，想复盘某次会话
 - 实现 harness 自我闭环
 
 **目标对象判定：**
-- 如果用户明确说“优化这个项目 / 这个仓库 / 这套 superpowers”，优先输出该对象的优化建议
+- 如果用户明确说“优化这个项目 / 这个仓库 / 这套 superpowers”，优先输出该对象的优化建议并在该对象上落地修改
 - 如果用户明确说“优化这个 skill”或“优化分析器本身”，才把 `harness-optimizer` 当成主要优化对象
-- 如果 session 命中了别的项目目录，要在报告里显式标注跨项目风险，避免把样本项目的问题误写成当前项目的问题
+- 如果 session 命中了别的项目目录，要在分析报告里显式标注跨项目风险，避免把样本项目的问题误写成当前项目的问题
 
 ## Session 数据位置
 
@@ -96,103 +96,83 @@ python ${SKILL_PATH}/scripts/extract-session.py \
 - 如果精确匹配失败，提取脚本会先尝试请求目录中的前缀匹配，再回退到 `~/.claude/projects/*` 中全局查找
 - 如果只有一个前缀候选，会自动命中并继续分析
 - 如果前缀候选不止一个，脚本会列出候选并要求补全 session id
-- 分析结果应在报告里注明真实命中的 `file_path`
+- 后续分析报告必须注明真实命中的 `file_path` / `actual_project_dir`
 
-## Step 3: 分析效果
+## Step 3: 启动子 agent 分析 JSON 并生成报告
 
-使用分析脚本：
-```bash
-python ${SKILL_PATH}/scripts/analyze-session.py \
-  --input .superpowers/session-analysis/<session-id>.json \
-  --output .superpowers/session-analysis/<session-id>-report.md
+不要使用 `analyze-session.py`。提取完 JSON 后，直接启动一个**只做分析、不写代码**的子 agent，读取 JSON 并输出 markdown 报告。
+
+**要求：**
+- 子 agent 只负责分析和写报告，不负责改代码
+- 报告必须基于提取出的 JSON 证据，不要虚构结论
+- 报告必须区分：样本 session 来自哪里、用户真正要优化的对象是什么
+- 如果命中了跨项目 session，要明确提醒这是样本来源，不等于当前要修改的项目
+- 如果证据不足，要明确写 `insufficient evidence`
+
+**推荐子 agent 任务描述：**
+```text
+读取 .superpowers/session-analysis/<session-id>.json，生成 .superpowers/session-analysis/<session-id>-report.md。
+
+目标：基于该 session 样本总结问题模式、关键证据、风险和优化建议。
+限制：只做分析，不写代码，不修改目标项目。
+必须包含：
+1. Summary
+2. Session Provenance
+3. Issues Found
+4. Optimization Recommendations
+5. 明确说明建议应作用于哪个目标对象（用户指定项目 / workflow / skill / harness）
 ```
 
-### 分析维度
-
-| 维度 | 指标 | 健康值 |
-|------|------|--------|
-| 工具成功率 | 成功调用 / 总调用 | > 90% |
-| 任务完成度 | 用户确认完成 / 总任务 | > 80% |
-| 效率 | tokens / 完成任务 | 越低越好 |
-| Skill 触发率 | 实际触发 / 应该触发 | > 70% |
-| 用户纠正率 | 被纠正次数 / 总回复 | < 10% |
-
-### 问题模式识别
-
-**常见问题：**
-- `repeated_failures`: 同一 failure category 在短时间内重复出现 3+ 次（不含 `expected_test_failure`）
-- `skill_not_triggered`: 应该使用 skill 但没有触发
-- `excessive_tokens`: 单次任务消耗 > 50k tokens
-- `user_corrections`: 用户频繁纠正
-
-**输出报告：**
+**报告建议结构：**
 ```markdown
 # Session Analysis Report
 
 ## Summary
-- Duration: 60 min
-- Tool Success Rate: 85%
-- Tasks Completed: 3/4
-- Skills Used: brainstorming, systematic-debugging
+- Duration: ...
+- Tool Success Signals: ...
+- Skills Used: ...
+- Primary Optimization Target: ...
 
 ## Session Provenance
-| Field | Value |
-|-------|-------|
-| Requested Project | `-Users-example-Desktop-project-superpowers` |
-| Actual Session File | `~/.claude/projects/-Users-example-Desktop-project-target/ac3a4...jsonl` |
-| Actual Project Directory | `~/.claude/projects/-Users-example-Desktop-project-target` |
-| Session Source | `fallback-global-search` |
+- Requested Project: ...
+- Actual Session File: ...
+- Actual Project Directory: ...
+- Session Source: ...
 
 ## Issues Found
-1. **expected_test_failure** in Bash tool (4 times)
-   - Context: TDD red phase / test verification
-   - Handling: Count separately, do not treat as high-severity execution failure
-
-2. **edit_match_ambiguity** repeated 3 times in Edit
-   - Suggestion: Widen the edit context, make the target snippet unique, or use replace_all when every match should change
-
-3. **skill_not_triggered**: test-driven-development
-   - Context: Real user request only; hook/summary/skill payload noise excluded
-   - Suggestion: Improve skill description
+1. ...
+   - Evidence: ...
+   - Impact: ...
+   - Confidence: high / medium / low
 
 ## Optimization Recommendations
-- [ ] Track expected TDD failures separately from actionable execution failures
-- [ ] Check file/session/project paths before execution
-- [ ] Widen edit-match context or switch to `replace_all` when every occurrence should change
+- [ ] ...
+- [ ] ...
+
+## Targeting Decision
+- Why these recommendations should apply to `<user-target>` instead of the sampled session project / harness itself
 ```
 
-**不要把工具层占位错误当成真实问题：**
-- `Read` 非 PDF 文件时若出现 `pages: ""`，这是调用层占位值，不应在报告中当成高优先级失败
-- `Skill` 若报 `shell command failed`，优先检查 skill shell wrapper、模板插值和脚本路径，而不是笼统归类成 runtime failure
+## Step 4: 主 agent 基于报告优化用户指定对象
 
-## Step 4: 生成优化建议
+主 agent 读取报告后，先判断优化对象，再实施修改。
 
-基于分析结果，生成针对特定 skill 的优化建议：
+**执行规则：**
+- 默认优先优化用户明确指定的项目 / 仓库 / workflow / skill
+- 不要因为分析样本来自别的目录，就直接改样本目录
+- 不要把 `harness-optimizer` 默认当成修复目标
+- 只有当报告证据明确指出问题就在 `harness-optimizer` 自身时，才回收为自优化
 
-### Skill Description 优化
-
-如果发现 skill 触发率低：
-```bash
-# 分析 skill 触发失败的上下文
-grep -A5 "should_trigger.*false" .superpowers/session-analysis/*-report.md
-```
-
-**优化方向：**
-- 扩展触发关键词
-- 添加常见变体表达
-- 增加"推动性"描述
-
-### Skill Content 优化
-
-如果发现执行效果差：
-- 检查指令是否清晰
-- 添加更多示例
-- 简化过于复杂的步骤
-- 解释"为什么"而不只是"做什么"
+**主 agent 的职责：**
+1. 读取子 agent 报告
+2. 提炼与用户目标对象最相关的建议
+3. 在用户指定项目中搜索对应实现位置
+4. 进行最小必要修改
+5. 验证修改是否匹配报告结论
 
 ## Step 5: 验证优化
 
-修改 skill 后，验证改进效果：
+修改 skill 或项目后，验证改进效果：
 
 ```bash
 # 使用 skill-creator 的 eval 系统
@@ -209,27 +189,27 @@ python -m skill_creator.scripts.run_eval \
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     Skill Self-Optimization                  │
+│                     Skill Harness-Optimizer                    │
 ├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│  1. INPUT: Session ID                                        │
-│     └─► extract-session.py                                  │
-│                                                              │
-│  2. EXTRACT: 会话数据                                        │
-│     └─► messages, tool_calls, skills_used                   │
-│                                                              │
-│  3. ANALYZE: 效果分析                                        │
-│     └─► 成功率, 完成度, 问题模式                            │
-│                                                              │
-│  4. OPTIMIZE: 生成建议                                       │
-│     └─► description 优化, content 改进                      │
-│                                                              │
-│  5. VERIFY: 验证测试                                         │
-│     └─► skill-creator eval 系统                             │
-│                                                              │
-│  6. LOOP: 记录学习                                           │
-│     └─► session-learnings 存储                              │
-│                                                              │
+│                                                             │
+│  1. INPUT: Session ID                                       │
+│     └─► extract-session.py                                 │
+│                                                             │
+│  2. EXTRACT: 会话数据                                       │
+│     └─► messages, tool_calls, skills_used                  │
+│                                                             │
+│  3. ANALYZE: 子 agent 读取 JSON 生成报告                    │
+│     └─► issues, evidence, targeting decision               │
+│                                                             │
+│  4. OPTIMIZE: 主 agent 基于报告优化用户指定目标             │
+│     └─► project / workflow / skill / harness               │
+│                                                             │
+│  5. VERIFY: 验证测试                                        │
+│     └─► skill-creator eval 系统                            │
+│                                                             │
+│  6. LOOP: 记录学习                                          │
+│     └─► session-learnings 存储                             │
+│                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -241,12 +221,6 @@ ls -lt ~/.claude/projects/<project-path>/*.jsonl | head -10
 
 # 提取特定会话
 python ${SKILL_PATH}/scripts/extract-session.py --session-id <id>
-
-# 分析效果
-python ${SKILL_PATH}/scripts/analyze-session.py --input <extracted.json>
-
-# 搜索问题模式
-grep -r "repeated_failures\|skill_not_triggered" .superpowers/session-analysis/
 ```
 
 ## Integration
