@@ -25,7 +25,7 @@ argument-hint: "任务描述或 Plan 路径"
 12. The completion promise uses exact string matching. Do not quote, mention, or emit it before all required work is complete.
 13. If you are approaching the iteration limit and are still blocked, document what is blocking progress, what you already tried, and the most likely next step.
 14. When ALL plan tasks are done, you MUST run superpowers:finishing-a-development-branch to complete the branch.
-15. ONLY after finishing-a-development-branch is executed, emit the completion signal exactly once as `<promise>COMPLETE</promise>`.
+15. ONLY after finishing-a-development-branch is executed, emit the completion signal exactly once as <promise>COMPLETE</promise>.
 " \
   --completion-promise "COMPLETE" \
   --max-iterations 60
