@@ -1,5 +1,11 @@
 # Superpowers Release Notes
 
+## v5.0.18 (2026-04-23)
+
+### Changes
+
+- 新增/huashu-design skill
+
 ## v5.0.17 (2026-04-16)
 
 ### Changes
