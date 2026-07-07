@@ -59,4 +59,9 @@ if grep -q "会话筛选协议" "$PROMPT_FILE"; then pass "prompt has filter pro
 if grep -q "{{FILTER}}" "$PROMPT_FILE"; then pass "prompt has {{FILTER}} placeholder"; else fail "prompt has {{FILTER}} placeholder"; fi
 if grep -q "filtered_sessions" "$PROMPT_FILE"; then pass "prompt records filtered_sessions"; else fail "prompt records filtered_sessions"; fi
 
+# Case 13: --project 只改变会话扫描目标，不把外部项目当作操作仓库
+if grep -q 'SCAN_TARGET="$PROJECT"' "$SCRIPT"; then pass "--project sets scan target"; else fail "--project sets scan target"; fi
+if grep -q 'TARGET_REPO="$(cd "$PROJECT"' "$SCRIPT"; then fail "--project must not reassign TARGET_REPO"; else pass "--project keeps operation repo unchanged"; fi
+if grep -q 'STATE_DIR="$TARGET_REPO/.claude/auto-loop"' "$SCRIPT"; then pass "state stays under operation repo"; else fail "state stays under operation repo"; fi
+
 print_summary "auto-loop.sh CLI"

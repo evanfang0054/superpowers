@@ -22,6 +22,12 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 If the spec covers multiple independent subsystems, it should have been broken into sub-project specs during brainstorming. If it wasn't, suggest breaking this into separate plans — one per subsystem. Each plan should produce working, testable software on its own.
 
+**大型任务分段:** If the task is full-stack, spans multiple apps, includes backend + frontend + AI, or will likely exceed 8 implementation tasks, do not create one monolithic plan. First output a directory-level execution map and 默认拆成多个 plan (for example: infrastructure / backend / frontend / design-polish). Each plan must have its own confirmation gate and testable outcome.
+
+**GDD gate:** Before writing implementation tasks, check whether the spec has a GDD / gate-driven-test-design artifact when the work carries non-trivial behavior, contract, or regression risk. If missing, stop and tell the user to generate GDD first (or explicitly skip GDD). Do not silently proceed into implementation tasks.
+
+**Design sync:** If a design doc, prototype, or `harness-design` artifact exists, the plan must include explicit 设计同步点. Name the design token / interaction constraints, where they land in code, and which task verifies them. Do not let design intent live only in prose.
+
 ## Sprint Contract Verification
 
 Before defining tasks, check for sprint contract:
