@@ -15,9 +15,9 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # （orchestrator-prompt.md、--plugin-dir 加载点）。全局安装下指向
 # ~/.claude/plugins/cache/.../agent-harness/<ver>/，开发期指向源仓库。
 PLUGIN_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-# TARGET_REPO: 用户要分析/修复的目标仓库。默认 = 当前工作目录的 git
-# 顶层，可被 --project 覆盖。必须与 PLUGIN_ROOT 区分：全局安装下两者
-# 不同，TARGET_REPO 是用户项目，PLUGIN_ROOT 是插件目录。
+# OPERATION_REPO: auto-loop 自身运行、state、worktree、issue/PR 所属仓库。
+# SCAN_TARGET: 要导出/分析会话的项目路径。--project 只改变 SCAN_TARGET，
+# 不改变 OPERATION_REPO，避免跨仓库 dry-run 被外部项目 git 状态阻断。
 TARGET_REPO="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 STATE_DIR="$TARGET_REPO/.claude/auto-loop"
 STATE_FILE="$STATE_DIR/state.json"
@@ -202,10 +202,6 @@ else
     elif [ -n "$PROJECT" ]; then
         SCOPE_DESC="扫描指定项目: $PROJECT"
         SCAN_TARGET="$PROJECT"
-        # --project 同时改变 target repo（用户指定要操作的项目仓库）
-        TARGET_REPO="$(cd "$PROJECT" && git rev-parse --show-toplevel 2>/dev/null || echo "$PROJECT")"
-        STATE_DIR="$TARGET_REPO/.claude/auto-loop"
-        STATE_FILE="$STATE_DIR/state.json"
     else
         SCOPE_DESC="扫描当前项目: $TARGET_REPO"
         SCAN_TARGET="$TARGET_REPO"
