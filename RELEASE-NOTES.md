@@ -1,5 +1,11 @@
 # Agent Harness Release Notes
 
+## v6.3.1 (2026-07-07)
+
+### Changes
+
+- Minor updates
+
 ## v6.2.0 (2026-06-26)
 
 ### Changes
