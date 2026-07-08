@@ -34,7 +34,14 @@ Definition of Done, write one paragraph (2-4 sentences) describing the
 **user-visible outcome** the feature should produce — what the user sees,
 does, or avoids having to do once it ships. Write it in the user's voice, not
 implementation terms. If you cannot write this paragraph, the spec is not
-ready for a contract yet: go back to brainstorming and clarify the outcome.
+ready for a contract yet. **Do NOT push the user back into brainstorming** —
+that risks a bounce loop between brainstorming's HARD-GATE and sprint-contract.
+Instead:
+1. Present the user with two options: (a) supplement the outcome description
+   here and continue, or (b) invoke `agent-harness:office-hours` to re-align
+   on goals before returning to the contract.
+2. office-hours sits upstream of brainstorming in the workflow and avoids
+   the loop.
 This blocks the #83 failure mode of negotiating detailed acceptance criteria
 for the wrong problem.
 

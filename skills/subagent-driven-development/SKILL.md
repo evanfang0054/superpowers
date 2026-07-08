@@ -28,7 +28,7 @@ resolve to the wrong location and fail.
 1. Read the plan/task, extract pending tasks
 2. For the NEXT pending task:
    a. Run \`\"\$SDD_SKILL_DIR/scripts/task-brief\"\` to extract task text to a file
-   b. **Inline referenced plan content (issue #82):** open the brief; for every line like \"per <plan>.md Task N\" or \"see <plan>.md section X\", copy that section verbatim into the brief so the implementer never has to Read the plan file. The brief must be self-contained. Prefer inlining when the referenced section is <= ~1KB; for huge sections, quote only the binding constraints and acceptance criteria.
+   b. **Inline referenced plan content (issue #82):** open the brief; for every line like \"per <plan>.md Task N\" or \"see <plan>.md section X\", copy that section verbatim into the brief. Prefer inlining when the referenced section is <= ~1KB; for larger sections, inline a summary + note in the brief that the full section lives at <plan>.md:<section> and the implementer may Read that specific section if needed (scoped re-Read fallback per ce8d713).
    c. Dispatch IMPLEMENTER subagent (use \`\"\$SDD_SKILL_DIR/implementer-prompt.md\"\` template, with brief file path)
    d. If implementer asks questions, answer them and re-dispatch
    e. When implementer reports DONE, run \`\"\$SDD_SKILL_DIR/scripts/review-package\" BASE HEAD\` to generate diff file

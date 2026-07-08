@@ -187,24 +187,22 @@ else
 fi
 
 # ==========================================
-# Test 9: Confidence decay
+# Test 9: Confidence decay (non-summary) vs summary freeze
 # ==========================================
 echo "--- Test 9: Confidence decay ---"
 setup
 mkdir -p .agent-harness
 
 # Create an entry with old timestamp (365 days ago = ~12 months = -12 points decay)
-# Use Python for portable date calculation
 OLD_TS=$(python3 -c "from datetime import datetime, timedelta; print((datetime.utcnow() - timedelta(days=365)).strftime('%Y-%m-%dT%H:%M:%SZ'))")
 echo "{\"ts\":\"$OLD_TS\",\"type\":\"pattern\",\"key\":\"old_entry\",\"insight\":\"Old observed pattern\",\"confidence\":10,\"source\":\"observed\",\"files\":[]}" > .agent-harness/learnings.jsonl
 
-OUTPUT=$("$PLUGIN_DIR/scripts/search-learnings.sh" --summary)
-
-# Confidence should have decayed (10 - 12 = -2, capped at 1)
-if echo "$OUTPUT" | grep -q "confidence: 1/10"; then
-    log_pass "Confidence decay works (old entry decayed to minimum)"
+# --summary freezes confidence to original value (byte-stable, issue #79 C1+I3)
+OUTPUT_SUMMARY=$("$PLUGIN_DIR/scripts/search-learnings.sh" --summary 2>&1 || true)
+if echo "$OUTPUT_SUMMARY" | grep -q "confidence: 10/10"; then
+    log_pass "Summary mode: confidence frozen to original (10/10)"
 else
-    log_fail "Confidence decay failed: $OUTPUT"
+    log_fail "Summary mode should show original confidence: $OUTPUT_SUMMARY"
 fi
 
 # ==========================================

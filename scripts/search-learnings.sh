@@ -62,10 +62,12 @@ format_learnings() {
     local max_entries="${3:-0}"          # 0 = no limit
     local min_confidence="${4:-0}"       # 0 = no filter
     local recent_within_days="${5:-0}"   # 0 = no filter
+    local is_summary="${6:-0}"           # 1 = summary mode (freeze confidence)
     LEARNINGS_FILTER="$filter" LEARNINGS_TYPE_FILTER="$type_filter" \
         LEARNINGS_MAX_ENTRIES="$max_entries" \
         LEARNINGS_MIN_CONFIDENCE="$min_confidence" \
         LEARNINGS_RECENT_WITHIN_DAYS="$recent_within_days" \
+        LEARNINGS_SUMMARY_MODE="$is_summary" \
         python3 - "$LEARNINGS_FILE" << 'PYTHON'
 import json
 import sys
@@ -79,6 +81,7 @@ type_filter = os.environ.get('LEARNINGS_TYPE_FILTER', '').lower()
 max_entries = int(os.environ.get('LEARNINGS_MAX_ENTRIES', '0') or '0')
 min_confidence = int(os.environ.get('LEARNINGS_MIN_CONFIDENCE', '0') or '0')
 recent_within_days = int(os.environ.get('LEARNINGS_RECENT_WITHIN_DAYS', '0') or '0')
+summary_mode = os.environ.get('LEARNINGS_SUMMARY_MODE', '0') == '1'
 
 try:
     with open(file_path, 'r') as f:
@@ -107,12 +110,16 @@ for line in lines:
             if filter_text not in text_to_search:
                 continue
         
-        # Calculate effective confidence with decay
+        # Calculate effective confidence with decay.
+        # In summary mode (--min-confidence or throttle flags present),
+        # freeze to the original value to keep output deterministic across
+        # days — prompt cache prefix match breaks if the confidence
+        # number changes (issue #79 / C1+I3 fix).
         conf = e.get('confidence', 5)
         source = e.get('source', '')
         ts = e.get('ts', '')
-        
-        if source in ('observed', 'inferred') and ts:
+
+        if not summary_mode and source in ('observed', 'inferred') and ts:
             try:
                 # Handle ISO format with Z suffix
                 ts_clean = ts.replace('Z', '+00:00')
@@ -197,7 +204,8 @@ for t in sorted(by_type.keys()):
         files = f" (files: {', '.join(e.get('files', []))})" if e.get('files') else ""
         # Note: deliberately omit ts-derived date here. Including it would
         # make the summary non-stable across days and break prompt-cache
-        # prefix matching (issue #79). Confidence/source are stable attrs.
+        # prefix matching (issue #79). In summary mode confidence is frozen
+        # to the original value; display it so the model sees signal strength.
         print(f"- [{e['key']}] (confidence: {e['_effective_confidence']}/10, {e.get('source', 'unknown')})")
         print(f"  {e.get('insight', '')}{files}")
     print()
@@ -237,7 +245,7 @@ set -- "${new_args[@]}"
 
 case "$1" in
     --summary)
-        format_learnings "" "" "$MAX_ENTRIES" "$MIN_CONFIDENCE" "$RECENT_WITHIN_DAYS"
+        format_learnings "" "" "$MAX_ENTRIES" "$MIN_CONFIDENCE" "$RECENT_WITHIN_DAYS" "1"
         ;;
     --all)
         echo "=== All Learnings ($total entries) ==="

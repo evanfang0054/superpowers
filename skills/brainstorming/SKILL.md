@@ -175,11 +175,18 @@ If unsure whether a change qualifies, default to running sprint contract.
 
 ## Clarification Loop Circuit-Breaker (issue #83)
 
-If the user rejects your proposed options **3 times in a row** (signals like
-"不对", "不行", "还是不对", "重新", "no", "not what I meant"), **stop listing
-more options**. Listing more variants of the same shape does not converge — it
-inflates context with zero-output turns (hack session 90b1b2fd hit 45.6%
-no-tool turns this way).
+If the user rejects your proposed options **3 times in a row** (clear rejection
+signals — "不对" / "不行" / "重新" / "no" / "not what I meant" / "that's not
+it" / "try again" / a hesitant "嗯..." followed by a different question / any
+response that says "this isn't what I want, try something else" regardless of
+language), **stop listing more options**. Listing more variants of the same
+shape does not converge — it inflates context with zero-output turns (hack
+session 90b1b2fd hit 45.6% no-tool turns this way).
+
+Judge by intent, not by keyword matching — a user can reject without using any
+of the example phrases. If you're unsure whether something was a rejection,
+ask directly ("is this a no?") rather than treating an ambiguous turn as
+neither yes nor no.
 
 **Switch strategy immediately:**
 
@@ -193,9 +200,8 @@ no-tool turns this way).
 4. Only resume option-listing once the user has described the desired outcome
    in their own words.
 
-This rule works together with `loop-detection`'s semantic-loop trigger
-(3+ no-tool turns with rejection), which surfaces the same signal from the
-detection side.
+This rule works together with `loop-detection`'s semantic-loop section,
+which cross-references this skill as the authoritative handler.
 
 ## Six Forcing Questions (Product Ideas)
 

@@ -50,7 +50,9 @@ else
     fail "using-agent-harness should precede Project Learnings (ua=$ua_line learnings=$learnings_line)"
 fi
 
-# Assertion 3: learnings summary output is deterministic (no ts-derived date).
+# Assertion 3: learnings summary output is deterministic (no ts-derived date,
+# no decay). C1+I3 fix: summary mode freezes confidence to original value so
+# output is stable across days.
 LEARNINGS_FILE="$REPO_ROOT/.agent-harness/learnings.jsonl"
 if [ -f "$LEARNINGS_FILE" ]; then
     S1=$("$REPO_ROOT/scripts/search-learnings.sh" --summary 2>/dev/null || true)
@@ -59,6 +61,29 @@ if [ -f "$LEARNINGS_FILE" ]; then
         pass "search-learnings.sh --summary is byte-stable across two runs"
     else
         fail "search-learnings.sh --summary is byte-stable across two runs"
+    fi
+
+    # Additional: verify that any confidence displayed in summary matches
+    # the raw confidence from the learnings JSONL (not decayed).
+    # This catches the C1+I3 bug where decayed values would differ cross-day.
+    RAW_CONF=$(python3 -c "
+import json, sys
+with open('$LEARNINGS_FILE') as f:
+    for line in f:
+        if line.strip():
+            e = json.loads(line)
+            if 'confidence' in e:
+                print(e['confidence'])
+                break
+" 2>/dev/null || true)
+    if [ -n "$RAW_CONF" ]; then
+        if echo "$S1" | grep -q "confidence: ${RAW_CONF}/10"; then
+            pass "summary confidence matches raw value (not decayed, C1+I3)"
+        else
+            fail "summary confidence should match raw value ${RAW_CONF}/10 (C1+I3)"
+        fi
+    else
+        pass "no confidence in learnings (skip C1+I3 check)"
     fi
 else
     pass "no learnings file present (skip summary determinism check)"
