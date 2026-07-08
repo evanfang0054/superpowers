@@ -93,6 +93,21 @@ echo "--- Test 7: query --recent 0 excludes old (sanity) ---"
 OUT=$("$PLUGIN_DIR/scripts/query-phase-metrics.sh" --phase brainstorming --recent 0 --summary 2>&1 || true)
 echo "$OUT" | grep -q "count.*0" && log_pass "recent 0 shows nothing" || log_pass "recent 0 still works (boundary)"
 
+# --- Test 8: global --summary without --phase ---
+echo "--- Test 8: global --summary without --phase ---"
+setup
+"$PLUGIN_DIR/scripts/log-phase-metric.sh" --phase brainstorming --action end --duration-ms 1000 --gate-result passed --spec-topic t1
+"$PLUGIN_DIR/scripts/log-phase-metric.sh" --phase writing-plans --action end --duration-ms 2000 --gate-result failed --spec-topic t1
+OUT=$("$PLUGIN_DIR/scripts/query-phase-metrics.sh" --summary)
+echo "$OUT" | grep -q "phase: all" && log_pass "global summary reports phase all" || log_fail "global summary phase missing"
+echo "$OUT" | grep -q "count.*2" && log_pass "global summary count=2" || log_fail "global summary count wrong"
+echo "$OUT" | grep -q "failed.*1" && log_pass "global summary failed=1" || log_fail "global summary failed wrong"
+
+# --- Test 9: coverage --trends supports global summary ---
+echo "--- Test 9: coverage --trends global summary ---"
+OUT=$("$PLUGIN_DIR/scripts/coverage-metrics.sh" --trends --summary)
+echo "$OUT" | grep -q "phase: all" && log_pass "coverage trends delegates global summary" || log_fail "coverage trends global summary failed"
+
 echo ""
 echo "Results: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ] || exit 1

@@ -40,6 +40,29 @@ else
     pass "CLAUDE_ENV_FILE (handled by hooks.json first hook)"
 fi
 
+TMP_PROJECT=$(mktemp -d)
+KB_OUTPUT=$(printf '{"source":"startup"}' | CLAUDE_PLUGIN_ROOT="$REPO_ROOT" CLAUDE_PROJECT_DIR="$TMP_PROJECT" bash "$SESSION_START" 2>/dev/null || true)
+if printf '%s' "$KB_OUTPUT" | grep -q "Knowledge Base"; then
+    fail "KB hint omitted outside agent-harness projects"
+else
+    pass "KB hint omitted outside agent-harness projects"
+fi
+if printf '%s' "$KB_OUTPUT" | grep -q "\*\*/\*.md"; then
+    fail "glob warning omitted outside agent-harness projects"
+else
+    pass "glob warning omitted outside agent-harness projects"
+fi
+
+mkdir -p "$TMP_PROJECT/docs/agent-harness"
+printf '# Index\n' > "$TMP_PROJECT/docs/agent-harness/index.md"
+KB_OUTPUT=$(printf '{"source":"startup"}' | CLAUDE_PLUGIN_ROOT="$REPO_ROOT" CLAUDE_PROJECT_DIR="$TMP_PROJECT" bash "$SESSION_START" 2>/dev/null || true)
+if printf '%s' "$KB_OUTPUT" | grep -q "Knowledge Base"; then
+    pass "KB hint included for agent-harness projects"
+else
+    fail "KB hint included for agent-harness projects"
+fi
+
 rm -f "$MOCK_ENV_FILE"
+rm -rf "$TMP_PROJECT"
 
 print_summary "SessionStart Injection"

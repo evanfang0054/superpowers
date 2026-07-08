@@ -36,6 +36,20 @@ EOF
 "$PLUGIN_DIR/scripts/write-diagnosis-task.sh" --diagnosis diag.json 2>&1
 F=$(ls docs/agent-harness/notes/diagnoses/*.md 2>/dev/null | head -1)
 [ -n "$F" ] && log_pass "standalone created" || log_fail "no standalone file"
+[ -n "$F" ] && ! grep -q "🔧" "$F" && log_pass "standalone heading has no emoji" || log_fail "standalone heading has emoji"
+
+# --- Test 3: default does not append latest plan ---
+echo "--- Test 3: default does not append latest plan ---"
+setup
+mkdir -p docs/agent-harness/plans
+printf '# Plan\n' > docs/agent-harness/plans/latest.md
+cat > diag.json <<'EOF'
+{"ts":"2026-06-29T00:00:00Z","failure_type":"loop","spec_topic":"t1","failure_summary":"3 edits","evidence":{},"root_cause_hypothesis":"h","suggested_fixes":[{"action":"revisit-brainstorming","rationale":"r"}],"confidence":7}
+EOF
+"$PLUGIN_DIR/scripts/write-diagnosis-task.sh" --diagnosis diag.json >/dev/null
+if [ "$(cat docs/agent-harness/plans/latest.md)" = "# Plan" ]; then log_pass "default does not append latest plan"; else log_fail "default mutated latest plan"; fi
+F=$(ls docs/agent-harness/notes/diagnoses/*.md 2>/dev/null | head -1)
+[ -n "$F" ] && log_pass "default writes standalone note" || log_fail "default standalone note missing"
 
 echo ""
 echo "Results: $PASS passed, $FAIL failed"

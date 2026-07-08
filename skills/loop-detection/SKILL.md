@@ -84,7 +84,7 @@ circuit-breaker) or recommend `/compact` + fresh session. See
 scripts/diagnose-failure.sh --type loop --context '{"file":"<path>","edits":<n>}' --spec-topic "$SPEC_TOPIC"
 ```
 
-诊断报告路径会在警告输出里告知用户（stderr）。报告只记录，不执行修复——由人审决定下一步。
+诊断报告路径会输出到 stdout，status 信息输出到 stderr。报告只记录，不执行修复——由人审决定下一步。
 
 ## Red Flags -- STOP Editing
 

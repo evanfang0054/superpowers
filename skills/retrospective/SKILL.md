@@ -1,6 +1,6 @@
 ---
 name: retrospective
-description: "Engineering retro: analyze commits, learnings, patterns. Trigger: 'do a retro', 'review the week', end of sprint/milestone."
+description: "Engineering retrospective for analyzing recent work. Use when asked to 'do a retro', 'review the week', 'what did we accomplish', or at the end of a sprint/milestone. Analyzes commits, learnings, and patterns to improve future work."
 when_to_use: "[feedback] Triggered at end of sprint or session to analyze what happened and improve."
 ---
 
@@ -91,12 +91,12 @@ Read phase-level trends for the retro period:
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/query-phase-metrics.sh" --recent 14 --summary
 ```
 
-Write the top three signals into the retro report:
-- 失败率最高的阶段（gate fail 比例）
-- 平均耗时最长的阶段（end-to-gate duration）
-- 累计 token 成本最高的阶段（if recorded）
+Write the top available signals into the retro report:
+- 失败率最高的阶段（from recorded `gate_result` values）
+- 平均耗时最长的阶段（when `duration_ms` is recorded）
+- 累计 token / cost 最高的阶段（only when token or cost fields were recorded）
 
-Use these to focus action items on the bottlenecks that matter.
+If the metrics file is empty, say that no phase metrics have been recorded yet instead of inferring trends. Use available signals to focus action items on the bottlenecks that matter.
 
 ### Step 3: Structured Review
 

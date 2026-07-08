@@ -276,7 +276,7 @@ Agent Harness 不仅是一组 skill 的集合，更在模型外搭建了一层�
 
 | 子系统 | 解决的问题 | 关键产物 |
 |---|---|---|
-| **可监测性** | "这套 harness 好不好用、贵不贵、哪一步老翻车"从感觉变成数据 | `.agent-harness/phase-metrics.jsonl`（token / 耗时 / 失败率持久化）+ `log-phase-metric.sh` / `query-phase-metrics.sh`，7 个核心 skill 在阶段边界主动 emit |
+| **可监测性** | 把阶段门禁、耗时等可记录信号从零散感受沉淀为可查询数据 | `.agent-harness/phase-metrics.jsonl` + `log-phase-metric.sh` / `query-phase-metrics.sh`；在显式接入的阶段记录 `gate_result`、`duration_ms`，并在可用时保留 token / cost 字段 |
 | **协议层契约** | skill 间交接从"自然语言软校验"升级为"机器可校验的 schema 前置" | spec / plan / task 三交接点 YAML frontmatter + `validate-handoff.sh` 硬前置校验；与现有 reviewer 子代理并行不替代 |
 | **知识库 / 上下文** | 上下文注入从"塞得越多越好"变成"每一步只送该看见的那一片" | 顶级 `index.md` + 各子目录二级索引 + `glossary.md`（SSOT）；SessionStart 只加一行指路，不爆 token |
 | **失败自愈** | 失败处理从"报警 + 人工介入"升级为"诊断报告 → 可执行修复任务"闭环 | `diagnose-failure.sh` 收敛 loop / gate / test 三类失败信号为结构化 JSON + `write-diagnosis-task.sh` 回写为 task；不自动执行，闭环可被人工打断 |
