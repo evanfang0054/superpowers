@@ -152,10 +152,15 @@ kb_hint_escaped=$(escape_for_json "$kb_hint")
 # - resume: lean payload — using-agent-harness is already in the prior context,
 #   so we inject only the learnings refresh (and warning if present). No empty
 #   "Below is the full content..." heading.
+#
+# Cache-friendly ordering (issue #79): Anthropic prompt caching is prefix-match.
+# Static segments (using-agent-harness, headless_tip, kb_hint) are placed first
+# so they form a stable prefix; dynamic segments (warning, learnings) go last
+# so their per-session churn does not invalidate the cache hit on the prefix.
 if [ "$SESSION_SOURCE" = "resume" ]; then
     session_context="${warning_escaped}${learnings_escaped}"
 else
-    session_context="<EXTREMELY_IMPORTANT>\nYou have agent-harness.\n\n**Below is the full content of your 'agent-harness:using-agent-harness' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\n\n${using_agent_harness_escaped}\n\n${warning_escaped}${learnings_escaped}${headless_tip_escaped}${kb_hint_escaped}\n</EXTREMELY_IMPORTANT>"
+    session_context="<EXTREMELY_IMPORTANT>\nYou have agent-harness.\n\n**Below is the full content of your 'agent-harness:using-agent-harness' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\n\n${using_agent_harness_escaped}${headless_tip_escaped}${kb_hint_escaped}\n\n${warning_escaped}${learnings_escaped}\n</EXTREMELY_IMPORTANT>"
 fi
 
 # Output context injection as JSON.

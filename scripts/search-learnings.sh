@@ -147,7 +147,10 @@ for e in entries:
             seen[dk] = e
 
 results = list(seen.values())
-results.sort(key=lambda x: x.get('_effective_confidence', 0), reverse=True)
+# Sort: deterministic order so identical learning sets produce byte-equal
+# summary output (cache-friendly prefix, issue #79). Confidence is still
+# surfaced per-entry but no longer drives ordering.
+results.sort(key=lambda x: (x.get('type', ''), x.get('key', '')))
 
 # Apply throttle filters (--max-entries / --min-confidence / --recent-within-days)
 if min_confidence > 0:
@@ -184,13 +187,18 @@ type_counts = [f"{len(arr)} {t}{'s' if len(arr) > 1 else ''}" for t, arr in by_t
 print(f"LEARNINGS: {len(results)} loaded ({', '.join(type_counts)})")
 print()
 
-# Output by type
-for t, arr in sorted(by_type.items()):
+# Output by type. Groups are iterated in sorted order and entries within each
+# group are sorted by key — both deterministic, so two runs over the same
+# learning set produce byte-equal output (cache-friendly, issue #79).
+for t in sorted(by_type.keys()):
+    arr = sorted(by_type[t], key=lambda e: e.get('key', ''))
     print(f"## {t.capitalize()}s")
     for e in arr:
         files = f" (files: {', '.join(e.get('files', []))})" if e.get('files') else ""
-        date = e.get('ts', '')[:10] if e.get('ts') else 'unknown'
-        print(f"- [{e['key']}] (confidence: {e['_effective_confidence']}/10, {e.get('source', 'unknown')}, {date})")
+        # Note: deliberately omit ts-derived date here. Including it would
+        # make the summary non-stable across days and break prompt-cache
+        # prefix matching (issue #79). Confidence/source are stable attrs.
+        print(f"- [{e['key']}] (confidence: {e['_effective_confidence']}/10, {e.get('source', 'unknown')})")
         print(f"  {e.get('insight', '')}{files}")
     print()
 PYTHON
