@@ -39,6 +39,16 @@ Knowledge discovered in one session shouldn't be lost. Learnings accumulate proj
 
 ## How to Record
 
+### Before Recording (Dedup Check)
+
+Before writing a new learning, check whether the key already exists:
+
+```bash
+${CLAUDE_PLUGIN_ROOT}/scripts/search-learnings.sh <key>
+```
+
+If the key exists, prompt the user: **"更新现有条目还是新建？"** — 避免重复（SSOT 精神延伸到 learnings）。
+
 ### Storage Location
 
 Learnings are stored in `.agent-harness/learnings.jsonl` at the project root.

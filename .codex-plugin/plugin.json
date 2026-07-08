@@ -1,6 +1,6 @@
 {
   "name": "agent-harness",
-  "version": "6.2.0",
+  "version": "6.3.0",
   "description": "为 coding agent 提供的技能框架与软件开发方法论：规划、TDD、调试、协作工作流",
   "author": {
     "name": "evanfang",

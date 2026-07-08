@@ -46,6 +46,10 @@ Invoke the `code-reviewer` agent (defined in `agents/code-reviewer.md`).
 - Fix Important issues before proceeding
 - Note Minor issues for later
 - Push back if reviewer is wrong (with reasoning)
+- Reviewer 返回且 Critical/Important 处理完毕后，emit 阶段 gate（不阻断）：
+  ```bash
+  scripts/log-phase-metric.sh --phase requesting-code-review --action gate --gate-result passed --spec-topic "$SPEC_TOPIC"
+  ```
 
 ## Example
 

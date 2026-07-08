@@ -314,3 +314,17 @@ echo '{"ts":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","type":"pitfall","key":"SHORT_K
 - Bug was caused by project-specific convention
 - Fix required understanding undocumented behavior
 - Same mistake could happen again without this knowledge
+
+## Capture Diagnosis Task
+
+**调试结束时**，把「这次怎么修的」沉淀为 task，避免下次同类问题重复根因分析（不自动执行修复，只生成 task 供人审）：
+
+```bash
+# 1. 生成诊断 JSON（stdout 只输出 JSON 路径；status 信息走 stderr）
+scripts/diagnose-failure.sh --type test --context '<json>' --spec-topic "$SPEC_TOPIC"
+
+# 2. 把诊断写成 task（默认写独立 note；只有显式 --plan 才追加计划文件）
+scripts/write-diagnosis-task.sh --diagnosis <上一步 stdout 输出的 json 路径>
+```
+
+**When to run:** 根因非显而易见 / 同类问题反复出现 / 修复涉及项目特定约定。如果 bug 是一次性的明显笔误，可跳过。

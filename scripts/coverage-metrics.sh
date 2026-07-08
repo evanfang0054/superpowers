@@ -14,6 +14,13 @@
 
 set -euo pipefail
 
+# --- --trends: 委托给 query-phase-metrics ---
+if [ "${1:-}" = "--trends" ]; then
+  shift
+  SCRIPT_DIR_CM="$(cd "$(dirname "$0")" && pwd)"
+  exec "$SCRIPT_DIR_CM/query-phase-metrics.sh" "$@"
+fi
+
 PROJECT_ROOT="${1:-.}"
 SKILLS_DIR="${PROJECT_ROOT}/skills"
 SENSORS_FILE="${PROJECT_ROOT}/.agent-harness/sensors.json"

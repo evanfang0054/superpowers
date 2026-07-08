@@ -36,6 +36,8 @@ Before defining tasks, check for sprint contract:
 
 ## File Structure
 
+**知识库检索约定**：开始前先读 `docs/agent-harness/index.md`，再按主题跳到子目录 index.md，禁止 `**/*.md` 全局通配。
+
 Before defining tasks, map out which files will be created or modified and what each one is responsible for. This is where decomposition decisions get locked in.
 
 - Design units with clear boundaries and well-defined interfaces. Each file should have one clear responsibility.
@@ -56,9 +58,17 @@ This structure informs the task decomposition. Each task should produce self-con
 
 ## Plan Document Header
 
-**Every plan MUST start with this header:**
+**Every plan MUST start with this frontmatter, followed by this header:**
 
 ```markdown
+---
+spec_ref: ../specs/<spec-file>.md
+spec_topic: <topic-from-docs-agent-harness-index>
+task_count: <number>
+estimated_phases: [tests, implementation, verification]
+dod: "<definition of done from sprint contract>"
+---
+
 # [Feature Name] Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use agent-harness:subagent-driven-development (recommended) or agent-harness:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
@@ -158,6 +168,12 @@ This prevents plan execution interruptions from type errors discovered during im
 
 After writing the complete plan, look at the spec with fresh eyes and check the plan against it. This is a checklist you run yourself — not a subagent dispatch.
 
+**结构前置校验（硬门禁）**：plan 落盘后、进入 self-review 之前，必须跑：
+```bash
+scripts/validate-handoff.sh --stage plan --file <plan-path>
+```
+失败则回到 plan 写作步骤补全 frontmatter / 字段。通过后再交 self-review 做语义审稿。
+
 **1. Spec coverage:** Skim each section/requirement in the spec. Can you point to a task that implements it? List any gaps.
 
 **2. Placeholder scan:** Search your plan for red flags — any of the patterns from the "No Placeholders" section above. Fix them.
@@ -165,6 +181,15 @@ After writing the complete plan, look at the spec with fresh eyes and check the 
 **3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
 
 If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
+
+- Plan 落盘并通过 self-review 后，跑结构校验并按结果 emit 阶段 gate（不阻断）：
+  ```bash
+  if scripts/validate-handoff.sh --stage plan --file "$PLAN"; then
+    scripts/log-phase-metric.sh --phase writing-plans --action gate --gate-result passed --spec-topic "$SPEC_TOPIC"
+  else
+    scripts/log-phase-metric.sh --phase writing-plans --action gate --gate-result failed --spec-topic "$SPEC_TOPIC"
+  fi
+  ```
 
 ## Execution Handoff
 

@@ -65,6 +65,14 @@ You MUST do ONE of the following before touching that file again:
 
 No exceptions. HARD STOP means stop.
 
+**触发诊断（不自动修复）：** HARD STOP 时除原警告外，额外生成一份失败诊断报告，便于后续追溯同类循环：
+
+```bash
+scripts/diagnose-failure.sh --type loop --context '{"file":"<path>","edits":<n>}' --spec-topic "$SPEC_TOPIC"
+```
+
+诊断报告路径会输出到 stdout，status 信息输出到 stderr。报告只记录，不执行修复——由人审决定下一步。
+
 ## Red Flags -- STOP Editing
 
 - "This time is different" -- convergence evidence or stop

@@ -1,5 +1,12 @@
 # Agent Harness Release Notes
 
+## v6.3.0 (2026-06-29)
+
+### Changes
+
+- README 新增 Harness Engineering 小节（中英双语），介绍可监测性 / 协议层契约 / 知识库 / 失败自愈四个子系统的咬合关系
+- bump-version.sh 升级为双面 CLI：agent-native 路径（JSON envelope / --dry-run / --yes / --notes / schema 自省），人类路径保持向后兼容
+
 ## v6.2.0 (2026-06-26)
 
 ### Changes

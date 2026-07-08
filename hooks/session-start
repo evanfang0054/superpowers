@@ -123,6 +123,14 @@ if [ "$SESSION_SOURCE" = "startup" ] || [ "$SESSION_SOURCE" = "clear" ]; then
     headless_tip="\n\n## Skill Invocation Best Practice\nWhen programmatically invoking skills (tests, CI, -p mode), use imperative form:\n  ✅ 'Invoke the Skill tool with brainstorming'\n  ❌ '/brainstorming'\n"
 fi
 
+# Knowledge base pointer (one line) — only on startup/clear for agent-harness KB projects.
+# Just point at the KB index, never inject the body. Two-level lookup, no **/*.md glob.
+kb_hint=""
+if { [ "$SESSION_SOURCE" = "startup" ] || [ "$SESSION_SOURCE" = "clear" ]; } \
+   && [ -f "$LEARNINGS_DIR/docs/agent-harness/index.md" ]; then
+    kb_hint="\n\n## Knowledge Base\nAgent Harness 知识库入口: docs/agent-harness/index.md（仅用于本项目知识库检索：两级查找，不要对 docs/agent-harness 使用 **/*.md 全局通配）\n"
+fi
+
 # Escape string for JSON embedding using bash parameter substitution.
 escape_for_json() {
     local s="$1"
@@ -138,6 +146,7 @@ using_agent_harness_escaped=$(escape_for_json "$using_agent_harness_content")
 warning_escaped=$(escape_for_json "$warning_message")
 learnings_escaped=$(escape_for_json "$learnings_content")
 headless_tip_escaped=$(escape_for_json "$headless_tip")
+kb_hint_escaped=$(escape_for_json "$kb_hint")
 
 # Build the session context.
 # - startup / clear: full wrapper with using-agent-harness body + learnings + tip
@@ -147,7 +156,7 @@ headless_tip_escaped=$(escape_for_json "$headless_tip")
 if [ "$SESSION_SOURCE" = "resume" ]; then
     session_context="${warning_escaped}${learnings_escaped}"
 else
-    session_context="<EXTREMELY_IMPORTANT>\nYou have agent-harness.\n\n**Below is the full content of your 'agent-harness:using-agent-harness' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\n\n${using_agent_harness_escaped}\n\n${warning_escaped}${learnings_escaped}${headless_tip_escaped}\n</EXTREMELY_IMPORTANT>"
+    session_context="<EXTREMELY_IMPORTANT>\nYou have agent-harness.\n\n**Below is the full content of your 'agent-harness:using-agent-harness' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\n\n${using_agent_harness_escaped}\n\n${warning_escaped}${learnings_escaped}${headless_tip_escaped}${kb_hint_escaped}\n</EXTREMELY_IMPORTANT>"
 fi
 
 # Output context injection as JSON.

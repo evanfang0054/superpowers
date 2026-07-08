@@ -268,6 +268,27 @@ Agent Harness 采用分层架构：**决策层**确保"做对的事"，**执行�
 
 详见 [设计文档](docs/agent-harness/specs/2026-06-24-auto-loop-self-improvement-design.md)。
 
+## Harness Engineering：可观测、可校验、可诊断的工程层
+
+Agent Harness 不仅是一组 skill 的集合，更在模型外搭建了一层工程环境，让 AI 在你的工程体系里能**可执行、可约束、可验证、可反馈**地持续工作。这层被业界称为 Harness Engineering——不是教模型"怎么回答"，而是设计模型"怎么工作"（`Agent = Model + Harness`）。
+
+围绕三层工作流，agent-harness 提供四个互相咬合的子系统：
+
+| 子系统 | 解决的问题 | 关键产物 |
+|---|---|---|
+| **可监测性** | 把阶段门禁、耗时等可记录信号从零散感受沉淀为可查询数据 | `.agent-harness/phase-metrics.jsonl` + `log-phase-metric.sh` / `query-phase-metrics.sh`；在显式接入的阶段记录 `gate_result`、`duration_ms`，并在可用时保留 token / cost 字段 |
+| **协议层契约** | skill 间交接从"自然语言软校验"升级为"机器可校验的 schema 前置" | spec / plan / task 三交接点 YAML frontmatter + `validate-handoff.sh` 硬前置校验；与现有 reviewer 子代理并行不替代 |
+| **知识库 / 上下文** | 上下文注入从"塞得越多越好"变成"每一步只送该看见的那一片" | 顶级 `index.md` + 各子目录二级索引 + `glossary.md`（SSOT）；SessionStart 只加一行指路，不爆 token |
+| **失败自愈** | 失败处理从"报警 + 人工介入"升级为"诊断报告 → 可执行修复任务"闭环 | `diagnose-failure.sh` 收敛 loop / gate / test 三类失败信号为结构化 JSON + `write-diagnosis-task.sh` 回写为 task；不自动执行，闭环可被人工打断 |
+
+**四个子系统的咬合点：**
+
+- 协议层的 `gate_result` 由 `validate-handoff.sh` 驱动，emit 到 phase-metrics
+- 协议层的 `spec_topic` 必须命中知识库的 `index.md`，否则硬前置退回
+- 失败自愈的信号源复用 phase-metrics 与知识库的 learnings 索引，命中相似历史故障
+
+设计文档见 `docs/agent-harness/specs/2026-06-29-harness-engineering-improvements-design.md`，四个实施 plan 在 `docs/agent-harness/plans/2026-06-29-*.md`。
+
 ## 包含内容
 
 ### 技能库

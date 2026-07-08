@@ -42,4 +42,6 @@ triage/
 skills/harness-optimizer/tests
 skills/harness-optimizer/scripts/__pycache__
 .agent-harness/session-analysis
+.agent-harness/phase-metrics.jsonl
+.agent-harness/diagnoses/
 !CLAUDE.md

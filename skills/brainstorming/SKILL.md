@@ -23,6 +23,7 @@ Every project goes through this process. A todo list, a single-function utility,
 You MUST create a task for each of these items and complete them in order:
 
 1. **Explore project context** — check files, docs, recent commits
+   - **知识库检索约定**：先读 `docs/agent-harness/index.md`，再按主题跳到子目录 index.md，禁止 `**/*.md` 全局通配
 2. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 3. **Propose 2-3 approaches** — with trade-offs and your recommendation
 4. **Present design** — in sections scaled to their complexity, get user approval after each section
@@ -110,8 +111,27 @@ digraph brainstorming {
 
 - Write the validated design (spec) to `docs/agent-harness/specs/YYYY-MM-DD-<topic>-design.md`
   - (User preferences for spec location override this default)
+- Every spec document must start with YAML frontmatter before the title:
+
+```yaml
+---
+spec_topic: <topic-from-docs-agent-harness-index>
+decision_summary: "<one sentence decision summary>"
+design_approved: true
+user_approved_at: <ISO-8601 timestamp>
+gates: [user-review-passed]
+---
+```
+
+- Use a real topic from `docs/agent-harness/index.md`; if this is a new topic, add it to the index before running `validate-handoff.sh`.
 - Use elements-of-style:writing-clearly-and-concisely skill if available
 - Commit the design document to git
+
+**结构前置校验（硬门禁）**：spec 文档提交后、进入 self-review 之前，必须跑：
+```bash
+scripts/validate-handoff.sh --stage spec --file <spec-path>
+```
+退出码非 0 时，回到「Documentation」步骤补全 frontmatter / 字段，**不得**进入 Spec self-review。
 
 **Spec Self-Review:**
 After writing the spec document, look at it with fresh eyes:
@@ -122,6 +142,15 @@ After writing the spec document, look at it with fresh eyes:
 4. **Ambiguity check:** Could any requirement be interpreted two different ways? If so, pick one and make it explicit.
 
 Fix any issues inline. No need to re-review — just fix and move on.
+
+- Spec self-review 通过后，跑结构校验并按结果 emit 阶段指标（不阻断）：
+  ```bash
+  if scripts/validate-handoff.sh --stage spec --file "$SPEC"; then
+    scripts/log-phase-metric.sh --phase brainstorming --action gate --gate-result passed --spec-topic "$SPEC_TOPIC"
+  else
+    scripts/log-phase-metric.sh --phase brainstorming --action gate --gate-result failed --spec-topic "$SPEC_TOPIC"
+  fi
+  ```
 
 **User Review Gate:**
 After the spec review loop passes, ask the user to review the written spec before proceeding:

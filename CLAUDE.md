@@ -32,6 +32,10 @@
 - `tests/explicit-skill-requests/run-all.sh` — 多轮显式 skill 调用测试（依赖 `claude -p` headless 模式实际调用 Claude API）
 - `tests/skill-triggering/run-all.sh` — 隐式 skill 触发测试（依赖 `claude -p` headless 模式实际调用 Claude API）
 - `tests/learnings-scripts/test-learnings.sh` — learnings shell 脚本测试
+- `tests/phase-metrics-scripts/run-all.sh` — phase-metrics 脚本测试
+- `tests/knowledge-base-scripts/run-all.sh` — knowledge-base 脚本测试
+- `tests/handoff-scripts/run-all.sh` — handoff schema 校验测试
+- `tests/diagnose-scripts/run-all.sh` — 失败诊断脚本测试
 - `tests/subagent-driven-dev/run-test.sh` — SDD 端到端测试，使用示例项目（依赖 `claude -p` headless 模式实际调用 Claude API）
 - `tests/skill-behavior/` — 全部 skill 的 headless 行为测试（依赖 `claude -p` + Claude API 配额，全量运行约 15-40 分钟；单 skill 可独立运行 `cd tests/skill-behavior/<skill> && ./run-test.sh`）
 - `tests/pi/` — Pi 平台扩展测试，运行：`npx tsx --test tests/pi/test-pi-extension.mjs`

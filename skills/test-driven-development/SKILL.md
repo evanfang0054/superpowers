@@ -192,6 +192,11 @@ After green only:
 
 Keep tests green. Don't add behavior.
 
+- 一个 RED-GREEN-REFACTOR 循环闭合（green 且 refactor 完成）后，emit 阶段指标（不阻断）：
+  ```bash
+  scripts/log-phase-metric.sh --phase test-driven-development --action end --spec-topic "$SPEC_TOPIC"
+  ```
+
 ### Repeat
 
 Next failing test for next feature.

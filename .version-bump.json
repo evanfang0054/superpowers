@@ -12,7 +12,11 @@
       "node_modules",
       ".git",
       ".version-bump.json",
-      "scripts/bump-version.sh"
+      "scripts/bump-version.sh",
+      "tests/plugin-infrastructure/test-bump-version-agent.sh",
+      "pnpm-lock.yaml",
+      "package-lock.json",
+      "yarn.lock"
     ]
   }
 }

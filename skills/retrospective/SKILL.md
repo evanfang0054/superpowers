@@ -83,6 +83,21 @@ bash "${CLAUDE_PLUGIN_ROOT}/scripts/coverage-metrics.sh"
 
 Use coverage gaps to identify which harness dimensions need improvement in the next sprint.
 
+### Phase Metrics Input
+
+Read phase-level trends for the retro period:
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/query-phase-metrics.sh" --recent 14 --summary
+```
+
+Write the top available signals into the retro report:
+- 失败率最高的阶段（from recorded `gate_result` values）
+- 平均耗时最长的阶段（when `duration_ms` is recorded）
+- 累计 token / cost 最高的阶段（only when token or cost fields were recorded）
+
+If the metrics file is empty, say that no phase metrics have been recorded yet instead of inferring trends. Use available signals to focus action items on the bottlenecks that matter.
+
 ### Step 3: Structured Review
 
 Present findings in this format:
@@ -187,6 +202,11 @@ Commit the retro:
 git add docs/retros/YYYY-MM-DD-retro.md
 git commit -m "docs(retro): add retrospective for YYYY-MM-DD"
 ```
+
+- Retro 落盘并 commit 后，emit 阶段指标（不阻断）：
+  ```bash
+  scripts/log-phase-metric.sh --phase retrospective --action end --spec-topic "$SPEC_TOPIC"
+  ```
 
 ## Quick Templates
 

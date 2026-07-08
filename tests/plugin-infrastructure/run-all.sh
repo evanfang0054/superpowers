@@ -24,6 +24,7 @@ TESTS=(
     "test-commands-frontmatter.sh"
     "test-agents-frontmatter.sh"
     "test-bump-version.sh"
+    "test-bump-version-agent.sh"
     "test-scripts-smoke.sh"
     "test-guard-staging.sh"
     "test-guard-auto-loop.sh"

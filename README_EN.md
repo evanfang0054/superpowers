@@ -253,6 +253,27 @@ In real-world testing on this project itself, auto-loop has autonomously discove
 
 See the [design spec](docs/agent-harness/specs/2026-06-24-auto-loop-self-improvement-design.md) for details.
 
+## Harness Engineering: Observable, Verifiable, Self-Healing Engineering Layer
+
+Agent Harness is more than a collection of skills — it builds an engineering environment around the model so AI can work in your engineering system in a way that is **executable, constrained, verifiable, and feedback-driven**. This layer is what the industry calls Harness Engineering — not teaching the model "how to answer", but designing "how it works" (`Agent = Model + Harness`).
+
+Around the three-layer workflow, agent-harness provides four interlocking subsystems:
+
+| Subsystem | Problem it solves | Key artifacts |
+|---|---|---|
+| **Observability** | Turn "is this harness any good, how expensive, where does it keep failing" from feelings into data | `.agent-harness/phase-metrics.jsonl` (token / duration / failure-rate persistence) + `log-phase-metric.sh` / `query-phase-metrics.sh`; 7 core skills actively emit at phase boundaries |
+| **Protocol Contracts** | Upgrade skill-to-skill handoff from "natural-language soft review" to "machine-verifiable schema precondition" | YAML frontmatter at spec / plan / task handoff points + `validate-handoff.sh` hard precondition; runs in parallel with existing reviewer subagents, does not replace them |
+| **Knowledge Base / Context** | Shift context injection from "the more the better" to "only what each step needs to see" | Top-level `index.md` + per-subdir secondary indexes + `glossary.md` (SSOT); SessionStart adds only a one-line pointer, no token bloat |
+| **Failure Self-Healing** | Upgrade failure handling from "alert + manual intervention" to "diagnosis report → executable fix task" closed loop | `diagnose-failure.sh` converges loop / gate / test failure signals into structured JSON + `write-diagnosis-task.sh` writes it back as a task; never auto-executes, the loop can be interrupted by humans at any point |
+
+**How the four subsystems interlock:**
+
+- The protocol layer's `gate_result` is driven by `validate-handoff.sh` and emitted to phase-metrics
+- The protocol layer's `spec_topic` must be present in the knowledge base's `index.md`, otherwise the hard precondition rejects it
+- Failure self-healing reuses phase-metrics and the knowledge base's learnings index as signal sources to match similar historical failures
+
+Design spec: `docs/agent-harness/specs/2026-06-29-harness-engineering-improvements-design.md`. Four implementation plans: `docs/agent-harness/plans/2026-06-29-*.md`.
+
 ## What's Inside
 
 ### Skills Library

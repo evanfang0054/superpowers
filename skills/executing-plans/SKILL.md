@@ -57,12 +57,22 @@ For each task:
 3. Run verifications as specified
 4. Mark as completed
 
+**Task stage 结构软提示（不阻断）**：每个 task 完成时，建议跑一下：
+```bash
+scripts/validate-handoff.sh --stage task --file <plan-path>
+```
+失败时先看是否缺 `## Tasks` / `### Task N:` 结构，再决定是否回 plan 步骤补全。本阶段不强制阻断——仅作为「plan → task」交接的结构体检。
+
 ### Step 3: Complete Development
 
 After all tasks complete and verified:
 - Announce: "I'm using the finishing-a-development-branch skill to complete this work."
 - **REQUIRED SUB-SKILL:** Use agent-harness:finishing-a-development-branch
 - Follow that skill to verify tests, present options, execute choice
+- All tasks 完成并 verified 后，emit 阶段指标（不阻断）：
+  ```bash
+  scripts/log-phase-metric.sh --phase executing-plans --action end --spec-topic "$SPEC_TOPIC"
+  ```
 
 ## When to Stop and Ask for Help
 
