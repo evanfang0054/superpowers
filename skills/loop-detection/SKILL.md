@@ -18,6 +18,7 @@ Editing the same file repeatedly without convergence is a doom loop. Stop. Detec
 - Each edit fixes one thing, breaks another
 - "Iterating" with no convergence evidence
 - verification-before-completion detects repeated changes
+- **Semantic loop (issue #81):** 3+ consecutive assistant turns with no tool calls while user keeps rejecting proposals ("不对", "不行", "重新"), or a single session exceeds 2 active plans (see writing-plans)
 
 **Not for:** Intentional multi-file refactors, systematic changes across different files.
 
@@ -64,6 +65,23 @@ You MUST do ONE of the following before touching that file again:
 3. **Replan:** Step back, write a new plan, get it reviewed before implementing
 
 No exceptions. HARD STOP means stop.
+
+## Semantic Loop Recovery (issue #81)
+
+When the semantic-loop trigger fires (3+ consecutive no-tool turns with user
+rejecting proposals, or 2+ active plans stacking in one session):
+
+1. **Stop generating option lists.** Listing more options does not converge.
+2. **Switch to outcome question:** ask the user to describe the end result they
+   want, ignoring feasibility.
+3. **Or recommend handoff:** "我们对需求理解差距较大，先用 office-hours 厘清目标"
+   / "this session is carrying too many plans, start a new session".
+4. **Or recommend compaction:** if context is the problem, suggest `/compact`
+   or starting a fresh session before continuing.
+
+Rationale (issue #81, hack session evidence): a single session stacking 4 plans
+triggered 8 compacts and 45.6% of turns were no-tool text loops. Breaking the
+loop at turn 3 saves an estimated 60+ zero-output turns.
 
 **触发诊断（不自动修复）：** HARD STOP 时除原警告外，额外生成一份失败诊断报告，便于后续追溯同类循环：
 

@@ -71,6 +71,38 @@ fi
 # - precompact      → inject nothing (compact is meant to free space; re-injecting
 #                     the same content defeats the purpose)
 if [ "$SESSION_SOURCE" = "precompact" ]; then
+    # Issue #81 — precompact checkpoint: snapshot recovery hints before
+    # compact discards context. The checkpoint is a small pointer file
+    # (not the content itself) so the next startup can offer to resume
+    # in-progress work. Best-effort: never fail the hook on checkpoint errors.
+    checkpoint_dir="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}"
+    if [ -n "$checkpoint_dir" ] && [ -d "$checkpoint_dir" ]; then
+        checkpoint_file="$checkpoint_dir/.agent-harness/last-session-checkpoint.md"
+        mkdir -p "$checkpoint_dir/.agent-harness" 2>/dev/null || true
+        {
+            echo "# Last Session Checkpoint"
+            echo ""
+            echo "Generated: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "Session: ${SESSION_ID:-unknown}"
+            echo "Trigger: precompact"
+            echo ""
+            echo "## Recovery Hints"
+            echo ""
+            echo "Compact just fired. The following may have been dropped from context:"
+            echo ""
+            echo "- Sprint contract (if any): docs/agent-harness/contracts/*.contract.md"
+            echo "- Active plans (max 2 recommended, see writing-plans): docs/agent-harness/plans/*.md"
+            echo "- Recent learnings: .agent-harness/learnings.jsonl (auto-injected next startup)"
+            echo ""
+            echo "## Recommended Next Steps"
+            echo ""
+            echo "1. If 2+ plans are still active, finish or shelve one before starting new work."
+            echo "2. If clarification loops happened (see loop-detection), ask for the desired"
+            echo "   outcome instead of listing more options."
+            echo "3. If context pressure continues, start a fresh session."
+        } > "$checkpoint_file" 2>/dev/null || true
+    fi
+
     # Emit an empty-but-valid JSON for each platform.
     if [ -n "${CURSOR_PLUGIN_ROOT:-}" ]; then
         printf '{\n  "additional_context": ""\n}\n'
@@ -130,6 +162,21 @@ if [ "$SESSION_SOURCE" = "startup" ] || [ "$SESSION_SOURCE" = "clear" ]; then
     kb_hint="\n\n## Knowledge Base\n知识库入口: docs/agent-harness/index.md（两级查找，禁止 **/*.md 通配）\n"
 fi
 
+# Issue #81 — checkpoint recovery hint. On startup/clear, if the previous
+# session wrote a precompact checkpoint, surface a one-line pointer so the
+# agent can offer to resume in-progress work. The checkpoint file is removed
+# after being surfaced (one-shot, not every startup).
+checkpoint_hint=""
+if [ "$SESSION_SOURCE" = "startup" ] || [ "$SESSION_SOURCE" = "clear" ]; then
+    ckpt_dir="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}"
+    ckpt_file="$ckpt_dir/.agent-harness/last-session-checkpoint.md"
+    if [ -n "$ckpt_dir" ] && [ -f "$ckpt_file" ]; then
+        checkpoint_hint="\n\n## Prior Session Checkpoint (issue #81)\nThe previous session ended with a /compact. Recovery hints at: .agent-harness/last-session-checkpoint.md — read it if you need to resume in-progress plans or sprint contracts, then delete it once consumed.\n"
+        # One-shot: remove after surfacing so subsequent startups don't re-prompt.
+        rm -f "$ckpt_file" 2>/dev/null || true
+    fi
+fi
+
 # Escape string for JSON embedding using bash parameter substitution.
 escape_for_json() {
     local s="$1"
@@ -146,6 +193,7 @@ warning_escaped=$(escape_for_json "$warning_message")
 learnings_escaped=$(escape_for_json "$learnings_content")
 headless_tip_escaped=$(escape_for_json "$headless_tip")
 kb_hint_escaped=$(escape_for_json "$kb_hint")
+checkpoint_hint_escaped=$(escape_for_json "$checkpoint_hint")
 
 # Build the session context.
 # - startup / clear: full wrapper with using-agent-harness body + learnings + tip
@@ -158,9 +206,9 @@ kb_hint_escaped=$(escape_for_json "$kb_hint")
 # so they form a stable prefix; dynamic segments (warning, learnings) go last
 # so their per-session churn does not invalidate the cache hit on the prefix.
 if [ "$SESSION_SOURCE" = "resume" ]; then
-    session_context="${warning_escaped}${learnings_escaped}"
+    session_context="${warning_escaped}${learnings_escaped}${checkpoint_hint_escaped}"
 else
-    session_context="<EXTREMELY_IMPORTANT>\nYou have agent-harness.\n\n**Below is the full content of your 'agent-harness:using-agent-harness' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\n\n${using_agent_harness_escaped}${headless_tip_escaped}${kb_hint_escaped}\n\n${warning_escaped}${learnings_escaped}\n</EXTREMELY_IMPORTANT>"
+    session_context="<EXTREMELY_IMPORTANT>\nYou have agent-harness.\n\n**Below is the full content of your 'agent-harness:using-agent-harness' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\n\n${using_agent_harness_escaped}${headless_tip_escaped}${kb_hint_escaped}\n\n${warning_escaped}${learnings_escaped}${checkpoint_hint_escaped}\n</EXTREMELY_IMPORTANT>"
 fi
 
 # Output context injection as JSON.

@@ -21,6 +21,7 @@ TESTS=(
     "test-hooks-config.sh"
     "test-session-start-injection.sh"
     "test-session-start-cache-stable.sh"
+    "test-precompact-checkpoint.sh"
     "test-stop-hook.sh"
     "test-commands-frontmatter.sh"
     "test-agents-frontmatter.sh"
