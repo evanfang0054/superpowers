@@ -1,10 +1,19 @@
 # Agent Harness Release Notes
 
+## v6.3.2 (2026-07-08)
+
+### Changes
+
+- Token 优化与插件分发改进：让 SessionStart 上下文更利于缓存命中，精简 skill description，新增 /compact 检查点，SDD 支持内联 plan section，补充 clarification-loop 护栏，并通过 archive exclusion 排除 demo/tests/docs。
+
 ## v6.3.1 (2026-07-07)
 
 ### Changes
 
-- Minor updates
+- 加固 auto-loop 的 worktree 与运行边界：明确区分主仓库与隔离 worktree 的职责，避免修复流程误操作主工作区。
+- 改进 worktree 错误处理：保留创建 / 复用失败时的诊断信息，便于 `--resume` 或人工排查，而不是吞掉关键上下文。
+- 补充大型计划 / 设计交接护栏：`brainstorming`、`writing-plans`、`harness-design` 增加针对超大计划和设计产物的约束，减少 agent 在长上下文中跑偏。
+- 扩展插件基础设施测试：新增 auto-loop CLI、worktree 行为、guard hook 与大型计划 guardrail 覆盖，防止上述行为回退。
 
 ## v6.3.0 (2026-06-29)
 
