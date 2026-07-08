@@ -22,6 +22,11 @@ Subagent (general-purpose):
 
     Read the task brief: [BRIEF_FILE]
 
+    **Do NOT Read the plan file (issue #82).** The brief contains the task's
+    plan section verbatim; reading the whole plan again wastes ~3K tokens
+    and is the largest avoidable cost in SDD review. If a requirement seems
+    missing, ask the controller instead of opening the plan.
+
     Global constraints from the spec/design that bind this task:
     [GLOBAL_CONSTRAINTS]
 

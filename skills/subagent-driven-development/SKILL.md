@@ -28,12 +28,13 @@ resolve to the wrong location and fail.
 1. Read the plan/task, extract pending tasks
 2. For the NEXT pending task:
    a. Run \`\"\$SDD_SKILL_DIR/scripts/task-brief\"\` to extract task text to a file
-   b. Dispatch IMPLEMENTER subagent (use \`\"\$SDD_SKILL_DIR/implementer-prompt.md\"\` template, with brief file path)
-   c. If implementer asks questions, answer them and re-dispatch
-   d. When implementer reports DONE, run \`\"\$SDD_SKILL_DIR/scripts/review-package\" BASE HEAD\` to generate diff file
-   e. Dispatch TASK REVIEWER subagent (\`\"\$SDD_SKILL_DIR/task-reviewer-prompt.md\"\`) with brief file + report file + review package
-   f. If review fails, have implementer fix and re-review
-   g. When review passes, mark task complete in progress ledger
+   b. **Inline referenced plan content (issue #82):** open the brief; for every line like \"per <plan>.md Task N\" or \"see <plan>.md section X\", copy that section verbatim into the brief so the implementer never has to Read the plan file. The brief must be self-contained. Prefer inlining when the referenced section is <= ~1KB; for huge sections, quote only the binding constraints and acceptance criteria.
+   c. Dispatch IMPLEMENTER subagent (use \`\"\$SDD_SKILL_DIR/implementer-prompt.md\"\` template, with brief file path)
+   d. If implementer asks questions, answer them and re-dispatch
+   e. When implementer reports DONE, run \`\"\$SDD_SKILL_DIR/scripts/review-package\" BASE HEAD\` to generate diff file
+   f. Dispatch TASK REVIEWER subagent (\`\"\$SDD_SKILL_DIR/task-reviewer-prompt.md\"\`) with brief file + report file + review package
+   g. If review fails, have implementer fix and re-review
+   h. When review passes, mark task complete in progress ledger
 3. Move to next task
 
 === MANDATORY Rules (DO NOT SKIP) ===
