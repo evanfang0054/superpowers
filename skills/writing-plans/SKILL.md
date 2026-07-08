@@ -58,9 +58,17 @@ This structure informs the task decomposition. Each task should produce self-con
 
 ## Plan Document Header
 
-**Every plan MUST start with this header:**
+**Every plan MUST start with this frontmatter, followed by this header:**
 
 ```markdown
+---
+spec_ref: ../specs/<spec-file>.md
+spec_topic: <topic-from-docs-agent-harness-index>
+task_count: <number>
+estimated_phases: [tests, implementation, verification]
+dod: "<definition of done from sprint contract>"
+---
+
 # [Feature Name] Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use agent-harness:subagent-driven-development (recommended) or agent-harness:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.

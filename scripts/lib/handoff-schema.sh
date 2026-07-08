@@ -55,7 +55,7 @@ handoff_check_required() {
     local topic; topic=$(yaml_parse_get "spec_topic")
     if [ -n "$topic" ]; then
       local idx="$ROOT/docs/agent-harness/index.md"
-      if [ -f "$idx" ] && ! grep -q "$topic" "$idx" 2>/dev/null; then
+      if [ -f "$idx" ] && ! grep -Fq -- "- $topic →" "$idx" 2>/dev/null; then
         echo "validate-handoff: spec_topic '$topic' not found in docs/agent-harness/index.md" >&2
         rc=1
       fi

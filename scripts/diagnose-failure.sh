@@ -27,10 +27,13 @@ done
 
 [ -z "$TYPE" ] && { echo "diagnose-failure: --type required" >&2; exit 0; }
 
-# context 接受字符串或文件路径
+# context 接受字符串、文件路径或 @file
 CONTEXT=""
 if [ -n "$CONTEXT_RAW" ]; then
-  if [ -f "$CONTEXT_RAW" ]; then
+  if [ "${CONTEXT_RAW#@}" != "$CONTEXT_RAW" ]; then
+    CONTEXT_FILE="${CONTEXT_RAW#@}"
+    [ -f "$CONTEXT_FILE" ] && CONTEXT=$(cat "$CONTEXT_FILE")
+  elif [ -f "$CONTEXT_RAW" ]; then
     CONTEXT=$(cat "$CONTEXT_RAW")
   else
     CONTEXT="$CONTEXT_RAW"

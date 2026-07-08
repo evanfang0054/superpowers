@@ -92,6 +92,23 @@ EOF
 "$PLUGIN_DIR/scripts/validate-handoff.sh" --stage spec --file docs/agent-harness/specs/s.md 2>/dev/null
 [ $? -ne 0 ] && log_pass "unregistered topic rejected" || log_fail "unregistered topic accepted"
 
+# --- Test 5: topic matching is literal and anchored ---
+echo "--- Test 5: literal topic matching ---"
+setup
+mkdir -p docs/agent-harness/specs
+echo "- alphaXbeta → specs/real.md" > docs/agent-harness/index.md
+cat > docs/agent-harness/specs/s.md <<'EOF'
+---
+spec_topic: alpha.beta
+decision_summary: x
+design_approved: true
+user_approved_at: 2026-06-29T10:00:00Z
+gates: []
+---
+EOF
+"$PLUGIN_DIR/scripts/validate-handoff.sh" --stage spec --file docs/agent-harness/specs/s.md 2>/dev/null
+[ $? -ne 0 ] && log_pass "regex-like near match rejected" || log_fail "regex-like near match accepted"
+
 echo ""
 echo "Results: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ] || exit 1

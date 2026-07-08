@@ -111,6 +111,19 @@ digraph brainstorming {
 
 - Write the validated design (spec) to `docs/agent-harness/specs/YYYY-MM-DD-<topic>-design.md`
   - (User preferences for spec location override this default)
+- Every spec document must start with YAML frontmatter before the title:
+
+```yaml
+---
+spec_topic: <topic-from-docs-agent-harness-index>
+decision_summary: "<one sentence decision summary>"
+design_approved: true
+user_approved_at: <ISO-8601 timestamp>
+gates: [user-review-passed]
+---
+```
+
+- Use a real topic from `docs/agent-harness/index.md`; if this is a new topic, add it to the index before running `validate-handoff.sh`.
 - Use elements-of-style:writing-clearly-and-concisely skill if available
 - Commit the design document to git
 

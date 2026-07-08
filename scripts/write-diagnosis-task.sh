@@ -3,8 +3,8 @@
 #
 # Usage: write-diagnosis-task.sh --diagnosis <json-file> [--plan <path>]
 #
-# 默认 --plan 缺省时：若当前目录存在 docs/agent-harness/plans/<最新>.md 则追加；
-# 否则写独立文件到 docs/agent-harness/notes/diagnoses/<ts>-<type>.md。
+# 默认 --plan 缺省时：写独立文件到 docs/agent-harness/notes/diagnoses/<ts>-<type>.md。
+# 只有显式 --plan 才追加到计划文件。
 # 不自动执行修复——只生成 task。
 
 set -uo pipefail
@@ -23,19 +23,13 @@ done
 
 ROOT="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 
-# 若未指定 plan，尝试找最新 plan
-if [ -z "$PLAN" ]; then
-  LATEST=$(ls -t "$ROOT"/docs/agent-harness/plans/*.md 2>/dev/null | head -1 || true)
-  PLAN="$LATEST"
-fi
-
 DIAG="$DIAG" PLAN="$PLAN" ROOT="$ROOT" python3 <<'PY'
 import json, os, datetime
 diag = json.load(open(os.environ["DIAG"], encoding="utf-8"))
 plan = os.environ["PLAN"]
 root = os.environ["ROOT"]
 
-lines = ["", "## 🔧 Diagnosis Task (auto-generated)", ""]
+lines = ["", "## Diagnosis Task (auto-generated)", ""]
 lines.append(f"- **failure_type**: {diag.get('failure_type')}")
 lines.append(f"- **spec_topic**: {diag.get('spec_topic','')}")
 lines.append(f"- **summary**: {diag.get('failure_summary','')}")

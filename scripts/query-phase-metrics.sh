@@ -30,7 +30,7 @@ done
 ROOT="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 FILE="$ROOT/.agent-harness/phase-metrics.jsonl"
 
-[ -z "$PHASE" ] && { echo "query-phase-metrics: --phase required" >&2; exit 1; }
+[ -z "$PHASE" ] && PHASE="all"
 [ ! -f "$FILE" ] && {
   if [ "$JSON_OUT" = "yes" ]; then
     echo '{"count":0}'
@@ -69,7 +69,7 @@ with open(path) as f:
             d = json.loads(line)
         except json.JSONDecodeError:
             continue
-        if d.get("phase") != phase:
+        if phase != "all" and d.get("phase") != phase:
             continue
         if by_spec and d.get("spec_topic") != by_spec:
             continue

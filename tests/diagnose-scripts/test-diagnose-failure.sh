@@ -20,7 +20,11 @@ echo "=== Diagnose Failure Tests ==="
 echo "--- Test 1: type loop ---"
 setup
 CTX='{"file":"spec.md","edits":3,"last_error":"schema-mismatch"}'
-OUT=$("$PLUGIN_DIR/scripts/diagnose-failure.sh" --type loop --context "$CTX" --spec-topic t1 2>&1)
+OUT=$("$PLUGIN_DIR/scripts/diagnose-failure.sh" --type loop --context "$CTX" --spec-topic t1 2>/dev/null)
+
+echo "$OUT" | grep -Eq '^\.agent-harness/diagnoses/.+\.json$|^/.+\.agent-harness/diagnoses/.+\.json$' \
+  && log_pass "stdout is diagnosis path" \
+  || log_fail "stdout should be diagnosis path only"
 
 # 找到产物文件
 F=$(ls .agent-harness/diagnoses/*.json 2>/dev/null | head -1)
@@ -29,13 +33,14 @@ log_pass "diagnosis file created"
 grep -q '"failure_type": "loop"' "$F" 2>/dev/null && log_pass "loop type stamped" || log_fail "loop type missing"
 python3 -c "import json; json.load(open('$F'))" 2>/dev/null && log_pass "JSON valid" || log_fail "JSON invalid"
 
-# --- Test 2: type gate, context from file ---
+# --- Test 2: type gate from file ---
 echo "--- Test 2: type gate from file ---"
 setup
 echo '{"phase":"writing-plans","validate_error":"missing field spec_ref"}' > ctx.json
-"$PLUGIN_DIR/scripts/diagnose-failure.sh" --type gate --context ctx.json --spec-topic t2 2>&1 >/dev/null
-F=$(ls .agent-harness/diagnoses/*.json 2>/dev/null | head -1)
+OUT=$("$PLUGIN_DIR/scripts/diagnose-failure.sh" --type gate --context @ctx.json --spec-topic t2 2>/dev/null)
+F="$OUT"
 echo "$F" | grep -q "gate" && log_pass "gate file named" || log_fail "gate file naming wrong"
+grep -q 'missing field spec_ref' "$F" && log_pass "@file context supported" || log_fail "@file context not loaded"
 
 # --- Test 3: graceful when all signals missing ---
 echo "--- Test 3: empty warehouse ---"

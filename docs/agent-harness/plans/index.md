@@ -84,6 +84,9 @@
 ## handoff-contracts
 - [2026-06-29-handoff-contracts](2026-06-29-handoff-contracts.md)
 
+## harness-engineering-improvements
+- [2026-07-08-pr73-logic-fixes](2026-07-08-pr73-logic-fixes.md)
+
 ## knowledge-base
 - [2026-06-29-knowledge-base](2026-06-29-knowledge-base.md)
 

@@ -123,11 +123,12 @@ if [ "$SESSION_SOURCE" = "startup" ] || [ "$SESSION_SOURCE" = "clear" ]; then
     headless_tip="\n\n## Skill Invocation Best Practice\nWhen programmatically invoking skills (tests, CI, -p mode), use imperative form:\n  ✅ 'Invoke the Skill tool with brainstorming'\n  ❌ '/brainstorming'\n"
 fi
 
-# Knowledge base pointer (one line) — only on startup/clear.
+# Knowledge base pointer (one line) — only on startup/clear for agent-harness KB projects.
 # Just point at the KB index, never inject the body. Two-level lookup, no **/*.md glob.
 kb_hint=""
-if [ "$SESSION_SOURCE" = "startup" ] || [ "$SESSION_SOURCE" = "clear" ]; then
-    kb_hint="\n\n## Knowledge Base\n知识库入口: docs/agent-harness/index.md（两级查找，禁止 **/*.md 通配）\n"
+if { [ "$SESSION_SOURCE" = "startup" ] || [ "$SESSION_SOURCE" = "clear" ]; } \
+   && [ -f "$LEARNINGS_DIR/docs/agent-harness/index.md" ]; then
+    kb_hint="\n\n## Knowledge Base\nAgent Harness 知识库入口: docs/agent-harness/index.md（仅用于本项目知识库检索：两级查找，不要对 docs/agent-harness 使用 **/*.md 全局通配）\n"
 fi
 
 # Escape string for JSON embedding using bash parameter substitution.
