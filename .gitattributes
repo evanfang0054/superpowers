@@ -16,3 +16,8 @@ hooks/session-start text eol=lf
 *.png binary
 *.jpg binary
 *.gif binary
+
+# Exclude non-runtime directories from generated archives/plugin distribution
+/demo export-ignore
+/tests export-ignore
+/docs export-ignore
