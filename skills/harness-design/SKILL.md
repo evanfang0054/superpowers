@@ -21,6 +21,15 @@ description: 用HTML做高保真原型、交互Demo、幻灯片、动画、设�
 
 不适用场景：生产级Web App、SEO网站、需要后端的动态系统——这些用frontend-design skill。
 
+## 与开发计划的 handoff contract
+
+当设计结果会进入 `writing-plans` 或 SDD 实施时，交付物必须包含一个简短 handoff contract，避免计划和设计脱节：
+
+- 列出关键 design token：颜色、字体、圆角、间距、动效节奏。
+- 列出必须保留的交互约束：状态切换、动画 timing、响应式断点、可点击区域。
+- 标注每个约束应落到哪个代码区域或后续 plan task。
+- 如果任务规模很大，先输出设计 execution map，把视觉探索、交互原型、design-polish 拆成独立确认点，不要把所有设计要求塞进一个 monolithic plan。
+
 ## 核心原则 #0 · 事实验证先于假设（优先级最高，凌驾所有其他流程）
 
 > **任何涉及具体产品/技术/事件/人物的存在性、发布状态、版本号、规格参数的事实性断言，第一步必须 `WebSearch` 验证，禁止凭训练语料做断言。**

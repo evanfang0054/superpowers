@@ -42,6 +42,26 @@ if worktree_exists "$WORKTREE2"; then pass "worktree_exists true"; else fail "wo
 worktree_remove "$TEST_REPO" "$WORKTREE2"
 if ! worktree_exists "$WORKTREE2"; then pass "worktree_exists false after remove"; else fail "worktree_exists false after remove"; fi
 
+# Case 7: 无 HEAD 仓库给出明确错误，而不是泛化 worktree 创建失败
+NO_HEAD_REPO="$(mktemp -d)"
+git init -q "$NO_HEAD_REPO"
+OUTPUT=$(worktree_create "$NO_HEAD_REPO" "test-no-head" "feat/no-head" 2>&1) && EXIT=0 || EXIT=$?
+if [ "$EXIT" -ne 0 ]; then pass "worktree_create rejects repo without HEAD"; else fail "worktree_create rejects repo without HEAD"; fi
+if echo "$OUTPUT" | grep -q "还没有任何 commit\|not a valid object name: 'HEAD'"; then pass "worktree_create explains missing HEAD"; else fail "worktree_create explains missing HEAD (got: $OUTPUT)"; fi
+if [ ! -e "$NO_HEAD_REPO/.claude" ]; then pass "worktree_create does not mutate repo without HEAD"; else fail "worktree_create does not mutate repo without HEAD"; fi
+rm -rf "$NO_HEAD_REPO"
+
+# Case 8: git worktree add 的底层 stderr 不被吞掉
+CONFLICT_REPO="$(mktemp -d)"
+git init -q "$CONFLICT_REPO"
+git -C "$CONFLICT_REPO" commit -q --allow-empty -m "init"
+CONFLICT_WT=$(worktree_create "$CONFLICT_REPO" "test-conflict-a" "feat/conflict")
+OUTPUT=$(worktree_create "$CONFLICT_REPO" "test-conflict-b" "feat/conflict" 2>&1) && EXIT=0 || EXIT=$?
+if [ "$EXIT" -ne 0 ]; then pass "worktree_create surfaces branch checkout conflict"; else fail "worktree_create surfaces branch checkout conflict"; fi
+if echo "$OUTPUT" | grep -qi "already.*checked out\|is already checked out\|fatal:"; then pass "worktree_create preserves git stderr"; else fail "worktree_create preserves git stderr (got: $OUTPUT)"; fi
+worktree_remove "$CONFLICT_REPO" "$CONFLICT_WT"
+rm -rf "$CONFLICT_REPO"
+
 # 清理
 rm -rf "$TEST_REPO"
 print_summary "auto-loop worktree.sh"

@@ -19,7 +19,7 @@ run_guard() {
 # Helper: run without AUTO_LOOP_ACTIVE (should always pass)
 run_guard_inactive() {
     local json="$1"
-    echo "$json" | bash "$GUARD" 2>/dev/null
+    echo "$json" | env -u AUTO_LOOP_ACTIVE bash "$GUARD" 2>/dev/null
     return $?
 }
 
