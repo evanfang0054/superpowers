@@ -173,6 +173,30 @@ If unsure whether a change qualifies, default to running sprint contract.
 - **Incremental validation** - Present design, get approval before moving on
 - **Be flexible** - Go back and clarify when something doesn't make sense
 
+## Clarification Loop Circuit-Breaker (issue #83)
+
+If the user rejects your proposed options **3 times in a row** (signals like
+"不对", "不行", "还是不对", "重新", "no", "not what I meant"), **stop listing
+more options**. Listing more variants of the same shape does not converge — it
+inflates context with zero-output turns (hack session 90b1b2fd hit 45.6%
+no-tool turns this way).
+
+**Switch strategy immediately:**
+
+1. Stop generating option lists.
+2. Ask one open-ended outcome question: "能描述一下你最终想看到的结果是什么
+   样子吗？不用管可行性。" / "Describe the end result you want to see, ignoring
+   feasibility for now."
+3. If the user still can't describe it, recommend handoff:
+   - `agent-harness:office-hours` to re-align on goals, or
+   - pause and ask the user to gather more context before continuing.
+4. Only resume option-listing once the user has described the desired outcome
+   in their own words.
+
+This rule works together with `loop-detection`'s semantic-loop trigger
+(3+ no-tool turns with rejection), which surfaces the same signal from the
+detection side.
+
 ## Six Forcing Questions (Product Ideas)
 
 When brainstorming a **new product idea** or **major new feature** (not bug fixes or small improvements), use these six forcing questions to validate the idea before diving into design. These questions expose assumptions and prevent building things nobody wants.
