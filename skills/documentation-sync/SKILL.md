@@ -1,6 +1,6 @@
 ---
 name: documentation-sync
-description: "Use after code changes are committed, before creating PR or merging. Scans all project documentation files, cross-references the diff, and updates README/ARCHITECTURE/CHANGELOG/CONTRIBUTING to match what shipped. Invoke when asked to 'sync docs', 'update documentation', or after finishing a feature branch."
+description: "Use after code changes, before PR or merge. Sync README/ARCHITECTURE/CHANGELOG/CONTRIBUTING with the diff. Trigger: 'sync docs'."
 ---
 
 # Documentation Sync

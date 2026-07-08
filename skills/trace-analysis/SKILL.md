@@ -1,6 +1,6 @@
 ---
 name: trace-analysis
-description: Use during retrospective or when trying to understand recurring failure patterns across sessions, based on historical learnings data in .agent-harness/learnings.jsonl.
+description: Use during retrospective or when analyzing recurring failure patterns across sessions via learnings data.
 when_to_use: "[feedback] Triggered during retrospective or when analyzing cross-session failure trends."
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: harness-init
-description: Use when initializing agent-harness in a new project or reconfiguring an existing project for a specific tech stack like React, Python, or Go.
+description: Use when initializing agent-harness in a new project or reconfiguring for a specific tech stack.
 when_to_use: "[feedforward] Triggered at project setup to bootstrap harness configuration from templates."
 user-invocable: true
 disable-model-invocation: true

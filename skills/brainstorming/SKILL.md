@@ -1,6 +1,6 @@
 ---
 name: brainstorming
-description: "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation."
+description: "You MUST use this before any creative work — features, components, behavior changes. Explores intent, requirements, and design before implementation."
 when_to_use: "[feedforward] Triggered before any creative or implementation work to explore intent and design."
 ---
 

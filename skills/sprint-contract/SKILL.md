@@ -1,6 +1,6 @@
 ---
 name: sprint-contract
-description: "Use after brainstorming produces a spec and before writing-plans begins, to negotiate explicit Definition of Done and prevent ambiguity in completion criteria."
+description: "Use after brainstorming produces a spec and before writing-plans — negotiates explicit Definition of Done to prevent ambiguity."
 when_to_use: "[feedforward] Triggered between brainstorming and writing-plans for non-trivial tasks."
 ---
 

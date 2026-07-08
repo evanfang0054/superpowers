@@ -1,6 +1,6 @@
 ---
 name: post-deploy-monitoring
-description: "Use after deploying code to production. Monitors for console errors, performance regressions, and page failures. Invoke when asked to 'monitor deploy', 'check production', 'canary check', or after running deployment commands."
+description: "Verify production health after deploy. Monitor errors, performance, page failures. Trigger: 'monitor deploy', 'check production'."
 ---
 
 # Post-Deploy Monitoring

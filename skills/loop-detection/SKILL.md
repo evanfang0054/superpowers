@@ -1,6 +1,6 @@
 ---
 name: loop-detection
-description: Use when an agent suspects it is stuck editing the same file repeatedly without converging, or when verification-before-completion requires doom loop analysis before declaring completion.
+description: Use when an agent is stuck editing the same file repeatedly without converging, or when verification requires doom loop analysis.
 when_to_use: "[feedback] Triggered after multiple unsuccessful edits to the same file or when verification detects repeated changes without progress."
 ---
 
