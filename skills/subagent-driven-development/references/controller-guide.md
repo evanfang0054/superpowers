@@ -114,11 +114,13 @@ After compaction, trust the ledger and `git log` over your own recollection.
 - Skip task review, or accept a report missing either verdict (spec compliance AND task quality are both required).
 - Proceed with unfixed Critical/Important issues.
 - Dispatch multiple implementation subagents in parallel (conflicts).
-- Make a subagent read the whole plan file — hand it its task brief.
-- **Dispatch a brief that references the plan by path (issue #82).** The
-  brief must be self-contained: inline every plan section the task depends
-  on. A subagent that Reads the plan file burns ~3K tokens per dispatch
-  (241 subagents × 3K ≈ 720K tokens on the hack project trace).
+- Make a subagent read the whole plan file — hand it its task brief (extracted via `scripts/task-brief`). The brief is the single source of truth; subagents Read the brief, not the plan.
+- **Dispatch a brief that references the plan by path without inlining the
+  relevant section (issue #82).** If a brief line says "see plan2-backend.md
+  Task 3", either (a) paste that section into the brief before dispatch, or
+  (b) confirm the section is already in the brief. A subagent forced to Read
+  the whole plan burns ~3K tokens per dispatch (241 subagents × 3K ≈ 720K
+  tokens on the hack project trace).
 - Skip scene-setting context.
 - Ignore subagent questions.
 - Accept "close enough" on spec compliance.

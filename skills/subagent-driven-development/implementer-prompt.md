@@ -21,13 +21,12 @@ Subagent (general-purpose):
     - IGNORE any files, projects, or contexts not explicitly mentioned
     - If you find yourself exploring unrelated code, STOP immediately and report this in your output
     - Do NOT read files outside the task scope unless required for the specific change
-    - **Do NOT Read the plan file (issue #82).** Your BRIEF_FILE already contains the
-      task's plan section verbatim. If the brief references the plan by path
-      (e.g. "see plan2-backend.md Task 3"), that section has been inlined into
-      the brief — read the brief again, not the plan. Reading the whole plan
-      wastes ~3K tokens per subagent and is the single largest avoidable cost
-      in SDD dispatch. Only Read the plan file if the brief explicitly says
-      "plan content not available, read <path>".
+    - **Plan file policy (issue #82):** your BRIEF_FILE should already contain the
+      task's plan section (the controller extracts it via `scripts/task-brief`).
+      Trust the brief and do NOT Read the whole plan file — that burns ~3K tokens
+      per dispatch. If a requirement seems missing from the brief, Read ONLY the
+      specific section of the plan referenced (e.g. one Task or one section), not
+      the whole plan. Ask the controller if even that is unclear.
     - Your output MUST reference the actual files you modified (with paths and line numbers)
 
     ## Context
