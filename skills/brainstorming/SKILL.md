@@ -25,6 +25,7 @@ You MUST create a task for each of these items and complete them in order:
 1. **Explore project context** — check files, docs, recent commits
    - **知识库检索约定**：先读 `docs/agent-harness/index.md`，再按主题跳到子目录 index.md，禁止 `**/*.md` 全局通配
 2. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
+   - When domain terms crystallize (user defines a concept, or you propose a precise term to replace fuzzy language), invoke `agent-harness:domain-modeling` to update `CONTEXT.md` inline. If `CONTEXT.md` doesn't exist yet, the skill creates it lazily. Spec output should use `CONTEXT.md` vocabulary and include a `domain_terms` field in frontmatter listing the core terms.
 3. **Propose 2-3 approaches** — with trade-offs and your recommendation
 4. **Present design** — in sections scaled to their complexity, get user approval after each section
 5. **Write design doc** — save to `docs/agent-harness/specs/YYYY-MM-DD-<topic>-design.md` (check if target directory is gitignored before committing; if so, inform user and save anyway)
