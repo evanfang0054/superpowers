@@ -16,6 +16,5 @@
     "collaboration",
     "best-practices",
     "workflows"
-  ],
-  "hooks": "./hooks/hooks.json"
+  ]
 }
