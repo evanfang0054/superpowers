@@ -172,7 +172,7 @@ if { [ "$SESSION_SOURCE" = "startup" ] || [ "$SESSION_SOURCE" = "clear" ]; }; th
     if [ -f "$LEARNINGS_DIR/CONTEXT.md" ]; then
         # Extract ## headings + first line of definition, cap at 20 terms
         context_terms=$(grep -A 1 "^## " "$LEARNINGS_DIR/CONTEXT.md" 2>/dev/null | head -60 || true)
-        term_count=$(grep -c "^## " "$LEARNINGS_DIR/CONTEXT.md" 2>/dev/null || echo 0)
+        term_count=$(grep -c "^## " "$LEARNINGS_DIR/CONTEXT.md" 2>/dev/null) || term_count=0
         if [ -n "$context_terms" ]; then
             if [ "$term_count" -gt 20 ]; then
                 context_md_hint="\n\n## Domain Glossary\n${context_terms}\n\n(${term_count} terms total — see CONTEXT.md for full glossary)\n"

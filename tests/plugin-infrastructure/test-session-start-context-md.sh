@@ -66,14 +66,6 @@ grep -q "No CONTEXT.md found" "$TMPDIR/output2b.json" && {
 rm -rf "$TMPDIR/.agent-harness"
 
 # 4. Test truncation with >20 terms
-for i in $(seq 1 25); do
-    echo ""
-    echo "## Term$i"
-    echo "Definition $i"
-    echo ""
-    echo "_Avoid_: alias$i"
-done >> "$TMPDIR/CONTEXT.md"
-
 # Re-create with 25+ terms
 cat > "$TMPDIR/CONTEXT.md" << 'EOF'
 # Big Project Domain Glossary
