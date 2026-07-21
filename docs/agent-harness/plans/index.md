@@ -78,6 +78,9 @@
 ## 2026-06-27-rebrand-to-agent-harness
 - [2026-06-27-rebrand-to-agent-harness](2026-06-27-rebrand-to-agent-harness.md)
 
+## domain-modeling
+- [2026-07-21-domain-modeling](2026-07-21-domain-modeling.md)
+
 ## failure-diagnosis
 - [2026-06-29-failure-diagnosis](2026-06-29-failure-diagnosis.md)
 

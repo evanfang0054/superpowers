@@ -6,6 +6,9 @@
 ## design-md-generation.contract
 - [design-md-generation.contract](design-md-generation.contract.md)
 
+## domain-modeling.contract
+- [domain-modeling.contract](domain-modeling.contract.md)
+
 ## gate-driven-test-design.contract
 - [gate-driven-test-design.contract](gate-driven-test-design.contract.md)
 

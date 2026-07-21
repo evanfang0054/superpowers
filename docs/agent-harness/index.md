@@ -15,6 +15,7 @@
 > 主题锚点是跨 spec/plan/contract 的稳定 key，frontmatter 的 `spec_topic` 字段必须命中本节。
 
 - harness-engineering-improvements → specs/2026-06-29-harness-engineering-improvements-design.md
+- domain-modeling → specs/2026-07-21-domain-modeling-design.md
 - phase-metrics → plans/2026-06-29-phase-metrics.md
 - knowledge-base → plans/2026-06-29-knowledge-base.md
 - handoff-contracts → plans/2026-06-29-handoff-contracts.md
