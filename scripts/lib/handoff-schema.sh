@@ -73,10 +73,13 @@ handoff_check_required() {
         echo "validate-handoff: WARNING — domain_terms specified but CONTEXT.md not found at $context_md" >&2
       else
         # Parse YAML inline flow sequence [Term1, Term2, Term3]
-        # Strip brackets, split on comma, trim whitespace
+        # Strip brackets, split on comma, trim whitespace.
+        # Use while-read (NOT 'for term in $term_list') so multi-word terms
+        # like "Line Item" are not re-split on spaces (GDD L2-6-G1-A2).
         local term_list
         term_list=$(printf '%s' "$terms" | tr -d '[]' | tr ',' '\n' | sed 's/^ *//;s/ *$//' | grep -v '^$')
-        for term in $term_list; do
+        printf '%s\n' "$term_list" | while IFS= read -r term; do
+          [ -z "$term" ] && continue
           if ! grep -q "^## ${term}$" "$context_md" 2>/dev/null; then
             echo "validate-handoff: WARNING — domain_term '$term' not found as ## heading in CONTEXT.md" >&2
           fi

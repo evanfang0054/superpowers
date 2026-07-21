@@ -165,6 +165,59 @@ echo "$output5" | grep -qi "WARNING.*domain_term" && {
 }
 echo "PASS: test5 — plan stage skips domain_terms advisory"
 
+# --- Test 6: multi-word domain_terms (GDD L2-6-G1-A2) — "Line Item" must not split ---
+# Self-contained project: CONTEXT.md with ## Order, ## Cancellation, ## Line Item.
+# Spec has domain_terms: [Order, Cancellation, Line Item].
+# With the buggy 'for term in $term_list' loop, "Line Item" is word-split into
+# "Line" + "Item", each failing the ## heading check and emitting a false-positive
+# WARNING. After the fix (while IFS= read -r), "Line Item" is treated as one term
+# and matches ## Line Item. All three terms are present, so NO domain_term WARNING
+# should be emitted at all.
+TMPDIR_MULTI=$(mktemp -d)
+mkdir -p "$TMPDIR_MULTI/docs/agent-harness/specs"
+echo "- domain-modeling → specs/x.md" > "$TMPDIR_MULTI/docs/agent-harness/index.md"
+
+cat > "$TMPDIR_MULTI/CONTEXT.md" << 'EOF'
+# Test Glossary
+
+## Order
+A customer's request to purchase items.
+
+## Cancellation
+A request to void an Order.
+
+## Line Item
+A single product entry within an Order.
+EOF
+
+cat > "$TMPDIR_MULTI/spec6.md" << 'EOF'
+---
+spec_topic: domain-modeling
+decision_summary: "test"
+design_approved: true
+user_approved_at: 2026-07-21T00:00:00Z
+gates: [user-review-passed]
+domain_terms: [Order, Cancellation, Line Item]
+---
+
+# Test Spec
+EOF
+
+ORIG_CLAUDE_PROJECT_DIR_6="$CLAUDE_PROJECT_DIR"
+export CLAUDE_PROJECT_DIR="$TMPDIR_MULTI"
+output6=$("$VALIDATE" --stage spec --file "$TMPDIR_MULTI/spec6.md" 2>&1)
+exit_code6=$?
+export CLAUDE_PROJECT_DIR="$ORIG_CLAUDE_PROJECT_DIR_6"
+rm -rf "$TMPDIR_MULTI"
+[ "$exit_code6" -eq 0 ] || { echo "FAIL: test6 exit code $exit_code6 (expected 0, all terms present)"; echo "$output6"; exit 1; }
+# With the buggy 'for' loop, "Line Item" splits into "Line" and "Item", each
+# producing a WARNING like: domain_term 'Line' not found / domain_term 'Item' not found.
+# After the fix, "Line Item" matches ## Line Item and no WARNING is emitted.
+echo "$output6" | grep -qi "WARNING.*domain_term" && {
+    echo "FAIL: test6 emitted false-positive domain_term WARNING (multi-word 'Line Item' must not split — GDD L2-6-G1-A2)"; echo "$output6"; exit 1
+}
+echo "PASS: test6 — multi-word 'Line Item' not word-split (GDD L2-6-G1-A2)"
+
 echo ""
 echo "PASS: domain_terms advisory check works"
 exit 0
