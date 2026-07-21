@@ -20,5 +20,6 @@
 - knowledge-base → plans/2026-06-29-knowledge-base.md
 - handoff-contracts → plans/2026-06-29-handoff-contracts.md
 - failure-diagnosis → plans/2026-06-29-failure-diagnosis.md
+- brainstorming-optimization → specs/2026-07-21-brainstorming-optimization-design.md
 
 > 维护方式：手动追加，或跑 `scripts/index-knowledge-base.sh` 自动重建。
