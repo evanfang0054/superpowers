@@ -3,7 +3,7 @@
 #
 # Usage: index-knowledge-base.sh [--root <path>]
 #
-# 对 docs/agent-harness/{specs,contracts,plans,notes} 四个子目录扫描 .md
+# 对 docs/agent-harness/{specs,contracts,plans,notes,adr} 五个子目录扫描 .md
 # 文件，按主题（来自 frontmatter spec_topic 或文件名 slug）聚类，
 # 幂等生成各子目录的 index.md。已存在的顶级 index.md 不覆盖（手写维护）。
 
@@ -13,13 +13,13 @@ ROOT="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}
 [ "${1:-}" = "--root" ] && ROOT="${2:-$ROOT}"
 
 KB_DIR="$ROOT/docs/agent-harness"
-SUBDIRS="specs contracts plans notes"
+SUBDIRS="specs contracts plans notes adr"
 
 # Single python implementation: scan each subdir, emit index.md in-place.
 ROOT="$KB_DIR" python3 - <<'PY'
 import os, re, json
 kb = os.environ["ROOT"]
-subdirs = ["specs", "contracts", "plans", "notes"]
+subdirs = ["specs", "contracts", "plans", "notes", "adr"]
 for sub in subdirs:
     target = os.path.join(kb, sub)
     if not os.path.isdir(target):
