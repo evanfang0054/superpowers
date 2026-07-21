@@ -30,8 +30,11 @@ EOF
 
 PROMPT="You are working in a project with a CONTEXT.md at $TMPDIR/CONTEXT.md. The user says: 'I want to handle account stuff.' The word 'account' is fuzzy. Invoke the domain-modeling skill to sharpen this term and update CONTEXT.md. Then report what you did."
 
+# Record line count before invocation so we can detect real updates (seeded file has 4 lines)
+lines_before=$(wc -l < "$TMPDIR/CONTEXT.md")
+
 echo "Running claude -p (this may take 30-60 seconds)..."
-output=$(claude -p "$PROMPT" --allowedTools "Skill,Read,Write" 2>&1 || true)
+output=$(claude -p "$PROMPT" --allowedTools "Skill,Read,Write" --plugin-dir "$REPO_ROOT" 2>&1 || true)
 
 # Assertions
 echo "--- Output ---"
@@ -44,8 +47,8 @@ echo "$output" | grep -qi "domain-modeling" || {
 }
 
 # 2. CONTEXT.md was updated (non-deterministic — model may or may not update)
-if [ "$(wc -l < "$TMPDIR/CONTEXT.md")" -gt 3 ]; then
-    echo "PASS: CONTEXT.md appears to have been updated"
+if [ "$(wc -l < "$TMPDIR/CONTEXT.md")" -gt "$lines_before" ]; then
+    echo "PASS: CONTEXT.md was updated (lines: $lines_before → $(wc -l < "$TMPDIR/CONTEXT.md"))"
 else
     echo "WARN: CONTEXT.md may not have been updated (non-deterministic with headless mode)"
 fi
