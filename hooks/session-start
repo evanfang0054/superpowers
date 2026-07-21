@@ -163,6 +163,32 @@ if { [ "$SESSION_SOURCE" = "startup" ] || [ "$SESSION_SOURCE" = "clear" ]; } \
     kb_hint="\n\n## Knowledge Base\nAgent Harness 知识库入口: docs/agent-harness/index.md（仅用于本项目知识库检索：两级查找，不要对 docs/agent-harness 使用 **/*.md 全局通配）\n"
 fi
 
+# Inject CONTEXT.md glossary summary (cache-friendly, issue #79).
+# Placed in static segment (with using-agent-harness, headless_tip, kb_hint)
+# so prompt cache prefix stays stable. CONTEXT.md is structural vocabulary,
+# not per-session churn like learnings.
+context_md_hint=""
+if { [ "$SESSION_SOURCE" = "startup" ] || [ "$SESSION_SOURCE" = "clear" ]; }; then
+    if [ -f "$LEARNINGS_DIR/CONTEXT.md" ]; then
+        # Extract ## headings + first line of definition, cap at 20 terms
+        context_terms=$(grep -A 1 "^## " "$LEARNINGS_DIR/CONTEXT.md" 2>/dev/null | head -60 || true)
+        term_count=$(grep -c "^## " "$LEARNINGS_DIR/CONTEXT.md" 2>/dev/null || echo 0)
+        if [ -n "$context_terms" ]; then
+            if [ "$term_count" -gt 20 ]; then
+                context_md_hint="\n\n## Domain Glossary\n${context_terms}\n\n(${term_count} terms total — see CONTEXT.md for full glossary)\n"
+            else
+                context_md_hint="\n\n## Domain Glossary\n${context_terms}\n"
+            fi
+        fi
+    elif [ ! -f "$LEARNINGS_DIR/.agent-harness/.context-md-dismissed" ]; then
+        # One-time discovery hint: project has no CONTEXT.md and user hasn't dismissed.
+        # Shows once per session (startup/clear only) until user either:
+        # - creates CONTEXT.md (via /domain-modeling or /harness-init) → hint naturally disappears
+        # - touches .agent-harness/.context-md-dismissed → explicit dismiss
+        context_md_hint="\n\n## Domain Glossary\nNo CONTEXT.md found. If this project has domain-specific terminology, run /domain-modeling to create one, or re-run /harness-init. To dismiss this hint: touch .agent-harness/.context-md-dismissed\n"
+    fi
+fi
+
 # Issue #81 — checkpoint recovery hint. On startup/clear, if the previous
 # session wrote a precompact checkpoint, surface a one-line pointer so the
 # agent can offer to resume in-progress work. The checkpoint file is removed
@@ -194,6 +220,7 @@ warning_escaped=$(escape_for_json "$warning_message")
 learnings_escaped=$(escape_for_json "$learnings_content")
 headless_tip_escaped=$(escape_for_json "$headless_tip")
 kb_hint_escaped=$(escape_for_json "$kb_hint")
+context_md_hint_escaped=$(escape_for_json "$context_md_hint")
 checkpoint_hint_escaped=$(escape_for_json "$checkpoint_hint")
 
 # Build the session context.
@@ -209,7 +236,7 @@ checkpoint_hint_escaped=$(escape_for_json "$checkpoint_hint")
 if [ "$SESSION_SOURCE" = "resume" ]; then
     session_context="${warning_escaped}${learnings_escaped}${checkpoint_hint_escaped}"
 else
-    session_context="<EXTREMELY_IMPORTANT>\nYou have agent-harness.\n\n**Below is the full content of your 'agent-harness:using-agent-harness' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\n\n${using_agent_harness_escaped}${headless_tip_escaped}${kb_hint_escaped}\n\n${warning_escaped}${learnings_escaped}${checkpoint_hint_escaped}\n</EXTREMELY_IMPORTANT>"
+    session_context="<EXTREMELY_IMPORTANT>\nYou have agent-harness.\n\n**Below is the full content of your 'agent-harness:using-agent-harness' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\n\n${using_agent_harness_escaped}${headless_tip_escaped}${kb_hint_escaped}${context_md_hint_escaped}\n\n${warning_escaped}${learnings_escaped}${checkpoint_hint_escaped}\n</EXTREMELY_IMPORTANT>"
 fi
 
 # Output context injection as JSON.
