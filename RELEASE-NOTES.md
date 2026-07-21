@@ -1,5 +1,20 @@
 # Agent Harness Release Notes
 
+## v6.4.0 (2026-07-21)
+
+### Changes
+
+- 新增 domain-modeling 技能和 adr/ 目录，支持领域建模工作流
+- brainstorming 在领域术语明确时自动调用 domain-modeling
+- session-start hooks 注入 CONTEXT.md 术语总览和发现提示
+- 新增 harness-init CONTEXT.md 脚手架和 .gitignore 选项
+- validate-handoff 新增 domain_terms 校验检查，支持多词术语
+- 修复 plugin.json 重复 hooks 声明导致的加载报错
+- 修复 index-knowledge-base 忽略 adr/ 子目录的问题
+- 修复 hooks 中 grep -c 惯用法错误并清理死测试代码
+- 加固 auto-loop worktree 和规划护栏
+- 补充知识库 ADR 索引测试和 domain-modeling 行为测试
+
 ## v6.3.2 (2026-07-08)
 
 ### Changes
