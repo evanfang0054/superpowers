@@ -29,6 +29,33 @@ Bootstraps harness configuration from preset templates. Copies sensor configs an
 5. Show recommended skills from `templates/{selected}/skills-recommended.md`
 6. Prompt user to review and customize
 
+## Domain Glossary Setup
+
+After configuring sensors and hooks, set up the domain glossary. **This step is idempotent** — safe to re-run on existing projects (only creates what's missing, never overwrites).
+
+1. **Check & create CONTEXT.md:**
+   - If `CONTEXT.md` already exists at project root: skip (don't overwrite user's glossary)
+   - If missing: ask user "Create a domain glossary (CONTEXT.md)? (y/n)"
+     - If `y`: create `CONTEXT.md` at project root with scaffold:
+       ```markdown
+       # <Project> Domain Glossary
+
+       <!-- Domain terms go here.
+            Use /domain-modeling to maintain this file.
+            Glossary only — no implementation details. -->
+       ```
+2. **Check & create ADR directory:**
+   - If `docs/agent-harness/adr/` already exists: skip
+   - If missing and `docs/agent-harness/` exists: create `docs/agent-harness/adr/.gitkeep`
+3. **Ask about gitignore** (only if CONTEXT.md was just created):
+   - "Add CONTEXT.md to .gitignore? (y/n)"
+   - If `y`: append `CONTEXT.md` to `.gitignore` (some projects don't commit domain vocabulary — proprietary terminology)
+   - If `n`: CONTEXT.md will be tracked by git (default for shared glossaries)
+
+**For existing projects that never ran harness-init with this step:** simply re-run `/harness-init`. The idempotent check ensures only missing files are created — existing configs, sensors, and hooks are not touched. Alternatively, run `/domain-modeling` directly — it will create `CONTEXT.md` lazily on first term crystallization.
+
+The `domain-modeling` skill maintains CONTEXT.md during design work. See `skills/domain-modeling/SKILL.md` for the glossary format and ADR creation criteria.
+
 ## Auto-detection
 
 Check for `package.json`, `requirements.txt`/`pyproject.toml`, `go.mod` in project root to suggest the right template. Auto-detection is a hint, not a rule -- the user may override the suggestion.
