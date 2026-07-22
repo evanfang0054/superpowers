@@ -11,7 +11,7 @@ WRITING_PLANS="$SKILLS_DIR/writing-plans/SKILL.md"
 HARNESS_DESIGN="$SKILLS_DIR/harness-design/SKILL.md"
 
 # RED for #77: large projects need segmentation before monolithic specs/plans.
-if grep -q "execution map" "$BRAINSTORMING" && grep -q "大型任务分段" "$BRAINSTORMING"; then
+if grep -q "execution map" "$BRAINSTORMING" && grep -q "large-task decomposition" "$BRAINSTORMING"; then
     pass "brainstorming requires execution map for large tasks"
 else
     fail "brainstorming requires execution map for large tasks"

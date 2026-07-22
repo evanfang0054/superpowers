@@ -1,11 +1,5 @@
 # plans/ 索引
 
-## brainstorming-optimization
-- [2026-07-21-brainstorming-optimization](2026-07-21-brainstorming-optimization.md)
-
-## mattpocock-skills-adaptation
-- [2026-07-22-mattpocock-skills-adaptation](2026-07-22-mattpocock-skills-adaptation.md)
-
 ## 2026-01-22-document-review-system
 - [2026-01-22-document-review-system](2026-01-22-document-review-system.md)
 
@@ -84,6 +78,9 @@
 ## 2026-06-27-rebrand-to-agent-harness
 - [2026-06-27-rebrand-to-agent-harness](2026-06-27-rebrand-to-agent-harness.md)
 
+## brainstorming-optimization
+- [2026-07-21-brainstorming-optimization](2026-07-21-brainstorming-optimization.md)
+
 ## domain-modeling
 - [2026-07-21-domain-modeling](2026-07-21-domain-modeling.md)
 
@@ -98,6 +95,9 @@
 
 ## knowledge-base
 - [2026-06-29-knowledge-base](2026-06-29-knowledge-base.md)
+
+## mattpocock-skills-adaptation
+- [2026-07-22-mattpocock-skills-adaptation](2026-07-22-mattpocock-skills-adaptation.md)
 
 ## phase-metrics
 - [2026-06-29-phase-metrics](2026-06-29-phase-metrics.md)

@@ -66,15 +66,15 @@
 ## 2026-06-27-rebrand-to-agent-harness-design
 - [2026-06-27-rebrand-to-agent-harness-design](2026-06-27-rebrand-to-agent-harness-design.md)
 
-## domain-modeling
-- [2026-07-21-domain-modeling-design](2026-07-21-domain-modeling-design.md)
-
 ## brainstorming-optimization
 - [2026-07-21-brainstorming-optimization-design](2026-07-21-brainstorming-optimization-design.md)
 
-## mattpocock-skills-adaptation
-- [2026-07-22-mattpocock-skills-adaptation-design](2026-07-22-mattpocock-skills-adaptation-design.md)
+## domain-modeling
+- [2026-07-21-domain-modeling-design](2026-07-21-domain-modeling-design.md)
 
 ## harness-engineering-improvements
 - [2026-06-29-harness-engineering-improvements-design](2026-06-29-harness-engineering-improvements-design.md)
+
+## mattpocock-skills-adaptation
+- [2026-07-22-mattpocock-skills-adaptation-design](2026-07-22-mattpocock-skills-adaptation-design.md)
 
