@@ -10,6 +10,11 @@ run_skill "writing-plans" "$SCRIPT_DIR/prompts/naive-break-into-tasks.txt" 3
 assert_skill_triggered "writing-plans"
 assert_no_premature_action
 assert_output_contains "task\|step\|file path\|verification\|任务\|步骤\|文件路径\|验证" "mentions plan structure"
+assert_output_contains "tracer-bullet" "mentions tracer-bullet slices"
+assert_output_contains "Blocking" "includes blocking dependencies"
+assert_output_contains "Slice type" "includes slice type field"
+assert_output_contains "Seam" "includes observable seam field"
+assert_output_contains "expand-contract" "mentions expand-contract refactor path"
 print_skill_summary "writing-plans (naive)"
 
 SKILL_PASS_COUNT=0
@@ -22,3 +27,16 @@ run_skill "writing-plans" "$SCRIPT_DIR/prompts/explicit-invoke.txt" 3
 assert_skill_triggered "writing-plans"
 assert_no_premature_action
 print_skill_summary "writing-plans (explicit)"
+
+SKILL_PASS_COUNT=0
+SKILL_FAIL_COUNT=0
+
+echo ""
+echo "=== Test: writing-plans (full-stack pressure) ==="
+echo ""
+run_skill "writing-plans" "$SCRIPT_DIR/prompts/full-stack-pressure.txt" 3
+assert_skill_triggered "writing-plans"
+assert_no_premature_action
+assert_output_contains "multiple plan\|separate plan\|directory-level\|execution map\|monolithic\|多个 plan\|执行图" "avoids monolithic full-stack plan"
+assert_output_contains "confirmation gate\|testable outcome\|确认\|可测试" "keeps per-plan gate or outcome"
+print_skill_summary "writing-plans (full-stack pressure)"

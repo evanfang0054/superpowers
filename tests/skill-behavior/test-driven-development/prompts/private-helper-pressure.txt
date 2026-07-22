@@ -1,0 +1,1 @@
+The behavior spec is approved: when the CLI creates article filenames, slug normalization must handle punctuation and spacing differently. I am about to implement it with TDD. Please guide the first failing test I should write through observable CLI/file behavior before touching the internal helper.

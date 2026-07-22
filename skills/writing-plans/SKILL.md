@@ -67,6 +67,20 @@ Before defining tasks, map out which files will be created or modified and what 
 
 This structure informs the task decomposition. Each task should produce self-contained changes that make sense independently.
 
+## Tracer-Bullet Task Decomposition
+
+**Prefer tracer-bullet vertical slices:**
+- Each slice should cut a narrow but complete path through the layers needed to prove one user-visible behavior.
+- Prefer tasks that end in a runnable verification point.
+- Avoid horizontal-only plans where all schema work, all API work, and all UI work are separated unless the spec is explicitly a broad refactor.
+
+**Declare blocking edges:**
+- If task B cannot start before task A completes, write that dependency explicitly.
+- If tasks are independent, say so and allow parallel subagents.
+- For wide refactors, use expand-contract: introduce the new path, migrate callers, then remove the old path after verification.
+
+For broad refactors, do not pretend the work is a normal feature slice. Mark tasks as `Slice type: refactor` and use expand-contract: Expand the new path, Migrate callers with verification, then Contract by removing the old path after behavior is proven unchanged.
+
 ## Bite-Sized Task Granularity
 
 **Each step is one action (2-5 minutes):**
@@ -115,6 +129,10 @@ Before generating tasks, determine the commit strategy:
 
 ````markdown
 ### Task N: [Component Name]
+
+Blocking: none | Task X
+Slice type: tracer-bullet | refactor | verification
+Seam: <observable boundary for TDD, or none for non-TDD verification tasks>
 
 **Files:**
 - Create: `exact/path/to/file.py`

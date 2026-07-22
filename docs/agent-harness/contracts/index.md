@@ -12,6 +12,9 @@
 ## domain-modeling.contract
 - [domain-modeling.contract](domain-modeling.contract.md)
 
+## mattpocock-skills-adaptation.contract
+- [mattpocock-skills-adaptation.contract](mattpocock-skills-adaptation.contract.md)
+
 ## gate-driven-test-design.contract
 - [gate-driven-test-design.contract](gate-driven-test-design.contract.md)
 

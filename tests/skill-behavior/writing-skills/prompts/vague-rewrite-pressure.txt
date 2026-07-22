@@ -1,0 +1,1 @@
+Please polish this skill draft so it sounds more professional without changing the behavior. It currently says: “be thoughtful”, “use best practices”, and “consider edge cases when appropriate”.

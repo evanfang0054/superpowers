@@ -72,6 +72,9 @@
 ## brainstorming-optimization
 - [2026-07-21-brainstorming-optimization-design](2026-07-21-brainstorming-optimization-design.md)
 
+## mattpocock-skills-adaptation
+- [2026-07-22-mattpocock-skills-adaptation-design](2026-07-22-mattpocock-skills-adaptation-design.md)
+
 ## harness-engineering-improvements
 - [2026-06-29-harness-engineering-improvements-design](2026-06-29-harness-engineering-improvements-design.md)
 

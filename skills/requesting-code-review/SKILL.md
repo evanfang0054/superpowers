@@ -41,11 +41,20 @@ Invoke the `code-reviewer` agent (defined in `agents/code-reviewer.md`).
 - `{HEAD_SHA}` - Ending commit
 - `{DESCRIPTION}` - Brief summary
 
+## Review on Two Axes
+
+Every review request must ask the reviewer to check both axes:
+
+1. **Standards axis** — Does the change follow repository rules, security expectations, existing patterns, and maintainability standards?
+2. **Spec axis** — Does the change faithfully implement the originating spec, plan task, and Definition of Done?
+
+Do not let one axis hide the other. A clean implementation that misses the spec is still a failed review. A spec-complete implementation with Critical quality or security issues is still a failed review.
+
 **3. Act on feedback:**
-- Fix Critical issues immediately
-- Fix Important issues before proceeding
+- Fix Critical issues immediately on either axis
+- Fix Important issues before proceeding on either axis
 - Note Minor issues for later
-- Push back if reviewer is wrong (with reasoning)
+- Push back if reviewer is wrong, with reasoning tied to the relevant axis
 - Reviewer 返回且 Critical/Important 处理完毕后，emit 阶段 gate（不阻断）：
   ```bash
   scripts/log-phase-metric.sh --phase requesting-code-review --action gate --gate-result passed --spec-topic "$SPEC_TOPIC"

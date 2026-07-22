@@ -71,6 +71,13 @@ digraph tdd_cycle {
 
 ### RED - Write Failing Test
 
+**Choose the seam before writing tests:**
+- A seam is a public or agreed boundary where behavior can be observed: CLI command, HTTP endpoint, exported function, component prop contract, script output, or persisted file change.
+- Before writing the first failing test, identify the seam under test.
+- Prefer existing public seams. Do not create test-only public APIs.
+- Test behavior through the seam, not private helpers or implementation details.
+- If the task plan already names the seam, use it. If no seam is obvious, stop and clarify the smallest observable boundary before writing tests.
+
 Write one minimal test showing what should happen.
 
 <Good>
@@ -335,6 +342,9 @@ Extract validation for multiple fields if needed.
 Before marking work complete:
 
 - [ ] Every new function/method has a test
+- [ ] Identified the observable seam before writing the first failing test
+- [ ] Tested behavior through a public or agreed boundary, not private helpers
+- [ ] Did not create test-only public APIs
 - [ ] Watched each test fail before implementing
 - [ ] Each test failed for expected reason (feature missing, not typo)
 - [ ] Wrote minimal code to pass each test

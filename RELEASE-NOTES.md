@@ -1,5 +1,15 @@
 # Agent Harness Release Notes
 
+## v6.4.2 (2026-07-22)
+
+### Changes
+
+- Adapted Matt Pocock skills practices into Agent Harness skill workflows.
+- Added seam-first TDD guidance and focused behavior coverage.
+- Added Standards/Spec two-axis review contracts.
+- Added tracer-bullet planning fields and expand-contract guidance.
+- Added writing-skills predictability, context-load, progressive-disclosure, no-op pruning, and pressure-test guidance.
+
 ## v6.4.1 (2026-07-22)
 
 ### Changes
