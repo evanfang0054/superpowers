@@ -1,5 +1,8 @@
 # plans/ 索引
 
+## brainstorming-optimization
+- [2026-07-21-brainstorming-optimization](2026-07-21-brainstorming-optimization.md)
+
 ## 2026-01-22-document-review-system
 - [2026-01-22-document-review-system](2026-01-22-document-review-system.md)
 

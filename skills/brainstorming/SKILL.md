@@ -8,7 +8,7 @@ when_to_use: "[feedforward] Triggered before any creative or implementation work
 
 Help turn ideas into fully formed designs and specs through natural collaborative dialogue.
 
-Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the design and get user approval.
+Start by understanding the current project context, then clarify decisions in frontier rounds: ask every currently-unblocked question together, each with a recommended answer, then recompute the frontier after the user responds. Once you understand what you're building, present the design and get user approval.
 
 <HARD-GATE>
 Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
@@ -23,22 +23,24 @@ Every project goes through this process. A todo list, a single-function utility,
 You MUST create a task for each of these items and complete them in order:
 
 1. **Explore project context** — check files, docs, recent commits
-   - **知识库检索约定**：先读 `docs/agent-harness/index.md`，再按主题跳到子目录 index.md，禁止 `**/*.md` 全局通配
-2. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
+   - **Knowledge-base retrieval convention:** read `docs/agent-harness/index.md` first, then follow the relevant topic index; do not use global `**/*.md` globs
+2. **Map decision tree** — optional, complex tasks only (3+ decision dimensions): sketch the key decision dependencies before questioning
+3. **Ask clarifying questions** — work the current frontier in rounds; ask all unblocked decision questions together, each with a recommended answer and reason
    - When domain terms crystallize (user defines a concept, or you propose a precise term to replace fuzzy language), invoke `agent-harness:domain-modeling` to update `CONTEXT.md` inline. If `CONTEXT.md` doesn't exist yet, the skill creates it lazily. Spec output should use `CONTEXT.md` vocabulary and include a `domain_terms` field in frontmatter listing the core terms.
-3. **Propose 2-3 approaches** — with trade-offs and your recommendation
-4. **Present design** — in sections scaled to their complexity, get user approval after each section
-5. **Write design doc** — save to `docs/agent-harness/specs/YYYY-MM-DD-<topic>-design.md` (check if target directory is gitignored before committing; if so, inform user and save anyway)
-6. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
-7. **User reviews written spec** — ask user to review the spec file before proceeding
-8. **Transition to implementation** — invoke writing-plans skill to create implementation plan
+4. **Propose 2-3 approaches** — with trade-offs and your recommendation
+5. **Present design** — in sections scaled to their complexity, get user approval after each section
+6. **Write design doc** — save to `docs/agent-harness/specs/YYYY-MM-DD-<topic>-design.md` (check if target directory is gitignored before committing; if so, inform user and save anyway)
+7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
+8. **User reviews written spec** — ask user to review the spec file before proceeding
+9. **Transition to implementation** — invoke writing-plans skill to create implementation plan
 
 ## Process Flow
 
 ```dot
 digraph brainstorming {
     "Explore project context" [shape=box];
-    "Ask clarifying questions" [shape=box];
+    "Map decision tree\n(optional)" [shape=box];
+    "Ask frontier questions\nin rounds" [shape=box];
     "Propose 2-3 approaches" [shape=box];
     "Present design sections" [shape=box];
     "User approves design?" [shape=diamond];
@@ -49,8 +51,9 @@ digraph brainstorming {
     "Invoke gate-driven-test-design" [shape=box];
     "Invoke writing-plans skill" [shape=doublecircle];
 
-    "Explore project context" -> "Ask clarifying questions";
-    "Ask clarifying questions" -> "Propose 2-3 approaches";
+    "Explore project context" -> "Map decision tree\n(optional)";
+    "Map decision tree\n(optional)" -> "Ask frontier questions\nin rounds";
+    "Ask frontier questions\nin rounds" -> "Propose 2-3 approaches";
     "Propose 2-3 approaches" -> "Present design sections";
     "Present design sections" -> "User approves design?";
     "User approves design?" -> "Present design sections" [label="no, revise"];
@@ -73,12 +76,27 @@ digraph brainstorming {
 
 - Check out the current project state first (files, docs, recent commits)
 - Before asking detailed questions, assess scope: if the request describes multiple independent subsystems (e.g., "build a platform with chat, file storage, billing, and analytics"), flag this immediately. Don't spend questions refining details of a project that needs to be decomposed first.
-- For large tasks (full-stack project, multiple apps, backend + frontend + AI, or likely >8 implementation tasks), do **大型任务分段** first: present a directory-level **execution map** with the proposed sub-plans and confirmation gates. Do not write a monolithic spec/plan. Default split: infrastructure / backend / frontend / design-polish, adjusted to the project.
+- For large tasks (full-stack project, multiple apps, backend + frontend + AI, or likely >8 implementation tasks), do **large-task decomposition** first: present a directory-level **execution map** with the proposed sub-plans and confirmation gates. Do not write a monolithic spec/plan. Default split: infrastructure / backend / frontend / design-polish, adjusted to the project.
 - If the project is too large for a single spec, help the user decompose into sub-projects: what are the independent pieces, how do they relate, what order should they be built? Then brainstorm the first sub-project through the normal design flow. Each sub-project gets its own spec → plan → implementation cycle.
-- For appropriately-scoped projects, ask questions one at a time to refine the idea
-- Prefer multiple choice questions when possible, but open-ended is fine too
-- Only one question per message - if a topic needs more exploration, break it into multiple questions
-- Focus on understanding: purpose, constraints, success criteria
+- For complex tasks with 3+ decision dimensions, map the **decision tree** before questioning: identify what must be decided first and which later questions depend on each branch. Simple tasks can keep this tree implicit.
+
+**Ask clarifying questions:**
+
+- Build the current **frontier**: every decision whose prerequisites are already settled and can be answered now
+- Ask the whole frontier in one round: number each question and include a recommended answer with the reason
+- Wait for the user's answers, then recompute the frontier; settled decisions unblock dependent questions for the next round
+- If question B depends on question A's answer, B belongs to a later round, not the current one
+- Do not force 3+ questions per round: when the real frontier has only one question, ask one question
+- Recommended answers are defaults, not constraints: the user may accept, modify, or reject them
+
+**Fact-checking rules:**
+
+- Separate **facts** from **decisions**
+- Facts are things you can look up: project file structure, existing API endpoints, config files, codebase patterns
+- Decisions require human judgment: technology choices, business logic, product trade-offs, design preferences
+- Facts are your job: use tools or dispatch subagents to check them; never ask the user for facts you can inspect
+- Do not block unnecessarily: while a fact-finding subagent runs, keep asking frontier questions that do not depend on that fact
+- Only questions downstream of an unresolved fact wait for the fact-finding result
 
 **Exploring approaches:**
 
@@ -92,14 +110,8 @@ digraph brainstorming {
 - Scale each section to its complexity: a few sentences if straightforward, up to 200-300 words if nuanced
 - Ask after each section whether it looks right so far
 - Cover: architecture, components, data flow, error handling, testing
+- Keep units isolated and understandable: each component should have one clear purpose, explicit dependencies, and boundaries a reader can understand without reading internals
 - Be ready to go back and clarify if something doesn't make sense
-
-**Design for isolation and clarity:**
-
-- Break the system into smaller units that each have one clear purpose, communicate through well-defined interfaces, and can be understood and tested independently
-- For each unit, you should be able to answer: what does it do, how do you use it, and what does it depend on?
-- Can someone understand what a unit does without reading its internals? Can you change the internals without breaking consumers? If not, the boundaries need work.
-- Smaller, well-bounded units are also easier for you to work with - you reason better about code you can hold in context at once, and your edits are more reliable when files are focused. When a file grows large, that's often a signal that it's doing too much.
 
 **Working in existing codebases:**
 
@@ -129,11 +141,11 @@ gates: [user-review-passed]
 - Use elements-of-style:writing-clearly-and-concisely skill if available
 - Commit the design document to git
 
-**结构前置校验（硬门禁）**：spec 文档提交后、进入 self-review 之前，必须跑：
+**Structural pre-validation (hard gate):** after writing the spec document and before entering self-review, you MUST run:
 ```bash
 scripts/validate-handoff.sh --stage spec --file <spec-path>
 ```
-退出码非 0 时，回到「Documentation」步骤补全 frontmatter / 字段，**不得**进入 Spec self-review。
+If the exit code is non-zero, return to the Documentation step to complete the frontmatter/fields and **do not** enter Spec self-review.
 
 **Spec Self-Review:**
 After writing the spec document, look at it with fresh eyes:
@@ -145,7 +157,7 @@ After writing the spec document, look at it with fresh eyes:
 
 Fix any issues inline. No need to re-review — just fix and move on.
 
-- Spec self-review 通过后，跑结构校验并按结果 emit 阶段指标（不阻断）：
+- After Spec self-review passes, run structural validation and emit the phase metric based on the result (non-blocking):
   ```bash
   if scripts/validate-handoff.sh --stage spec --file "$SPEC"; then
     scripts/log-phase-metric.sh --phase brainstorming --action gate --gate-result passed --spec-topic "$SPEC_TOPIC"
@@ -162,36 +174,23 @@ After the spec review loop passes, ask the user to review the written spec befor
 Wait for the user's response. If they request changes, make them and re-run the spec review loop. Only proceed once the user approves.
 
 **Sprint Contract:**
-
 After spec approval, before invoking writing-plans, use `agent-harness:sprint-contract` to negotiate explicit Definition of Done. This prevents the common failure mode of "completed but not what was expected."
 
 Skip sprint contract only for changes that meet ALL of these criteria:
 - **Scope**: single file, < 15 lines changed
 - **Risk**: no architecture decisions, no new API surface, no behavioral change to existing logic
 - **Clarity**: the user's request is unambiguous and the implementation path is obvious
-
 Examples of valid skips: typo fixes, pure documentation changes, renaming a variable, updating a constant value.
 If unsure whether a change qualifies, default to running sprint contract.
 
 **Implementation:**
-
 - Invoke the writing-plans skill to create a detailed implementation plan
 - Do NOT invoke any other skill. writing-plans is the next step.
 
-## Key Principles
-
-- **One question at a time** - Don't overwhelm with multiple questions
-- **Multiple choice preferred** - Easier to answer than open-ended when possible
-- **YAGNI ruthlessly** - Remove unnecessary features from all designs
-- **Explore alternatives** - Always propose 2-3 approaches before settling
-- **Incremental validation** - Present design, get approval before moving on
-- **Be flexible** - Go back and clarify when something doesn't make sense
-
 ## Clarification Loop Circuit-Breaker (issue #83)
 
-If the user rejects your proposed options **3 times in a row** (clear rejection
-signals — "不对" / "不行" / "重新" / "no" / "not what I meant" / "that's not
-it" / "try again" / a hesitant "嗯..." followed by a different question / any
+If the user rejects your proposed options or recommended frontier answers **3 times in a row** (clear rejection
+signals — "no" / "not what I meant" / "that's not it" / "try again" / any hesitant response followed by a different question / any
 response that says "this isn't what I want, try something else" regardless of
 language), **stop listing more options**. Listing more variants of the same
 shape does not converge — it inflates context with zero-output turns (hack
@@ -205,8 +204,7 @@ neither yes nor no.
 **Switch strategy immediately:**
 
 1. Stop generating option lists.
-2. Ask one open-ended outcome question: "能描述一下你最终想看到的结果是什么
-   样子吗？不用管可行性。" / "Describe the end result you want to see, ignoring
+2. Ask one open-ended outcome question: "Describe the end result you want to see, ignoring
    feasibility for now."
 3. If the user still can't describe it, recommend handoff:
    - `agent-harness:office-hours` to re-align on goals, or
@@ -223,7 +221,7 @@ When brainstorming a **new product idea** or **major new feature** (not bug fixe
 
 **When to use:** User says "I have an idea", "is this worth building", "help me think through this", or describes a new product/feature concept.
 
-**How to use:** Ask these questions one at a time during the "Ask clarifying questions" phase. Not every question needs a long answer — some can be quick. But each must be addressed.
+**How to use:** Ask these during the frontier questioning phase when they are decision questions. Do not use them to ask for facts the agent can inspect. Not every question needs a long answer — some can be quick. But each must be addressed.
 
 | # | Question | What It Exposes |
 |---|----------|-----------------|

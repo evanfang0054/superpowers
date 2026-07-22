@@ -118,3 +118,104 @@ Round 1:
 3. B：决策树映射步骤插入
 4. 集成测试：跑 `tests/skill-behavior/brainstorming/run-test.sh`
 5. 验证循环检测 cross-reference 不失效
+
+## Gate Driven Development
+
+### ROOT
+
+本设计优化 `skills/brainstorming/SKILL.md` 的需求澄清行为：从单问单答改为 decision tree frontier rounds，每个当前可问决策附推荐答案；可查证事实由 agent 处理；复杂任务可显式映射决策树；同时精简冲突 prompt 并保留 agent-harness 既有门禁与后续流程。
+
+### Level Items
+
+#### L4-1
+
+PARENT_ID：ROOT
+视角下的需求：用户进入 brainstorming 后，需求澄清应以当前 frontier 批次推进，而不是被迫一轮一个问题或一次询问整棵决策树。
+Gate Items：
+
+- Gate：`e2e gate`
+  Covers：真实 skill 行为路径能体现 frontier batching 的用户可见效果。
+  Assertions：
+  1. 给定一个包含多个互不依赖决策维度的 feature 请求，brainstorming 输出同一 round 的多个编号问题，而不是只问一个问题。
+  2. 给定一个问题依赖另一问题答案的场景，brainstorming 不在同一 round 提出依赖未满足的问题，而是说明回答后会进入下一轮。
+
+#### L3-1
+
+PARENT_ID：L4-1
+视角下的需求：`skills/brainstorming/SKILL.md` 的提问契约必须明确 frontier、decision tree、rounds 和 recommended answers 的关系。
+Gate Items：
+
+- Gate：`contract gate`
+  Covers：skill 文档作为行为契约时，提问模式不含互相冲突的规则。
+  Assertions：
+  1. `Ask clarifying questions` 规则要求先建立 frontier，并在每轮询问所有先决条件已满足的决策。
+  2. 规则明确用户回答后重新计算 frontier，依赖未满足的问题进入后续 round。
+  3. 每个 frontier 问题必须附带推荐答案和理由，并说明用户可接受、修改或否决。
+
+#### L2-1
+
+PARENT_ID：L3-1
+视角下的需求：facts 与 decisions 的分离规则必须阻止 agent 把可查证事实推给用户。
+Gate Items：
+
+- Gate：`fixture gate`
+  Covers：代表性 skill 文案中 facts/decisions 分类和非阻塞查证规则存在。
+  Assertions：
+  1. 文案定义 facts 为项目文件结构、现有 API、配置、代码库模式等可从环境查证的信息。
+  2. 文案定义 decisions 为技术选型、业务逻辑、设计取舍等需要用户判断的信息。
+  3. 文案要求 facts 由 agent 通过工具或子代理查证，永远不要问用户。
+  4. 文案要求后台 fact 查证只阻塞依赖该 fact 的问题，其余 frontier 问题继续提出。
+
+#### L3-2
+
+PARENT_ID：ROOT
+视角下的需求：优化不能破坏 agent-harness 已有 brainstorming 交接流程。
+Gate Items：
+
+- Gate：`contract gate`
+  Covers：现有设计审批、spec、GDD、sprint-contract、writing-plans 交接契约保持存在。
+  Assertions：
+  1. `<HARD-GATE>` 仍禁止在用户批准设计前实现、写代码或脚手架。
+  2. checklist 仍包含 Explore project context、Ask clarifying questions、Propose approaches、Present design、Write design doc、Spec self-review、User reviews written spec、Transition to implementation。
+  3. spec frontmatter 模板、`validate-handoff.sh --stage spec` 硬门禁和 phase metric emit 逻辑仍存在。
+  4. GDD 可选门禁、sprint-contract 和 writing-plans 后续流程仍存在。
+  5. domain-modeling 触发规则仍存在。
+
+#### L2-2
+
+PARENT_ID：L3-2
+视角下的需求：保留的 product validation 和 loop protection 行为必须与新的批次提问兼容。
+Gate Items：
+
+- Gate：`fixture gate`
+  Covers：issue #83 circuit-breaker 与 Six Forcing Questions 不被删除或语义冲突。
+  Assertions：
+  1. Clarification Loop Circuit-Breaker 仍要求连续 3 次拒绝后停止继续列选项并改问 outcome question。
+  2. Six Forcing Questions 仍只用于 product idea / major feature，不用于 bug fix、小改进或已验证需求。
+  3. Six Forcing Questions 文案明确这些问题只询问决策类问题，不要求用户回答 agent 可查证事实。
+
+#### L1-1
+
+PARENT_ID：L3-1
+视角下的需求：静态文案不能保留与 frontier batching 冲突的旧规则。
+Gate Items：
+
+- Gate：`lint gate`
+  Covers：禁止旧单问单答硬规则残留。
+  Assertions：
+  1. `skills/brainstorming/SKILL.md` 不包含精确短语 `Only one question per message`。
+  2. `skills/brainstorming/SKILL.md` 不包含精确短语 `One question at a time`。
+  3. `skills/brainstorming/SKILL.md` 不包含独立 `Key Principles` 段。
+
+#### L1-2
+
+PARENT_ID：ROOT
+视角下的需求：prompt 精简必须产生净减少，而不是用新长文案抵消优化收益。
+Gate Items：
+
+- Gate：`lint gate`
+  Covers：skill 文档体积和冗余段落受控。
+  Assertions：
+  1. 改动后的 `skills/brainstorming/SKILL.md` 行数少于改动前 257 行。
+  2. `Design for isolation and clarity` 不再作为长独立教导段存在。
+  3. 不新增第三方依赖、辅助脚本或与 brainstorming 无关的 skill 文件。

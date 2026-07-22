@@ -1,5 +1,11 @@
 # Agent Harness Release Notes
 
+## v6.4.1 (2026-07-22)
+
+### Changes
+
+Optimize brainstorming skill clarification flow with frontier rounds, recommended answers, fact/decision separation, and English-only prompt text.
+
 ## v6.4.0 (2026-07-21)
 
 ### Changes
