@@ -7,10 +7,12 @@ import {
   ManyToOne,
   JoinColumn,
   Unique,
+  Index,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { ProductEntity } from './product.entity';
 
+@Index(['userId'])
 @Entity('carts')
 @Unique(['userId', 'productId', 'specLabel'])
 export class CartEntity {

@@ -5,8 +5,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Unique,
+  Index,
 } from 'typeorm';
 
+@Index(['productId'])
+@Index(['userId'])
 @Entity('reviews')
 @Unique(['orderId', 'productId'])
 export class ReviewEntity {

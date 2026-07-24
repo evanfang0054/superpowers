@@ -4,9 +4,11 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 import { CouponType } from 'shared';
 
+@Index(['status', 'startAt', 'endAt'])
 @Entity('coupon_templates')
 export class CouponTemplateEntity {
   @PrimaryGeneratedColumn()

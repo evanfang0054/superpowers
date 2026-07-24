@@ -4,8 +4,11 @@ import {
   Column,
   CreateDateColumn,
   Unique,
+  Index,
 } from 'typeorm';
 
+@Index(['userId'])
+@Index(['productId'])
 @Entity('favorites')
 @Unique(['userId', 'productId'])
 export class FavoriteEntity {

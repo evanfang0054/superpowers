@@ -7,11 +7,14 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { OrderStatus } from 'shared';
 import { UserEntity } from './user.entity';
 import { OrderItemEntity } from './order-item.entity';
 
+@Index(['userId'])
+@Index(['status'])
 @Entity('orders')
 export class OrderEntity {
   @PrimaryGeneratedColumn()
