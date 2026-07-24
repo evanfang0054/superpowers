@@ -1,5 +1,11 @@
 # Agent Harness Release Notes
 
+## v6.5.0 (2026-07-24)
+
+### Changes
+
+feat(sdd): 引入 Fan-Out 并行 dispatch 能力
+
 ## v6.4.2 (2026-07-22)
 
 ### Changes
