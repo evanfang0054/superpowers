@@ -29,6 +29,19 @@ Subagent (general-purpose):
       the whole plan. Ask the controller if even that is unclear.
     - Your output MUST reference the actual files you modified (with paths and line numbers)
 
+    ## Worktree Boundary
+
+    You are working in an isolated git worktree at: [WORKTREE_PATH]
+
+    **CRITICAL:** You may ONLY modify files in the following scope:
+    [FILE_SCOPE]
+
+    If no file scope is specified, you may work on any file related to the task.
+    If a file scope IS specified, modifying files outside that scope is a
+    **SEVERITY VIOLATION** that will trigger human intervention.
+
+    Work from: [WORKTREE_PATH]
+
     ## Context
 
     [Scene-setting: where this fits, dependencies, architectural context]
@@ -58,7 +71,7 @@ Subagent (general-purpose):
     output is NOT a completion — it is an incomplete attempt that wastes
     a round-trip. If you cannot finish, return BLOCKED with specifics.
 
-    Work from: [directory]
+    Work from: see Worktree Boundary section above.
 
     **While you work:** If you encounter something unexpected or unclear, **ask questions**.
     It's always OK to pause and clarify. Don't guess or make assumptions.
@@ -138,6 +151,7 @@ Subagent (general-purpose):
       - RED: command run, relevant failing output before implementation, and why the failure was expected
       - GREEN: command run and relevant passing output after implementation
     - Files changed
+    - File-scope check: modified files within scope (see WORKTREE BOUNDARY)
     - Self-review findings (if any)
     - Any issues or concerns
 

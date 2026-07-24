@@ -96,6 +96,20 @@ Subagent (general-purpose):
     unchanged code or spans tasks), report it as a ⚠️ item instead of
     broadening your search.
 
+    ### File-Scope Compliance (SDD Fan-Out)
+
+    If a task brief specifies a file scope, verify that ALL modified files
+    in the diff fall within this scope. The diff file may contain a
+    `FILE_SCOPE_VIOLATION:` section at the bottom — if present, the
+    controller has already flagged these as violations.
+
+    Your job: if you see FILE_SCOPE_VIOLATION entries, confirm them:
+    - TRUE: the file is genuinely outside the task's file scope
+      → escalate to Critical finding
+    - FALSE: the file is related enough (e.g., a dependency required by a
+      file in scope) → suggest the implementer update the file-scope in
+      the brief and note as Minor
+
     ## Part 2: Code Quality
 
     **Code quality:**

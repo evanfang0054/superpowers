@@ -87,6 +87,9 @@
 ## failure-diagnosis
 - [2026-06-29-failure-diagnosis](2026-06-29-failure-diagnosis.md)
 
+## sdd-fan-out
+- [2026-07-24-sdd-fan-out](2026-07-24-sdd-fan-out.md)
+
 ## handoff-contracts
 - [2026-06-29-handoff-contracts](2026-06-29-handoff-contracts.md)
 

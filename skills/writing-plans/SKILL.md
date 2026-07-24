@@ -125,6 +125,52 @@ Before generating tasks, determine the commit strategy:
 - If auto-commit: include "Step N: Commit" in each task as shown in the Task Structure below
 - If manual-commit: omit commit steps from all tasks; add a single "Final commit" reminder at the end of the plan
 
+## SDD Fan-Out Annotations (optional)
+
+When a plan has multiple tasks with no dependencies, SDD (Subagent-Driven
+Development) can dispatch them in parallel. Annotate each task with:
+
+- **`Blocking: none`** — no dependencies; can run in parallel with other
+  `Blocking: none` tasks
+- **`Blocking: Task N`** — depends on Task N; runs after Task N merges
+- **`files: path/to/file`** (optional, recommended) — files the task
+  intends to modify, used for conflict detection
+  - Multiple files: comma-separated: `files: src/a.ts, tests/a.test.ts`
+  - If omitted the orchestrator skips file-conflict checks
+
+**Read-after-write dependencies**: if Task B needs to **read** code that
+Task A modified (even if B only writes to different files), annotate
+`Blocking: Task A`. Plan authors own semantic dependencies; the
+orchestrator does not infer them.
+
+**Backward compatibility**: if any task in a plan lacks the `Blocking:`
+field, the orchestrator falls back to sequential execution (current
+behavior).
+
+Example:
+```markdown
+### Task 1: Implement user model
+Blocking: none
+files: src/user.ts, tests/user.test.ts
+
+### Task 2: Implement order model
+Blocking: none
+files: src/order.ts, tests/order.test.ts
+
+### Task 3: Integrate user and order
+Blocking: Task 1, Task 2
+files: src/integration.ts
+```
+
+Task 1 and Task 2 run in parallel; Task 3 waits for both.
+
+### Task heading format
+
+Plan task headings MUST use `### Task N: Description` format. The
+orchestrator parses task boundaries with this regex. Plans with
+non-standard headings (e.g., `### Step 1`) fall back to sequential
+execution.
+
 ## Task Structure
 
 ````markdown

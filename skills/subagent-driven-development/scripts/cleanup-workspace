@@ -23,4 +23,12 @@ else
   echo "warning: cleanup-workspace failed to remove contents of $dir" >&2
 fi
 
+# Additional: clean SDD Fan-Out worktree directories
+wt_root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}/.claude/worktrees"
+for wt_dir in "$wt_root"/sdd-*; do
+  [ -d "$wt_dir" ] || continue
+  rm -rf "$wt_dir" 2>/dev/null || true
+  echo "cleaned worktree: $wt_dir"
+done
+
 exit 0

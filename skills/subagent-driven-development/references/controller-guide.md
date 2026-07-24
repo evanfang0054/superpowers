@@ -113,7 +113,11 @@ After compaction, trust the ledger and `git log` over your own recollection.
 - Start implementation on main/master without explicit user consent.
 - Skip task review, or accept a report missing either verdict (spec compliance AND task quality are both required).
 - Proceed with unfixed Critical/Important issues.
-- Dispatch multiple implementation subagents in parallel (conflicts).
+- Dispatch multiple implementation subagents in parallel UNLESS the plan
+  task explicitly annotates `Blocking: none` (SDD Fan-Out). When a plan
+  uses Fan-Out, each implementer runs in an isolated git worktree and
+  the orchestrator handles merge + conflict resolution. Tasks without
+  `Blocking: none` must still run sequentially per the existing workflow.
 - Make a subagent read the whole plan file — hand it its task brief (extracted via `scripts/task-brief`). The brief is the single source of truth; subagents Read the brief, not the plan.
 - **Dispatch a brief that references the plan by path without inlining the
   relevant section (issue #82).** If a brief line says "see plan2-backend.md

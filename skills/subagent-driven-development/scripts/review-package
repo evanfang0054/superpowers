@@ -9,8 +9,8 @@
 # (named per range, so a re-review after fixes gets a distinct fresh file).
 set -euo pipefail
 
-if [ $# -lt 2 ] || [ $# -gt 3 ]; then
-  echo "usage: review-package BASE HEAD [OUTFILE]" >&2
+if [ $# -lt 2 ] || [ $# -gt 4 ]; then
+  echo "usage: review-package BASE HEAD [OUTFILE] [FILE-SCOPE-LIST]" >&2
   exit 2
 fi
 
@@ -39,6 +39,44 @@ fi
   echo "## Diff"
   git diff -U10 "${base}..${head}"
 } > "$out"
+
+# --- File-scope violation check (SDD Fan-Out) ---
+# If caller passes optional 4th argument <file-scope-list>,
+# verify all changed files in the diff are within this scope.
+if [ $# -ge 4 ] && [ -n "$4" ]; then
+  IFS=',' read -ra SCOPE_FILES <<< "$4"
+  VIOLATIONS=()
+
+  # Normalize scope files: trim whitespace, strip leading ./ prefix
+  NORM_SCOPE=()
+  for sf in "${SCOPE_FILES[@]}"; do
+    sf=$(echo "$sf" | sed 's/^ *//;s/ *$//;s|^\./||')
+    NORM_SCOPE+=("$sf")
+  done
+
+  # Get changed files from the diff (normalize paths too)
+  while IFS= read -r changed_file; do
+    [ -z "$changed_file" ] && continue
+    changed_file=$(echo "$changed_file" | sed 's|^\./||')
+    found=0
+    for scope_file in "${NORM_SCOPE[@]}"; do
+      if [ "$changed_file" = "$scope_file" ]; then
+        found=1
+        break
+      fi
+    done
+    if [ "$found" -eq 0 ]; then
+      VIOLATIONS+=("$changed_file")
+    fi
+  done < <(git diff --name-only "${base}".."${head}")
+
+  if [ ${#VIOLATIONS[@]} -gt 0 ]; then
+    { echo "FILE_SCOPE_VIOLATION:"; for v in "${VIOLATIONS[@]}"; do echo "  - $v"; done; } >> "$out"
+    echo "file-scope violations: ${#VIOLATIONS[@]}" >&2
+  else
+    echo "file-scope check: passed" >> "$out"
+  fi
+fi
 
 commits=$(git rev-list --count "${base}..${head}")
 echo "wrote ${out}: ${commits} commit(s), $(wc -c < "$out" | tr -d ' ') bytes"

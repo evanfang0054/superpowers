@@ -20,11 +20,83 @@ Then use:
   \"\$SDD_SKILL_DIR/scripts/review-package\"  # diff packager
   \"\$SDD_SKILL_DIR/implementer-prompt.md\"   # implementer template
   \"\$SDD_SKILL_DIR/task-reviewer-prompt.md\" # reviewer template
+  \"\$SDD_SKILL_DIR/scripts/session-init.sh\"  # SDD Fan-Out: session init
+  \"\$SDD_SKILL_DIR/scripts/sdd-state.sh\"     # SDD Fan-Out: state read-write
+  \"\$SDD_SKILL_DIR/scripts/sdd-worktree.sh\"  # SDD Fan-Out: worktree management
+  \"\$SDD_SKILL_DIR/merge-fix-prompt.md\"      # SDD Fan-Out: merge conflict resolution template
 Never call these with bare relative paths like \`scripts/task-brief\` — if
 the CWD has drifted (e.g. after cd-ing into a subdirectory) relative paths
 resolve to the wrong location and fail.
 
 === ORCHESTRATOR WORKFLOW (per iteration) ===
+
+**Fan-Out Detection:**
+After reading the plan, check if ANY task has \`Blocking: none\`:
+- If NO — run serial workflow below (existing behavior)
+- If YES — run Fan-Out workflow (see FAN-OUT WORKFLOW section below)
+
+**FAN-OUT WORKFLOW (for plans with Blocking: none tasks):**
+
+0. RESUME CHECK: If \`.agent-harness/sdd/\` has existing state files:
+   - Read the latest \`state.json\`
+   - For each node: \`in_progress\` and worktree exists → keep running; \`completed\` with no merge → merge now; \`intervention_needed\` → flag; \`pending\` → keep
+   - Resume where it left off (do not restart completed nodes)
+
+0. INIT (if no resume): Run \`\"\$SDD_SKILL_DIR/scripts/session-init.sh\" \"\$(git branch --show-current)\" \"\$PLAN_FILE\"\`
+   → SESSION_DIR (save for all subsequent steps)
+
+1. Parse the plan: extract all tasks with Blocking / files fields.
+   Build a DAG: nodes = tasks, edges = Blocking dependencies.
+
+2. DISPATCH LOOP:
+   While nodes remain unstarted or in_progress:
+     a. Find all nodes with status=pending AND all blocking deps in 'completed' or empty
+     b. Select up to concurrency_limit (default 3) nodes
+     c. For each selected node:
+        - Create worktree via \`sdd_worktree_create \"\$REPO_ROOT\" \"\$TASK_KEY\" \"\$ORCH_BRANCH\"\`
+        - Update state via sdd_state: node.status = in_progress
+        - Save worktree_path, branch to state
+     d. **Same message: dispatch ALL selected implementers in parallel**
+        Agent(implementer-N) with:
+          - task brief (via \`\"\$SDD_SKILL_DIR/scripts/task-brief\"\`)
+          - WORKTREE_PATH → worktree directory
+          - FILE_SCOPE → from plan's \`files:\` field or \"ALL\" if omitted
+     e. Wait for all implementers to return
+     f. For each returned implementer (serial, needs review agent):
+        i. **Check for contradiction signals** — if implementer output contains
+           \"contradiction\", \"conflict in requirements\", \"requirement A but\" → flag as intervention_needed
+        ii. Record BASE commit (before task): git rev-parse HEAD in worktree
+        iii. Generate review package:
+            \`\"\$SDD_SKILL_DIR/scripts/review-package\" BASE HEAD [FILE_SCOPE_LIST]\`
+        iv. Dispatch TASK REVIEWER with review package + file-scope check
+        v. **no-progress detection:** append reviewer findings to
+           state.retry_findings_history. If the same finding text appeared
+           in the last 2 entries → intervention_needed (stuck in loop)
+        vi. Review passes → state.node.status = completed
+            Review fails → retry_count++; if < max_retries → dispatch fix
+            If max_retries reached or FILE_SCOPE_VIOLATION → intervention_needed
+     g. If any node is intervention_needed → keep running other nodes, flag at end
+
+3. MERGE PHASE (serial, topological order):
+   For each completed node, in DAG order:
+     a. \`git merge --no-ff _sdd/{session}/{task-key}\`
+     b. If conflict:
+        - Read conflicted files
+        - Dispatch merge-fix subagent using \`\"\$SDD_SKILL_DIR/merge-fix-prompt.md\"\`
+        - merge-fix fails → intervention_needed
+     c. Remove worktree:
+        Default: \`sdd_worktree_remove \"\$REPO_ROOT\" \"\$TASK_KEY\"\` (delete branch)
+        If intervention_needed: \`sdd_worktree_remove \"\$REPO_ROOT\" \"\$TASK_KEY\" --keep-branch\`
+     d. Update state: node.merge = completed
+
+4. INTEGRATION: Run tests in orchestrator branch
+   - Pass → proceed to finishing-a-development-branch
+   - Fail → dispatch fix agent
+
+5. CLEANUP: \`sdd_cleanup_all_worktrees \"\$REPO_ROOT\"\`
+   + Update state via sdd_state
+
+**SERIAL WORKFLOW (fallback, for plans without Blocking: none):**
 1. Read the plan/task, extract pending tasks
 2. For the NEXT pending task:
    a. Run \`\"\$SDD_SKILL_DIR/scripts/task-brief\"\` to extract task text to a file

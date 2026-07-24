@@ -78,3 +78,6 @@
 ## mattpocock-skills-adaptation
 - [2026-07-22-mattpocock-skills-adaptation-design](2026-07-22-mattpocock-skills-adaptation-design.md)
 
+## sdd-fan-out
+- [2026-07-24-sdd-fan-out-design](2026-07-24-sdd-fan-out-design.md)
+

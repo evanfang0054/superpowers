@@ -1,7 +1,7 @@
 ---
 spec_ref: ../specs/2026-07-22-mattpocock-skills-adaptation-design.md
 spec_topic: mattpocock-skills-adaptation
-status: active
+status: completed
 task_count: 6
 estimated_phases: [tests, implementation, verification]
 dod: "四个现有 skill/reviewer 契约以最小文案改动吸收 seam-first TDD、Standards/Spec 双轴 review、tracer-bullet planning、writing-skills predictability/load 规则；不新增依赖、不复制外部仓库、不修改 hooks/release/demo；运行 skill 加载测试与相关 behavior tests 或记录真实失败原因。"
