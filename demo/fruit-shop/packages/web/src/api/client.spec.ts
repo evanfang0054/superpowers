@@ -1,5 +1,4 @@
 import { describe, it, expect, vi } from 'vitest';
-import axios from 'axios';
 import { apiClient } from './client';
 
 // Mock axios with a create function that captures the config onto the instance
