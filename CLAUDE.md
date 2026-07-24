@@ -27,7 +27,7 @@
 - 测试工具函数在 `tests/claude-code/test-helpers.sh`：`run_claude`、`assert_contains`、`assert_not_contains`、`assert_count`、`assert_order`
 
 ### 其他测试套件
-- `tests/plugin-infrastructure/run-all.sh` — 纯脚本套件，秒级完成，覆盖 hooks/scripts/manifest/commands/agents
+- `tests/plugin-infrastructure/run-all.sh` — 纯脚本套件，秒级完成，覆盖 hooks/scripts/manifest/commands/agents，包含 task-brief 提取测试（25 个子套件）
 - `tests/codex-plugin-sync/test-sync-to-codex-plugin.sh` — Codex plugin manifest 一致性测试
 - `tests/explicit-skill-requests/run-all.sh` — 多轮显式 skill 调用测试（依赖 `claude -p` headless 模式实际调用 Claude API）
 - `tests/skill-triggering/run-all.sh` — 隐式 skill 触发测试（依赖 `claude -p` headless 模式实际调用 Claude API）
@@ -110,10 +110,12 @@ Demo 是一个独立的全栈 monorepo（pnpm workspace）。在 demo 目录内�
 - **Hooks（`hooks/`）** — 会话生命周期管理。`hooks/hooks.json`（Claude Code）和 `hooks/hooks-cursor.json`（Cursor）定义 `sessionStart` 和 `Stop` 钩子。`hooks/session-start` 读取 `using-agent-harness` skill 内容及项目 learnings（`.agent-harness/learnings.jsonl`），以平台特定格式（Cursor / Claude Code / Copilot CLI）输出 JSON。`hooks/stop-hook.sh` 在会话结束时运行。
 - **Learnings（`.agent-harness/learnings.jsonl` + `scripts/*learnings.sh`）** — 持久化的项目知识，通过 session-start hook 注入每个新会话。使用 `session-learnings` skill 添加条目；不要手动编辑 JSONL 文件。
 - **子代理驱动开发（"Ralph Loop"）** — `skills/subagent-driven-development/` 编排专用子代理（implementer、spec reviewer、code quality reviewer）。通过 `scripts/setup-ralph-loop.sh` 设置。子代理提示与 SKILL.md 同目录存放。
+  - **SDD Fan-Out（v6.5.0+）**：当 plan 任务标注 `Blocking: none` 时，orchestrator 可并行 dispatch 多个 implementer 在隔离 git worktree 中工作，完成后自动 merge 回 orchestrator 分支。相关脚本：`session-init.sh`（会话初始化）、`sdd-state.sh`（state 读写）、`sdd-worktree.sh`（worktree 生命周期管理）、`merge-fix-prompt.md`（冲突修复模板）。仅 Claude Code 的 Agent tool 支持并行 dispatch；其他平台退化为串行。
 - **Slash 命令（`commands/`）** — 用户可调用：`ralph-loop`、`cancel-ralph`、`help`、`generate-issues`、`fix-issues-and-pr`。
 - **Agents（`agents/`）** — 专用 agent 定义，如 `code-reviewer.md`。
 - **Templates（`templates/）** — 技术栈起步模板（react-typescript、python-fastapi、go-cli）。
-- **Scripts（`scripts/`）** — Shell 工具：版本号管理、learnings 搜索/记录、循环检测、trace 分析、覆盖率指标。
+- **Scripts（`scripts/`）** — Shell 工具：版本号管理、learnings 搜索/记录、循环检测（`loop-detector.sh`）、trace 分析、覆盖率指标。
+- **SDD 脚本（`skills/subagent-driven-development/scripts/`）** — `task-brief`（plan 任务提取，使用章节标题边界解析，支持 `##/### Task N:` 格式和嵌套代码 fence）、`review-package`（diff 审查包生成，含 file-scope 越界检测）、`cleanup-workspace`（工作区清理）、`session-init.sh`/`sdd-state.sh`/`sdd-worktree.sh`（Fan-Out 会话管理）。
 - **Auto-Loop（`scripts/auto-loop.sh` + `scripts/lib/*.sh` + `skills/auto-loop/`）** — 自动化「会话分析→提 issue→SDD 修复→PR」闭环。独立 worktree 隔离运行 Claude，stream-json 信号驱动主循环。详见下方「Auto-Loop」一节。
 
 ## 配置与验证地图

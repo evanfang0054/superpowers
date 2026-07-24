@@ -3,6 +3,9 @@
 # implementer reads in one call, so the task text never has to be pasted
 # through the controller's context.
 #
+# Uses section-based parsing (heading boundaries) instead of fence tracking
+# to avoid getting confused by nested code fences inside plan documents.
+#
 # Usage: task-brief PLAN_FILE TASK_NUMBER [OUTFILE]
 # Default OUTFILE: <repo-root>/.agent-harness/sdd/task-<N>-brief.md
 # (per worktree; concurrent runs in the same working tree share it).
@@ -25,11 +28,33 @@ else
 fi
 
 awk -v n="$n" '
-  /^```/ { infence = !infence }
-  !infence && /^#+[ \t]+Task[ \t]+[0-9]+/ {
-    intask = ($0 ~ ("^#+[ \t]+Task[ \t]+" n "([^0-9]|$)"))
+  # Combined: heading boundaries + fence-depth tracking.
+  # Fences let us skip headings inside code blocks
+  # (e.g., writing-plans examples with "### Task N:" inside fences).
+  #
+  #   ```<lang>  opens a fence
+  #   ``` (bare) closes the most recent open fence
+  /^```[^[:space:]]/ { depth++ }   # open: ```<language>
+  /^```[[:space:]]*$/ { if (depth > 0) depth-- }  # close: ```
+
+  # Only match headings outside fences.
+  depth == 0 && /^[[:space:]]*#+[[:space:]]+Task[[:space:]]+[0-9]+/ {
+    if (!in_task) {
+      is_target = ($0 ~ ("^[[:space:]]*#+[[:space:]]+Task[[:space:]]+" n "([^0-9]|$)"))
+      if (is_target) {
+        in_task = 1
+        print          # output the heading line
+        next           # skip stop-condition checks on the same line
+      }
+    } else {
+      # Already inside the target task — next "Task M:" means stop.
+      exit
+    }
   }
-  intask { print }
+  # No explicit H1/H2 stop conditions. Task boundaries are determined
+  # solely by "### Task N:" headings. This avoids false positives from
+  # code comments (e.g., "# Before: ...") and sub-headings within a task.
+  in_task { print }
 ' "$plan" > "$out"
 
 if [ ! -s "$out" ]; then

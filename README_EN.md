@@ -171,7 +171,7 @@ Agent Harness uses a layered architecture: **Decision Layer** ensures "doing the
 
 3. **writing-plans** - Activates with sprint contract confirmed. Breaks work into bite-sized tasks (2-5 minutes each). Every task has exact file paths, complete code, verification steps.
 
-4. **subagent-driven-development** or **executing-plans** - Activates with plan. Both driven by ralph-loop to ensure completion. subagent-driven-development acts as orchestrator dispatching subagents (implementer → spec review → quality review), executing-plans runs directly in main session. Both support user-defined additional rules. SDD adopts the v6.0 unified review mechanism: a single `task-reviewer` returns a double verdict (spec compliance + code quality) in one pass, backed by `scripts/task-brief` and `scripts/review-package` which write task text and diff to files, avoiding controller context pollution.
+4. **subagent-driven-development** or **executing-plans** - Activates with plan. Both driven by ralph-loop to ensure completion. subagent-driven-development acts as orchestrator dispatching subagents (implementer → spec review → quality review), executing-plans runs directly in main session. Both support user-defined additional rules. SDD adopts the v6.0 unified review mechanism: a single `task-reviewer` returns a double verdict (spec compliance + code quality) in one pass, backed by `scripts/task-brief` and `scripts/review-package` which write task text and diff to files, avoiding controller context pollution. **SDD Fan-Out (v6.5.0+)**: When a plan annotates tasks with `Blocking: none`, the orchestrator can dispatch multiple implementers in parallel across isolated git worktrees, then auto-merge results back.
 
 5. **test-driven-development** - Activates during implementation. Enforces RED-GREEN-REFACTOR: write failing test, watch it fail, write minimal code, watch it pass, commit. Deletes code written before tests.
 
@@ -301,7 +301,7 @@ Design spec: `docs/agent-harness/specs/2026-06-29-harness-engineering-improvemen
 - **requesting-code-review** - Pre-review checklist
 - **receiving-code-review** - Responding to feedback
 - **finishing-a-development-branch** - Merge/PR decision workflow
-- **subagent-driven-development** - Ralph-loop driven orchestrator mode, dispatches subagents + v6.0 unified review (single reviewer, double verdict, backed by `task-brief` / `review-package` scripts)
+- **subagent-driven-development** - Ralph-loop driven orchestrator mode, dispatches subagents + v6.0 unified review (single reviewer, double verdict, backed by `task-brief` / `review-package` scripts). v6.5.0+ adds Fan-Out: tasks annotated `Blocking: none` run in parallel across isolated worktrees
 - **computational-sensors** - Run deterministic checks (lint/typecheck/test/coverage) before semantic review
 
 **Quality Assurance**

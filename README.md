@@ -186,7 +186,7 @@ Agent Harness 采用分层架构：**决策层**确保"做对的事"，**执行�
 
 3. **writing-plans（编写计划）** - 在冲刺合约确认后激活。将工作分解为小任务（每个 2-5 分钟）。每个任务都有精确的文件路径、完整的代码和验证步骤。
 
-4. **subagent-driven-development（子代理驱动开发）** 或 **executing-plans（执行计划）** - 有计划时激活。两者均由 ralph-loop 驱动确保完成。subagent-driven-development 作为协调者派发子代理（实现 → 统一审查），executing-plans 在主 session 内直接执行。均支持用户自定义额外规则。SDD 采用 v6.0 统一审查机制：单一 `task-reviewer` 一次返回规格合规 + 代码质量双 verdict，配合 `scripts/task-brief` 和 `scripts/review-package` 把任务文本与 diff 写入文件，避免控制器上下文污染。
+4. **subagent-driven-development（子代理驱动开发）** 或 **executing-plans（执行计划）** - 有计划时激活。两者均由 ralph-loop 驱动确保完成。subagent-driven-development 作为协调者派发子代理（实现 → 统一审查），executing-plans 在主 session 内直接执行。均支持用户自定义额外规则。SDD 采用 v6.0 统一审查机制：单一 `task-reviewer` 一次返回规格合规 + 代码质量双 verdict，配合 `scripts/task-brief` 和 `scripts/review-package` 把任务文本与 diff 写入文件，避免控制器上下文污染。**SDD Fan-Out（v6.5.0+）**：当 plan 标注 `Blocking: none` 时，orchestrator 可并行 dispatch 多个 implementer 在隔离 worktree 中工作，完成后自动 merge。
 
 5. **test-driven-development（测试驱动开发）** - 在实现过程中激活。强制执行红-绿-重构循环：编写失败的测试，观察失败，编写最少代码，观察通过，提交。删除在测试之前编写的代码。
 
@@ -316,7 +316,7 @@ Agent Harness 不仅是一组 skill 的集合，更在模型外搭建了一层�
 - **requesting-code-review** - 预审查清单
 - **receiving-code-review** - 响应反馈
 - **finishing-a-development-branch** - 合并/PR 决策工作流
-- **subagent-driven-development** - Ralph-loop 驱动协调者模式，派发子代理 + v6.0 统一审查（单 reviewer 双 verdict，`task-brief` / `review-package` 脚本支撑）
+- **subagent-driven-development** - Ralph-loop 驱动协调者模式，派发子代理 + v6.0 统一审查（单 reviewer 双 verdict，`task-brief` / `review-package` 脚本支撑）。v6.5.0+ 支持 Fan-Out：plan 中 `Blocking: none` 的任务可并行 dispatch，隔离 worktree 实现，自动 merge
 - **computational-sensors** - 在语义审查前运行确定性检查（lint/类型检查/测试/覆盖率）
 
 **质量保证**
