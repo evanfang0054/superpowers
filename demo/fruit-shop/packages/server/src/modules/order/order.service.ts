@@ -79,8 +79,6 @@ export class OrderService {
     return { ...order, items };
   }
 
-  // ─── Lifecycle methods (to be extracted to OrderLifecycleService in Task 5) ───
-
   /** 取消订单 */
   async cancel(userId: number, id: number) {
     return this.lifecycleService.cancel(userId, id, (uid, oid) =>
