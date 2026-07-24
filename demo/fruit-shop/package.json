@@ -11,8 +11,20 @@
     "build:server": "pnpm --filter server build",
     "build:web": "pnpm --filter web build",
     "build": "pnpm build:shared && pnpm build:server && pnpm build:web",
-    "lint": "pnpm -r lint",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test:unit": "pnpm -r run test:unit",
     "clean": "rm -rf packages/*/dist packages/*/node_modules node_modules"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "@eslint/js": "^9.0.0",
+    "typescript-eslint": "^8.0.0",
+    "eslint-plugin-react": "^4.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "prettier": "^3.0.0"
   },
   "engines": {
     "node": ">=20.0.0",
