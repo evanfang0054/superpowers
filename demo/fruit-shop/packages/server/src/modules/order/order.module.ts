@@ -13,6 +13,7 @@ import {
 import { CartModule } from '../cart/cart.module';
 import { CouponModule } from '../coupon/coupon.module';
 import { OrderService } from './order.service';
+import { OrderCheckoutService } from './order-checkout.service';
 import { OrderController } from './order.controller';
 
 @Module({
@@ -31,7 +32,7 @@ import { OrderController } from './order.controller';
     ]),
   ],
   controllers: [OrderController],
-  providers: [OrderService],
+  providers: [OrderService, OrderCheckoutService],
   exports: [OrderService],
 })
 export class OrderModule {}
