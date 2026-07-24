@@ -67,13 +67,13 @@ After reading the plan, check if ANY task has \`Blocking: none\`:
            \"contradiction\", \"conflict in requirements\", \"requirement A but\" → flag as intervention_needed
         ii. Record BASE commit (before task): git rev-parse HEAD in worktree
         iii. Generate review package:
-            \`\"\$SDD_SKILL_DIR/scripts/review-package\" BASE HEAD [FILE_SCOPE_LIST]\`
+            \`\"\$SDD_SKILL_DIR/scripts/review-package\" BASE HEAD \"\" [FILE_SCOPE_LIST]\`
         iv. Dispatch TASK REVIEWER with review package + file-scope check
         v. **no-progress detection:** append reviewer findings to
            state.retry_findings_history. If the same finding text appeared
            in the last 2 entries → intervention_needed (stuck in loop)
         vi. Review passes → state.node.status = completed
-            Review fails → retry_count++; if < max_retries → dispatch fix
+            Review fails → retry_count++; if < max_retries (default: 2) → dispatch fix
             If max_retries reached or FILE_SCOPE_VIOLATION → intervention_needed
      g. If any node is intervention_needed → keep running other nodes, flag at end
 

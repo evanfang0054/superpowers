@@ -4,7 +4,7 @@
 # call. Using the recorded per-task BASE (not HEAD~1) keeps multi-commit
 # tasks intact.
 #
-# Usage: review-package BASE HEAD [OUTFILE]
+# Usage: review-package BASE HEAD [OUTFILE] [FILE-SCOPE-LIST]
 # Default OUTFILE: <repo-root>/.agent-harness/sdd/review-<base7>..<head7>.diff
 # (named per range, so a re-review after fixes gets a distinct fresh file).
 set -euo pipefail
