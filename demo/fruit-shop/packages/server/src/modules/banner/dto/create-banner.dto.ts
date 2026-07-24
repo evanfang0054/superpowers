@@ -1,12 +1,4 @@
-import {
-  IsString,
-  IsOptional,
-  IsInt,
-  IsIn,
-  Min,
-  MinLength,
-  MaxLength,
-} from 'class-validator';
+import { IsString, IsOptional, IsInt, IsIn, Min, MinLength, MaxLength } from 'class-validator';
 
 export class CreateBannerDto {
   @IsString()

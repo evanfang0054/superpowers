@@ -1,17 +1,8 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { PinoLogger } from 'nestjs-pino';
-import {
-  ReviewEntity,
-  OrderEntity,
-  OrderItemEntity,
-  UserEntity,
-} from '../../entities';
+import { ReviewEntity, OrderEntity, OrderItemEntity, UserEntity } from '../../entities';
 import { ErrorCode, ErrorMessage, OrderStatus } from 'shared';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { QueryReviewDto } from './dto/query-review.dto';
@@ -43,10 +34,7 @@ export class ReviewService {
     const qb = this.reviewRepo
       .createQueryBuilder('r')
       .leftJoin(UserEntity, 'u', 'u.id = r.userId')
-      .addSelect([
-        'u.nickname AS userNickname',
-        'u.avatar AS userAvatar',
-      ])
+      .addSelect(['u.nickname AS userNickname', 'u.avatar AS userAvatar'])
       .where('r.productId = :productId', { productId })
       .orderBy('r.createdAt', 'DESC')
       .skip((page - 1) * limit)
@@ -158,10 +146,7 @@ export class ReviewService {
       const saved = await queryRunner.manager.save(ReviewEntity, entities);
 
       await queryRunner.commitTransaction();
-      this.logger.info(
-        { orderId, userId, count: saved.length },
-        '评价创建成功',
-      );
+      this.logger.info({ orderId, userId, count: saved.length }, '评价创建成功');
       return { created: saved.length, reviews: saved };
     } catch (err) {
       await queryRunner.rollbackTransaction();

@@ -32,7 +32,8 @@ const STATUS_BG: Record<OrderStatus, string> = {
 export default function OrderDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { currentOrder, isLoading, fetchOrderById, cancelOrder, clearCurrentOrder } = useOrderStore();
+  const { currentOrder, isLoading, fetchOrderById, cancelOrder, clearCurrentOrder } =
+    useOrderStore();
   const [isCancelling, setIsCancelling] = useState(false);
   const [isPaying, setIsPaying] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
@@ -147,12 +148,10 @@ export default function OrderDetail() {
 
   const showPayBtn = order.status === OrderStatus.PENDING;
   const showConfirmBtn = order.status === OrderStatus.SHIPPED;
-  const showRefundBtn =
-    order.status === OrderStatus.PAID || order.status === OrderStatus.SHIPPED;
+  const showRefundBtn = order.status === OrderStatus.PAID || order.status === OrderStatus.SHIPPED;
   const showReviewBtn = order.status === OrderStatus.COMPLETED;
 
-  const hasActionButtons =
-    showPayBtn || showConfirmBtn || showRefundBtn || showReviewBtn;
+  const hasActionButtons = showPayBtn || showConfirmBtn || showRefundBtn || showReviewBtn;
 
   return (
     <div className="min-h-screen bg-brand-bg pb-24">
@@ -163,15 +162,21 @@ export default function OrderDetail() {
         <section className={`${STATUS_BG[order.status]} rounded-2xl p-5 text-white`}>
           <p className="text-2xl font-bold">{STATUS_LABELS[order.status]}</p>
           <p className="text-sm opacity-80 mt-1">订单号: {order.orderNo}</p>
-          <p className="text-sm opacity-80">
-            {new Date(order.createdAt).toLocaleString('zh-CN')}
-          </p>
+          <p className="text-sm opacity-80">{new Date(order.createdAt).toLocaleString('zh-CN')}</p>
         </section>
 
         {/* Shipping info */}
         <section className="bg-brand-card rounded-2xl border border-brand-border p-4">
           <h2 className="text-sm font-semibold text-brand-dark mb-3 flex items-center gap-2">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-brand-primary">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="text-brand-primary"
+            >
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
               <circle cx="12" cy="10" r="3" />
             </svg>
@@ -210,9 +215,7 @@ export default function OrderDetail() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-brand-dark line-clamp-1">{item.productName}</p>
-                  {item.specLabel && (
-                    <p className="text-xs text-brand-muted">{item.specLabel}</p>
-                  )}
+                  {item.specLabel && <p className="text-xs text-brand-muted">{item.specLabel}</p>}
                 </div>
                 <div className="text-right flex-shrink-0">
                   <p className="text-sm font-medium text-brand-primary">
@@ -240,12 +243,22 @@ export default function OrderDetail() {
             返回列表
           </Button>
           {showPayBtn && (
-            <Button variant="primary" loading={isPaying} disabled={isCancelling} onClick={handlePay}>
+            <Button
+              variant="primary"
+              loading={isPaying}
+              disabled={isCancelling}
+              onClick={handlePay}
+            >
               {isPaying ? '支付中...' : '去支付'}
             </Button>
           )}
           {showPayBtn && (
-            <Button variant="danger" loading={isCancelling} disabled={isPaying} onClick={handleCancel}>
+            <Button
+              variant="danger"
+              loading={isCancelling}
+              disabled={isPaying}
+              onClick={handleCancel}
+            >
               {isCancelling ? '取消中...' : '取消订单'}
             </Button>
           )}
@@ -332,10 +345,7 @@ export default function OrderDetail() {
                   content: '',
                 };
                 return (
-                  <div
-                    key={item.id}
-                    className="border border-brand-border rounded-2xl p-3"
-                  >
+                  <div key={item.id} className="border border-brand-border rounded-2xl p-3">
                     <div className="flex items-center gap-2">
                       <img
                         src={item.image || '/placeholder-fruit.png'}
@@ -406,20 +416,17 @@ export default function OrderDetail() {
                 fullWidth
                 loading={isReviewing}
                 onClick={async () => {
-                  const reviews: CreateReviewItemDTO[] = currentOrder.items.map(
-                    (item) => {
-                      const draft =
-                        reviewDrafts[item.productId] ?? {
-                          rating: 5,
-                          content: '',
-                        };
-                      return {
-                        productId: item.productId,
-                        rating: draft.rating,
-                        content: draft.content.trim(),
-                      };
-                    },
-                  );
+                  const reviews: CreateReviewItemDTO[] = currentOrder.items.map((item) => {
+                    const draft = reviewDrafts[item.productId] ?? {
+                      rating: 5,
+                      content: '',
+                    };
+                    return {
+                      productId: item.productId,
+                      rating: draft.rating,
+                      content: draft.content.trim(),
+                    };
+                  });
                   // 至少要填一条内容
                   if (reviews.every((r) => !r.content)) {
                     Toast.show('请至少填写一条评价内容', 'warning');

@@ -24,7 +24,7 @@ describe('JwtAuthGuard', () => {
   });
 
   const mockCtx = (handler: any, clazz: any): ExecutionContext =>
-    ({ getHandler: () => handler, getClass: () => clazz } as any);
+    ({ getHandler: () => handler, getClass: () => clazz }) as any;
 
   it('should return true when @Public', () => {
     reflector.getAllAndOverride.mockReturnValue(true);

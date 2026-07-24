@@ -14,43 +14,44 @@
 
 ### 新建文件
 
-| 文件 | 职责 |
-|------|------|
-| `packages/server/jest.config.ts` | 单元测试 Jest 配置 |
-| `packages/server/test/jest-e2e.config.ts` | 集成测试 Jest 配置 |
-| `packages/server/test/helpers/test-helper.ts` | 集成测试 app 创建、auth helper、seed |
-| `packages/server/.env.test` | 集成测试环境变量 |
-| `packages/server/src/modules/health/health.module.ts` | Health 模块 |
-| `packages/server/src/modules/health/health.controller.ts` | /health 端点 |
-| `packages/server/src/modules/auth/auth.controller.spec.ts` | Auth 单元测试 |
-| `packages/server/src/modules/user/user.controller.spec.ts` | User 单元测试 |
-| `packages/server/src/modules/product/product.controller.spec.ts` | Product 单元测试 |
-| `packages/server/src/modules/product/category.controller.spec.ts` | Category 单元测试 |
-| `packages/server/src/modules/cart/cart.controller.spec.ts` | Cart 单元测试 |
-| `packages/server/src/modules/order/order.controller.spec.ts` | Order 单元测试 |
-| `packages/server/test/auth.e2e-spec.ts` | Auth 集成测试 |
-| `packages/server/test/user.e2e-spec.ts` | User 集成测试 |
-| `packages/server/test/product.e2e-spec.ts` | Product + Category 集成测试 |
-| `packages/server/test/cart.e2e-spec.ts` | Cart 集成测试 |
-| `packages/server/test/order.e2e-spec.ts` | Order 集成测试 |
-| `packages/server/test/health.e2e-spec.ts` | Health 集成测试 |
+| 文件                                                              | 职责                                 |
+| ----------------------------------------------------------------- | ------------------------------------ |
+| `packages/server/jest.config.ts`                                  | 单元测试 Jest 配置                   |
+| `packages/server/test/jest-e2e.config.ts`                         | 集成测试 Jest 配置                   |
+| `packages/server/test/helpers/test-helper.ts`                     | 集成测试 app 创建、auth helper、seed |
+| `packages/server/.env.test`                                       | 集成测试环境变量                     |
+| `packages/server/src/modules/health/health.module.ts`             | Health 模块                          |
+| `packages/server/src/modules/health/health.controller.ts`         | /health 端点                         |
+| `packages/server/src/modules/auth/auth.controller.spec.ts`        | Auth 单元测试                        |
+| `packages/server/src/modules/user/user.controller.spec.ts`        | User 单元测试                        |
+| `packages/server/src/modules/product/product.controller.spec.ts`  | Product 单元测试                     |
+| `packages/server/src/modules/product/category.controller.spec.ts` | Category 单元测试                    |
+| `packages/server/src/modules/cart/cart.controller.spec.ts`        | Cart 单元测试                        |
+| `packages/server/src/modules/order/order.controller.spec.ts`      | Order 单元测试                       |
+| `packages/server/test/auth.e2e-spec.ts`                           | Auth 集成测试                        |
+| `packages/server/test/user.e2e-spec.ts`                           | User 集成测试                        |
+| `packages/server/test/product.e2e-spec.ts`                        | Product + Category 集成测试          |
+| `packages/server/test/cart.e2e-spec.ts`                           | Cart 集成测试                        |
+| `packages/server/test/order.e2e-spec.ts`                          | Order 集成测试                       |
+| `packages/server/test/health.e2e-spec.ts`                         | Health 集成测试                      |
 
 ### 修改文件
 
-| 文件 | 改动 |
-|------|------|
-| `packages/server/package.json` | 新增依赖 + test 脚本 |
-| `packages/server/src/main.ts` | Swagger setup |
-| `packages/server/src/app.module.ts` | ThrottlerModule + HealthModule 注册 |
-| `packages/server/src/modules/auth/auth.controller.ts` | @Throttle 装饰器 |
-| `packages/server/src/common/filters/http-exception.filter.ts` | ThrottlerException 特殊处理 |
-| `packages/server/.env.example` | SWAGGER_ENABLED |
+| 文件                                                          | 改动                                |
+| ------------------------------------------------------------- | ----------------------------------- |
+| `packages/server/package.json`                                | 新增依赖 + test 脚本                |
+| `packages/server/src/main.ts`                                 | Swagger setup                       |
+| `packages/server/src/app.module.ts`                           | ThrottlerModule + HealthModule 注册 |
+| `packages/server/src/modules/auth/auth.controller.ts`         | @Throttle 装饰器                    |
+| `packages/server/src/common/filters/http-exception.filter.ts` | ThrottlerException 特殊处理         |
+| `packages/server/.env.example`                                | SWAGGER_ENABLED                     |
 
 ---
 
 ## Task 1: 安装依赖与 Jest 配置
 
 **Files:**
+
 - Modify: `packages/server/package.json`
 - Create: `packages/server/jest.config.ts`
 - Create: `packages/server/test/jest-e2e.config.ts`
@@ -153,6 +154,7 @@ git commit -m "chore(server): install swagger/throttler/terminus/test deps and j
 ## Task 2: 接入 Swagger
 
 **Files:**
+
 - Modify: `packages/server/src/main.ts`
 - Modify: `packages/server/.env.example`
 
@@ -209,6 +211,7 @@ git commit -m "feat(server): integrate @nestjs/swagger at /api/docs"
 ## Task 3: 接入速率限制
 
 **Files:**
+
 - Modify: `packages/server/src/app.module.ts`
 - Modify: `packages/server/src/modules/auth/auth.controller.ts`
 - Modify: `packages/server/src/common/filters/http-exception.filter.ts`
@@ -243,11 +246,13 @@ providers: [
 在 `packages/server/src/modules/auth/auth.controller.ts` 中：
 
 添加 import：
+
 ```typescript
 import { Throttle } from '@nestjs/throttler';
 ```
 
 在 `register` 和 `login` 方法上添加装饰器：
+
 ```typescript
 @Throttle([{ default: { ttl: 60000, limit: 10 } }])
 ```
@@ -262,9 +267,8 @@ import { Throttle } from '@nestjs/throttler';
 import { ThrottlerException } from '@nestjs/throttler';
 
 // 在 catch 方法中，response.status() 调用之前添加：
-const httpStatus = exception instanceof ThrottlerException
-  ? HttpStatus.TOO_MANY_REQUESTS
-  : HttpStatus.OK;
+const httpStatus =
+  exception instanceof ThrottlerException ? HttpStatus.TOO_MANY_REQUESTS : HttpStatus.OK;
 
 // 将 response.status(HttpStatus.OK) 改为：
 response.status(httpStatus).json({
@@ -304,6 +308,7 @@ git commit -m "feat(server): integrate @nestjs/throttler with global 60/min and 
 ## Task 4: 接入健康检查
 
 **Files:**
+
 - Create: `packages/server/src/modules/health/health.module.ts`
 - Create: `packages/server/src/modules/health/health.controller.ts`
 - Modify: `packages/server/src/app.module.ts`
@@ -330,11 +335,7 @@ export class HealthModule {}
 
 ```typescript
 import { Controller, Get } from '@nestjs/common';
-import {
-  HealthCheckService,
-  HealthCheck,
-  TypeOrmHealthIndicator,
-} from '@nestjs/terminus';
+import { HealthCheckService, HealthCheck, TypeOrmHealthIndicator } from '@nestjs/terminus';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
 import { Public } from '../../common/decorators/public.decorator';
@@ -351,10 +352,7 @@ export class HealthController {
   @Public()
   @HealthCheck()
   check() {
-    return this.health.check([
-      () => this.db.pingCheck('database'),
-      () => this.redisCheck(),
-    ]);
+    return this.health.check([() => this.db.pingCheck('database'), () => this.redisCheck()]);
   }
 
   private async redisCheck() {
@@ -402,6 +400,7 @@ git commit -m "feat(server): integrate @nestjs/terminus with /health endpoint (D
 ## Task 5: Auth 模块单元测试
 
 **Files:**
+
 - Create: `packages/server/src/modules/auth/auth.controller.spec.ts`
 
 - [ ] **Step 1: 编写 Auth 单元测试**
@@ -482,7 +481,9 @@ describe('AuthController', () => {
       authService.logout.mockResolvedValue(null as any);
 
       // logout 方法需要 @Req() 和 @CurrentUser()，直接调用测试
-      expect(await controller.logout(user, { headers: { authorization: 'Bearer test-token' } } as any)).toBeNull();
+      expect(
+        await controller.logout(user, { headers: { authorization: 'Bearer test-token' } } as any),
+      ).toBeNull();
       expect(authService.logout).toHaveBeenCalledWith(1, 'test-jti', 'test-token');
     });
   });
@@ -511,6 +512,7 @@ git commit -m "test(server): auth controller unit tests"
 ## Task 6: User 模块单元测试
 
 **Files:**
+
 - Create: `packages/server/src/modules/user/user.controller.spec.ts`
 
 - [ ] **Step 1: 编写 User 单元测试**
@@ -585,6 +587,7 @@ git commit -m "test(server): user controller unit tests"
 ## Task 7: Product + Category 模块单元测试
 
 **Files:**
+
 - Create: `packages/server/src/modules/product/product.controller.spec.ts`
 - Create: `packages/server/src/modules/product/category.controller.spec.ts`
 
@@ -743,6 +746,7 @@ git commit -m "test(server): product and category controller unit tests"
 ## Task 8: Cart 模块单元测试
 
 **Files:**
+
 - Create: `packages/server/src/modules/cart/cart.controller.spec.ts`
 
 - [ ] **Step 1: 编写 Cart 单元测试**
@@ -840,6 +844,7 @@ git commit -m "test(server): cart controller unit tests"
 ## Task 9: Order 模块单元测试
 
 **Files:**
+
 - Create: `packages/server/src/modules/order/order.controller.spec.ts`
 
 - [ ] **Step 1: 编写 Order 单元测试**
@@ -943,6 +948,7 @@ git commit -m "test(server): order controller unit tests"
 ## Task 10: 集成测试基础设施
 
 **Files:**
+
 - Create: `packages/server/test/helpers/test-helper.ts`
 
 - [ ] **Step 1: 创建 TestHelper**
@@ -1017,9 +1023,7 @@ export class TestHelper {
     const body: any = { phone, password };
     if (nickname) body.nickname = nickname;
 
-    const res = await request(this.httpServer)
-      .post('/api/auth/register')
-      .send(body);
+    const res = await request(this.httpServer).post('/api/auth/register').send(body);
 
     // 响应被 TransformInterceptor 包装: { code: 0, data: { accessToken, refreshToken, user } }
     // 防御性解析：注册失败时 data 可能为 undefined
@@ -1031,10 +1035,7 @@ export class TestHelper {
   /**
    * 以 ADMIN 身份注册并登录（第一个注册的用户自动成为 ADMIN）
    */
-  async registerAdmin(
-    phone = '13900000001',
-    password = 'admin123456',
-  ) {
+  async registerAdmin(phone = '13900000001', password = 'admin123456') {
     return this.registerAndLogin(phone, password, 'Admin');
   }
 }
@@ -1066,6 +1067,7 @@ git commit -m "test(server): add e2e test helper with app bootstrap and auth uti
 ## Task 11: Auth 集成测试
 
 **Files:**
+
 - Create: `packages/server/test/auth.e2e-spec.ts`
 
 - [ ] **Step 1: 编写 Auth 集成测试**
@@ -1248,6 +1250,7 @@ git commit -m "test(server): auth module e2e integration tests"
 ## Task 12: User 集成测试
 
 **Files:**
+
 - Create: `packages/server/test/user.e2e-spec.ts`
 
 - [ ] **Step 1: 编写 User 集成测试**
@@ -1343,6 +1346,7 @@ git commit -m "test(server): user module e2e integration tests"
 ## Task 13: Product + Category 集成测试
 
 **Files:**
+
 - Create: `packages/server/test/product.e2e-spec.ts`
 
 - [ ] **Step 1: 编写 Product + Category 集成测试**
@@ -1536,6 +1540,7 @@ git commit -m "test(server): product and category e2e integration tests"
 ## Task 14: Cart 集成测试
 
 **Files:**
+
 - Create: `packages/server/test/cart.e2e-spec.ts`
 
 - [ ] **Step 1: 编写 Cart 集成测试**
@@ -1703,6 +1708,7 @@ git commit -m "test(server): cart module e2e integration tests"
 ## Task 15: Order 集成测试
 
 **Files:**
+
 - Create: `packages/server/test/order.e2e-spec.ts`
 
 - [ ] **Step 1: 编写 Order 集成测试**
@@ -1866,6 +1872,7 @@ git commit -m "test(server): order module e2e integration tests"
 ## Task 16: Health 集成测试
 
 **Files:**
+
 - Create: `packages/server/test/health.e2e-spec.ts`
 
 - [ ] **Step 1: 编写 Health 集成测试**
@@ -1930,13 +1937,8 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { SUCCESS_CODE } from 'shared';
 
-export class TransformInterceptor<T>
-  implements NestInterceptor<T, any>
-{
-  intercept(
-    context: ExecutionContext,
-    next: CallHandler,
-  ): Observable<any> {
+export class TransformInterceptor<T> implements NestInterceptor<T, any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const ctx = context.switchToHttp();
     const request = ctx.getRequest();
 
@@ -1972,6 +1974,7 @@ git commit -m "test(server): health endpoint e2e integration tests"
 ## Task 17: 运行全部测试 + 限流集成测试
 
 **Files:**
+
 - 无新文件（验证所有测试通过）
 
 - [ ] **Step 1: 运行全部单元测试**
@@ -2037,33 +2040,33 @@ git commit -m "test(server): add rate limiting e2e test for auth endpoints"
 
 ### Spec 覆盖
 
-| Spec 要求 | Task |
-|-----------|------|
-| Swagger /api/docs | Task 2 |
-| SWAGGER_ENABLED 环境变量 | Task 2 |
-| ThrottlerModule 全局 60/min | Task 3 |
-| auth login/register 10/min | Task 3 |
-| ThrottlerException 处理 | Task 3 |
-| HealthModule + /health | Task 4 |
-| Redis health check | Task 4 |
-| DB health check | Task 4 |
-| Jest 配置 (unit + e2e) | Task 1 |
-| .env.test | Task 1 |
-| TestHelper | Task 10 |
-| Auth unit test | Task 5 |
-| User unit test | Task 6 |
-| Product unit test | Task 7 |
-| Category unit test | Task 7 |
-| Cart unit test | Task 8 |
-| Order unit test | Task 9 |
-| Auth e2e | Task 11 |
-| User e2e | Task 12 |
-| Product + Category e2e | Task 13 |
-| Cart e2e | Task 14 |
-| Order e2e | Task 15 |
-| Health e2e | Task 16 |
-| Rate limiting e2e | Task 17 |
-| .env.example 更新 | Task 2 |
+| Spec 要求                   | Task    |
+| --------------------------- | ------- |
+| Swagger /api/docs           | Task 2  |
+| SWAGGER_ENABLED 环境变量    | Task 2  |
+| ThrottlerModule 全局 60/min | Task 3  |
+| auth login/register 10/min  | Task 3  |
+| ThrottlerException 处理     | Task 3  |
+| HealthModule + /health      | Task 4  |
+| Redis health check          | Task 4  |
+| DB health check             | Task 4  |
+| Jest 配置 (unit + e2e)      | Task 1  |
+| .env.test                   | Task 1  |
+| TestHelper                  | Task 10 |
+| Auth unit test              | Task 5  |
+| User unit test              | Task 6  |
+| Product unit test           | Task 7  |
+| Category unit test          | Task 7  |
+| Cart unit test              | Task 8  |
+| Order unit test             | Task 9  |
+| Auth e2e                    | Task 11 |
+| User e2e                    | Task 12 |
+| Product + Category e2e      | Task 13 |
+| Cart e2e                    | Task 14 |
+| Order e2e                   | Task 15 |
+| Health e2e                  | Task 16 |
+| Rate limiting e2e           | Task 17 |
+| .env.example 更新           | Task 2  |
 
 ### 无占位符
 

@@ -178,9 +178,9 @@ describe('Product Search (e2e)', () => {
           expect(res.body.code).toBe(0);
           const list: any[] = res.body.data.list;
           for (let i = 1; i < list.length; i++) {
-            expect(
-              new Date(list[i].createdAt).getTime(),
-            ).toBeLessThanOrEqual(new Date(list[i - 1].createdAt).getTime());
+            expect(new Date(list[i].createdAt).getTime()).toBeLessThanOrEqual(
+              new Date(list[i - 1].createdAt).getTime(),
+            );
           }
         });
     });

@@ -59,53 +59,53 @@ packages/server/
 
 ### auth.service.spec.ts（~14 用例）
 
-| 方法 | 分支 |
-|---|---|
+| 方法       | 分支                                                                                                                                      |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | `register` | 首用户 → role=ADMIN；非首用户 → role=USER；手机号已注册 → ConflictException(PHONE_EXISTS)；bcrypt.hash 以 salt 10 调用；返回不含 password |
-| `login` | 用户不存在 → UnauthorizedException(AUTH_FAILED)；密码错误 → UnauthorizedException；成功签发双 token；返回不含 password |
-| `refresh` | payload.type !== 'refresh' → 401；Redis 黑名单命中 → 401；用户不存在 → 401；jwt.verify 抛错（过期/签名错）→ 401；成功返回新 accessToken |
-| `logout` | decode 成功 + ttl>0 → 写 Redis 黑名单 key 含 jti、EX=ttl；decode 返回 null → 静默不抛错；ttl<=0 → 不写；decode 抛错 → 静默 |
+| `login`    | 用户不存在 → UnauthorizedException(AUTH_FAILED)；密码错误 → UnauthorizedException；成功签发双 token；返回不含 password                    |
+| `refresh`  | payload.type !== 'refresh' → 401；Redis 黑名单命中 → 401；用户不存在 → 401；jwt.verify 抛错（过期/签名错）→ 401；成功返回新 accessToken   |
+| `logout`   | decode 成功 + ttl>0 → 写 Redis 黑名单 key 含 jti、EX=ttl；decode 返回 null → 静默不抛错；ttl<=0 → 不写；decode 抛错 → 静默                |
 
 **Mock 策略**：`jest.mock('bcryptjs')`、`jest.mock('uuid')`；JwtService.verify/sign/decode 全 mock；ConfigService.get 返回 `'JWT_SECRET'`、`'900'`、`'604800'`；Redis mock `{ get, set }`；Repository mock `{ findOne, count, create, save }`。
 
 ### user.service.spec.ts（~4 用例）
 
-| 方法 | 分支 |
-|---|---|
-| `getProfile` | 用户不存在 → NotFoundException(USER_NOT_FOUND)；成功返回 |
-| `updateProfile` | 用户不存在 → 404；成功 Object.assign + save |
+| 方法            | 分支                                                     |
+| --------------- | -------------------------------------------------------- |
+| `getProfile`    | 用户不存在 → NotFoundException(USER_NOT_FOUND)；成功返回 |
+| `updateProfile` | 用户不存在 → 404；成功 Object.assign + save              |
 
 ### product.service.spec.ts（~12 用例）
 
-| 方法 | 分支 |
-|---|---|
-| `findAll` | 缓存命中 → 跳过 DB；缓存未命中 → 查 DB + 写缓存 EX 60；categoryId 筛选；keyword 筛选 |
-| `findOne` | 缓存命中；缓存未命中 → 404；成功 + 写缓存 |
-| `create` | 保存 + clearProductCache 调用 |
-| `update` | 404；成功 + 清 product:{id} + products:* |
-| `remove` | 404；成功 + 清缓存 |
-| `findAllCategories` | 缓存命中；缓存未命中 → 写缓存 EX 300 |
+| 方法                | 分支                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------ |
+| `findAll`           | 缓存命中 → 跳过 DB；缓存未命中 → 查 DB + 写缓存 EX 60；categoryId 筛选；keyword 筛选 |
+| `findOne`           | 缓存命中；缓存未命中 → 404；成功 + 写缓存                                            |
+| `create`            | 保存 + clearProductCache 调用                                                        |
+| `update`            | 404；成功 + 清 product:{id} + products:*                                             |
+| `remove`            | 404；成功 + 清缓存                                                                   |
+| `findAllCategories` | 缓存命中；缓存未命中 → 写缓存 EX 300                                                 |
 
 **Mock 策略**：Redis mock `{ get, set, keys, del }`，验证 set 调用参数（key 格式 + EX 秒数）；QueryBuilder mock 链（`andWhere/getCount/getMany/orderBy/skip/take`）。
 
 ### cart.service.spec.ts（~9 用例）
 
-| 方法 | 分支 |
-|---|---|
-| `add` | 商品不存在 → 404；已存在 → 合并数量；新建项；quantity 默认 1 |
-| `update` | 不存在 → 404；成功更新 quantity |
-| `remove` | 不存在 → 404；成功 remove |
-| `removeByUserAndProductIds` | 空数组 → 直接 return；非空 → 执行 delete builder |
-| `findAll` | product 为 null 时映射正确；字段裁剪（不含 description 等敏感字段） |
+| 方法                        | 分支                                                                |
+| --------------------------- | ------------------------------------------------------------------- |
+| `add`                       | 商品不存在 → 404；已存在 → 合并数量；新建项；quantity 默认 1        |
+| `update`                    | 不存在 → 404；成功更新 quantity                                     |
+| `remove`                    | 不存在 → 404；成功 remove                                           |
+| `removeByUserAndProductIds` | 空数组 → 直接 return；非空 → 执行 delete builder                    |
+| `findAll`                   | product 为 null 时映射正确；字段裁剪（不含 description 等敏感字段） |
 
 ### order.service.spec.ts（~10 用例）
 
-| 方法 | 分支 |
-|---|---|
-| `create` | 空购物车 → BadRequestException(CART_EMPTY)；金额计算（price × quantity 求和）；事务 commit 顺序（save order → save items → delete cart）；事务回滚（mock save 抛错 → rollbackTransaction 被调用 + 原错误重新抛出）；queryRunner.release 总被调用 |
-| `findAll` | status 筛选；分页参数 page/limit |
-| `findOne` | 不存在 → 404；成功返回 order + items |
-| `cancel` | 不存在 → 404；非 PENDING → BadRequestException(ORDER_CANCEL_NOT_ALLOWED)；成功更新 status=CANCELLED |
+| 方法      | 分支                                                                                                                                                                                                                                             |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `create`  | 空购物车 → BadRequestException(CART_EMPTY)；金额计算（price × quantity 求和）；事务 commit 顺序（save order → save items → delete cart）；事务回滚（mock save 抛错 → rollbackTransaction 被调用 + 原错误重新抛出）；queryRunner.release 总被调用 |
+| `findAll` | status 筛选；分页参数 page/limit                                                                                                                                                                                                                 |
+| `findOne` | 不存在 → 404；成功返回 order + items                                                                                                                                                                                                             |
+| `cancel`  | 不存在 → 404；非 PENDING → BadRequestException(ORDER_CANCEL_NOT_ALLOWED)；成功更新 status=CANCELLED                                                                                                                                              |
 
 **Mock 策略**：`DataSource.createQueryRunner()` 返回 `{ connect: jest.fn(), startTransaction: jest.fn(), manager: { create, save, createQueryBuilder: () => ({ delete: () => ({ from: () => ({ where: () => ({ andWhere: () => ({ execute: jest.fn() }) }) }) }) }) }, commitTransaction: jest.fn(), rollbackTransaction: jest.fn(), release: jest.fn() }`。
 

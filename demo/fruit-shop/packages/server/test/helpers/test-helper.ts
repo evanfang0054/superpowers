@@ -67,9 +67,7 @@ export class TestHelper {
     const body: any = { phone, password };
     if (nickname) body.nickname = nickname;
 
-    const res = await request(this.httpServer)
-      .post('/api/auth/register')
-      .send(body);
+    const res = await request(this.httpServer).post('/api/auth/register').send(body);
 
     // 响应被 TransformInterceptor 包装: { code: 0, data: { accessToken, refreshToken, user } }
     // 注册失败时显式抛错，避免下游 TypeError，便于定位 DB 污染等问题
@@ -85,20 +83,14 @@ export class TestHelper {
   /**
    * 以 ADMIN 身份注册并登录（第一个注册的用户自动成为 ADMIN）
    */
-  async registerAdmin(
-    phone = '13900000001',
-    password = 'admin123456',
-  ) {
+  async registerAdmin(phone = '13900000001', password = 'admin123456') {
     return this.registerAndLogin(phone, password, 'Admin');
   }
 
   /**
    * 以 admin 身份创建商品，返回新商品 id
    */
-  async createProductAsAdmin(
-    token: string,
-    overrides: Record<string, any> = {},
-  ): Promise<number> {
+  async createProductAsAdmin(token: string, overrides: Record<string, any> = {}): Promise<number> {
     const body = {
       name: overrides.name ?? `测试商品-${Date.now()}`,
       origin: overrides.origin ?? '测试产地',
@@ -117,7 +109,9 @@ export class TestHelper {
       .set('Authorization', `Bearer ${token}`)
       .send(body);
     if (res.body?.code !== 0) {
-      throw new Error(`createProductAsAdmin failed: code=${res.body?.code} message=${res.body?.message}`);
+      throw new Error(
+        `createProductAsAdmin failed: code=${res.body?.code} message=${res.body?.message}`,
+      );
     }
     return res.body.data.id;
   }
@@ -136,7 +130,9 @@ export class TestHelper {
       .set('Authorization', `Bearer ${token}`)
       .send({ productId, specLabel, quantity });
     if (res.body?.code !== 0) {
-      throw new Error(`addToCartAsUser failed: code=${res.body?.code} message=${res.body?.message}`);
+      throw new Error(
+        `addToCartAsUser failed: code=${res.body?.code} message=${res.body?.message}`,
+      );
     }
   }
 
@@ -145,10 +141,9 @@ export class TestHelper {
    */
   async getProductStock(productId: number): Promise<number> {
     const dataSource = this.app.get(DataSource);
-    const rows: any[] = await dataSource.query(
-      'SELECT stock FROM products WHERE id = ?',
-      [productId],
-    );
+    const rows: any[] = await dataSource.query('SELECT stock FROM products WHERE id = ?', [
+      productId,
+    ]);
     return rows.length > 0 ? Number(rows[0].stock) : -1;
   }
 
@@ -157,9 +152,6 @@ export class TestHelper {
    */
   async setProductStock(productId: number, stock: number): Promise<void> {
     const dataSource = this.app.get(DataSource);
-    await dataSource.query(
-      'UPDATE products SET stock = ? WHERE id = ?',
-      [stock, productId],
-    );
+    await dataSource.query('UPDATE products SET stock = ? WHERE id = ?', [stock, productId]);
   }
 }

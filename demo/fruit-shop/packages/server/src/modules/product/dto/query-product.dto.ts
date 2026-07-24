@@ -2,11 +2,7 @@ import { IsOptional, IsString, IsInt, Min, IsNumber, IsIn } from 'class-validato
 import { Type } from 'class-transformer';
 import { PaginationQuery } from 'shared';
 
-export type ProductSortBy =
-  | 'created_desc'
-  | 'price_asc'
-  | 'price_desc'
-  | 'sales_desc';
+export type ProductSortBy = 'created_desc' | 'price_asc' | 'price_desc' | 'sales_desc';
 
 export const PRODUCT_SORT_BY_LIST: ProductSortBy[] = [
   'created_desc',

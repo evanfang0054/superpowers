@@ -16,16 +16,12 @@ export const reviewApi = {
   },
 
   createFromOrder(orderId: number, data: CreateReviewDTO) {
-    return apiClient.post<ApiResponse<unknown>>(
-      `/orders/${orderId}/reviews`,
-      data,
-    );
+    return apiClient.post<ApiResponse<unknown>>(`/orders/${orderId}/reviews`, data);
   },
 
   getMine(params?: PaginationQuery) {
-    return apiClient.get<ApiResponse<PaginatedResponse<ReviewWithUser>>>(
-      '/reviews/mine',
-      { params },
-    );
+    return apiClient.get<ApiResponse<PaginatedResponse<ReviewWithUser>>>('/reviews/mine', {
+      params,
+    });
   },
 };

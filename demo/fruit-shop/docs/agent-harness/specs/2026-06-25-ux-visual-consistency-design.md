@@ -39,8 +39,8 @@ interface NavBarProps {
   title?: React.ReactNode;
   left?: React.ReactNode;
   right?: React.ReactNode;
-  showBack?: boolean;     // 默认 true；首页设 false
-  sticky?: boolean;       // 默认 true
+  showBack?: boolean; // 默认 true；首页设 false
+  sticky?: boolean; // 默认 true
 }
 ```
 
@@ -74,19 +74,19 @@ type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant;   // 默认 'primary'
-  size?: ButtonSize;         // 默认 'md'
+  variant?: ButtonVariant; // 默认 'primary'
+  size?: ButtonSize; // 默认 'md'
   loading?: boolean;
   fullWidth?: boolean;
 }
 ```
 
-| variant | 背景 | 文字 | 圆角 | 备注 |
-|---|---|---|---|---|
-| primary | `bg-gradient-to-br from-brand-primary to-brand-coral` | white | rounded-2xl | 加 `animate-pulse-glow` |
-| secondary | `bg-brand-secondary` | brand-dark | rounded-2xl | |
-| ghost | `bg-transparent border border-brand-border` | brand-dark | rounded-2xl | hover `bg-brand-bg` |
-| danger | `bg-brand-coral` | white | rounded-2xl | |
+| variant   | 背景                                                  | 文字       | 圆角        | 备注                    |
+| --------- | ----------------------------------------------------- | ---------- | ----------- | ----------------------- |
+| primary   | `bg-gradient-to-br from-brand-primary to-brand-coral` | white      | rounded-2xl | 加 `animate-pulse-glow` |
+| secondary | `bg-brand-secondary`                                  | brand-dark | rounded-2xl |                         |
+| ghost     | `bg-transparent border border-brand-border`           | brand-dark | rounded-2xl | hover `bg-brand-bg`     |
+| danger    | `bg-brand-coral`                                      | white      | rounded-2xl |                         |
 
 - size：sm = `px-4 py-1.5 text-sm`，md = `px-6 py-2.5 text-sm`，lg = `px-8 py-3 text-base`
 - `fullWidth` 时加 `w-full`
@@ -100,9 +100,9 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 ```tsx
 interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'ghost' | 'solid';   // 默认 ghost
-  shape?: 'circle' | 'square';   // 默认 circle
-  size?: 'sm' | 'md' | 'lg';     // sm=28, md=36, lg=44
+  variant?: 'ghost' | 'solid'; // 默认 ghost
+  shape?: 'circle' | 'square'; // 默认 circle
+  size?: 'sm' | 'md' | 'lg'; // sm=28, md=36, lg=44
 }
 ```
 
@@ -142,44 +142,44 @@ interface TagProps {
 }
 ```
 
-| variant | 背景 | 文字 |
-|---|---|---|
-| primary | brand-primary | white |
-| success | brand-green | white |
-| warning | brand-secondary | brand-dark |
-| accent | brand-accent | white |
-| muted | bg-brand-btn-bg | brand-muted |
+| variant | 背景            | 文字        |
+| ------- | --------------- | ----------- |
+| primary | brand-primary   | white       |
+| success | brand-green     | white       |
+| warning | brand-secondary | brand-dark  |
+| accent  | brand-accent    | white       |
+| muted   | bg-brand-btn-bg | brand-muted |
 
 - 圆角 `rounded-full`
 - size sm：`px-2 py-0.5 text-[10px]`，md：`px-2.5 py-1 text-[11px]`
 
 ### 2.2 Token 修正映射表（全局严格执行）
 
-| 现状 | 改为 |
-|---|---|
+| 现状                                                    | 改为                                                               |
+| ------------------------------------------------------- | ------------------------------------------------------------------ |
 | `bg-white/90 backdrop-blur-sm border-b border-gray-100` | `bg-brand-bg/90 backdrop-blur-[10px] border-b border-brand-border` |
-| `bg-gray-100 hover:bg-gray-200` | `bg-brand-btn-bg hover:bg-brand-bg` |
-| `bg-gray-100`（占位图背景） | `bg-brand-btn-bg` |
-| `text-gray-900/800` | `text-brand-dark` |
-| `text-gray-600/500/400` | `text-brand-muted` |
-| `text-gray-300` | `text-brand-muted/60` |
-| `border-gray-100/200` | `border-brand-border` |
-| `bg-white shadow-sm`（卡片） | `bg-brand-card border border-brand-border` |
-| `hover:shadow-md` | `hover:border-brand-primary/30` |
-| `rounded-lg`（小图） | `rounded-xl` |
+| `bg-gray-100 hover:bg-gray-200`                         | `bg-brand-btn-bg hover:bg-brand-bg`                                |
+| `bg-gray-100`（占位图背景）                             | `bg-brand-btn-bg`                                                  |
+| `text-gray-900/800`                                     | `text-brand-dark`                                                  |
+| `text-gray-600/500/400`                                 | `text-brand-muted`                                                 |
+| `text-gray-300`                                         | `text-brand-muted/60`                                              |
+| `border-gray-100/200`                                   | `border-brand-border`                                              |
+| `bg-white shadow-sm`（卡片）                            | `bg-brand-card border border-brand-border`                         |
+| `hover:shadow-md`                                       | `hover:border-brand-primary/30`                                    |
+| `rounded-lg`（小图）                                    | `rounded-xl`                                                       |
 
 ### 2.3 页面改动清单
 
-| 页面 | 改动 | 工作量 |
-|---|---|---|
-| Cart.tsx | header → NavBar/PageHeader；卡片去 shadow 加 border；数量按钮换 IconButton；底部栏换 BottomActionBar；空态换 EmptyState；Button 统一；checkbox 边框 token 修正 | 大 |
-| Checkout.tsx | header → NavBar；3 个 section 卡片去 shadow；返回按钮换 IconButton；底部栏换 BottomActionBar；提交按钮换 Button | 中 |
-| OrderList.tsx | header → NavBar；状态 tab 配色对齐（激活 brand-primary，默认白底 brand-border）；卡片去 shadow 加 border hover；空态换 EmptyState；加载更多按钮换 Button | 中 |
-| OrderDetail.tsx | header → NavBar；状态色块 label 文字色修正；商品小图圆角；操作按钮换 Button；modal 样式统一 | 中 |
-| Favorites.tsx | header → NavBar；空态换 EmptyState；分页按钮换 Button | 小 |
-| Profile.tsx | 外层 `bg-brand-canvas` → `bg-brand-bg`（canvas token 不存在）；编辑/取消按钮可换 Button | 小 |
-| Login.tsx / Register.tsx | label `text-gray-*` → brand-muted；输入框 border 统一；按钮换 Button | 小 |
-| Home.tsx / ProductDetail.tsx | 基准页面，基本不动。ProductDetail 收藏/分享按钮可顺手换 IconButton（非必需） | 极小 |
+| 页面                         | 改动                                                                                                                                                           | 工作量 |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| Cart.tsx                     | header → NavBar/PageHeader；卡片去 shadow 加 border；数量按钮换 IconButton；底部栏换 BottomActionBar；空态换 EmptyState；Button 统一；checkbox 边框 token 修正 | 大     |
+| Checkout.tsx                 | header → NavBar；3 个 section 卡片去 shadow；返回按钮换 IconButton；底部栏换 BottomActionBar；提交按钮换 Button                                                | 中     |
+| OrderList.tsx                | header → NavBar；状态 tab 配色对齐（激活 brand-primary，默认白底 brand-border）；卡片去 shadow 加 border hover；空态换 EmptyState；加载更多按钮换 Button       | 中     |
+| OrderDetail.tsx              | header → NavBar；状态色块 label 文字色修正；商品小图圆角；操作按钮换 Button；modal 样式统一                                                                    | 中     |
+| Favorites.tsx                | header → NavBar；空态换 EmptyState；分页按钮换 Button                                                                                                          | 小     |
+| Profile.tsx                  | 外层 `bg-brand-canvas` → `bg-brand-bg`（canvas token 不存在）；编辑/取消按钮可换 Button                                                                        | 小     |
+| Login.tsx / Register.tsx     | label `text-gray-*` → brand-muted；输入框 border 统一；按钮换 Button                                                                                           | 小     |
+| Home.tsx / ProductDetail.tsx | 基准页面，基本不动。ProductDetail 收藏/分享按钮可顺手换 IconButton（非必需）                                                                                   | 极小   |
 
 ### 2.4 不改的部分
 
@@ -199,12 +199,12 @@ interface TagProps {
 
 项目无测试框架，本次不引入新测试基础设施（YAGNI）。采用以下轻量验证：
 
-| 验证项 | 方法 |
-|---|---|
-| TypeScript 编译 | `pnpm --filter web build` 必须通过 |
-| 视觉对比 | 改动前后逐页截图比对 |
-| 交互回归 | 手动跑核心流程：首页→详情→加购→购物车→结算→下单→订单列表→订单详情→取消/退款/评价；收藏；登录登出 |
-| token 清查 | Grep 搜 `gray-\|shadow-` 在 `packages/web/src/pages/` 和 `packages/web/src/components/` 应零残留（LoadingSpinner 内部除外） |
+| 验证项          | 方法                                                                                                                        |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| TypeScript 编译 | `pnpm --filter web build` 必须通过                                                                                          |
+| 视觉对比        | 改动前后逐页截图比对                                                                                                        |
+| 交互回归        | 手动跑核心流程：首页→详情→加购→购物车→结算→下单→订单列表→订单详情→取消/退款/评价；收藏；登录登出                            |
+| token 清查      | Grep 搜 `gray-\|shadow-` 在 `packages/web/src/pages/` 和 `packages/web/src/components/` 应零残留（LoadingSpinner 内部除外） |
 
 ## 5. 验收标准（Definition of Done）
 
@@ -218,9 +218,9 @@ interface TagProps {
 
 ## 6. 风险与缓解
 
-| 风险 | 缓解 |
-|---|---|
-| 抽组件改动面广，易引入回归 | 按页面逐个改，每改一页手动验证该页流程，不批量替换 |
-| `max-w-lg mx-auto` 布局差异 | NavBar 不强制 max-w，由 children 自决 |
+| 风险                                            | 缓解                                               |
+| ----------------------------------------------- | -------------------------------------------------- |
+| 抽组件改动面广，易引入回归                      | 按页面逐个改，每改一页手动验证该页流程，不批量替换 |
+| `max-w-lg mx-auto` 布局差异                     | NavBar 不强制 max-w，由 children 自决              |
 | DESIGN.md 与实际 token 名不一致（canvas vs bg） | 以 `styles/index.css` 中实际定义的 `brand-bg` 为准 |
-| IconButton 语义在不同页面不同 | 通过 `variant` + `aria-label` 区分 |
+| IconButton 语义在不同页面不同                   | 通过 `variant` + `aria-label` 区分                 |

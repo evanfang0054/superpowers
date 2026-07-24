@@ -31,9 +31,7 @@ const MAX_SIZE = 2 * 1024 * 1024; // 2MB
       destination: join(__dirname, '..', '..', '..', 'uploads'),
       filename: (_req, file, cb) => {
         const ext = extname(file.originalname) || '.png';
-        const name = `${Date.now()}-${Math.random()
-          .toString(36)
-          .slice(2, 10)}${ext}`;
+        const name = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}${ext}`;
         cb(null, name);
       },
     }),

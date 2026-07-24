@@ -8,10 +8,7 @@ export const categoryApi = {
   create(data: { name: string; icon?: string; sortOrder?: number }) {
     return apiClient.post<ApiResponse<Category>>('/categories', data);
   },
-  update(
-    id: number,
-    data: { name?: string; icon?: string; sortOrder?: number },
-  ) {
+  update(id: number, data: { name?: string; icon?: string; sortOrder?: number }) {
     return apiClient.put<ApiResponse<Category>>(`/categories/${id}`, data);
   },
   remove(id: number) {

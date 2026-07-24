@@ -31,10 +31,7 @@ export class ProductController {
 
   @Public()
   @Get('recommendations')
-  findRecommendations(
-    @Query('limit') limit?: number,
-    @Query('excludeId') excludeId?: number,
-  ) {
+  findRecommendations(@Query('limit') limit?: number, @Query('excludeId') excludeId?: number) {
     return this.productService.findRecommendations({
       limit: limit ? Number(limit) : undefined,
       excludeId: excludeId ? Number(excludeId) : undefined,
@@ -49,14 +46,8 @@ export class ProductController {
 
   @Public()
   @Get('suggest')
-  suggest(
-    @Query('keyword') keyword?: string,
-    @Query('limit') limit?: number,
-  ) {
-    return this.productService.suggest(
-      keyword || '',
-      limit ? Number(limit) : undefined,
-    );
+  suggest(@Query('keyword') keyword?: string, @Query('limit') limit?: number) {
+    return this.productService.suggest(keyword || '', limit ? Number(limit) : undefined);
   }
 
   @Get(':id')
@@ -74,10 +65,7 @@ export class ProductController {
   @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateProductDto,
-  ) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateProductDto) {
     return this.productService.update(id, dto);
   }
 

@@ -1,15 +1,6 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import {
-  OrderEntity,
-  OrderItemEntity,
-  ShippingEntity,
-  RefundEntity,
-} from '../../entities';
+import { OrderEntity, OrderItemEntity, ShippingEntity, RefundEntity } from '../../entities';
 import { ShipDto } from './dto/ship.dto';
 import { RefundRequestDto } from './dto/refund-request.dto';
 import { OrderStatus, ErrorCode, ErrorMessage, RefundStatus } from 'shared';
@@ -25,21 +16,16 @@ export class OrderLifecycleService {
   }
 
   /** 取消订单 */
-  async cancel(
-    userId: number,
-    id: number,
-    findOne: (uid: number, oid: number) => Promise<any>,
-  ) {
+  async cancel(userId: number, id: number, findOne: (uid: number, oid: number) => Promise<any>) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const rows: { id: number; status: number }[] =
-        await queryRunner.manager.query(
-          'SELECT id, status FROM orders WHERE id = ? AND user_id = ? FOR UPDATE',
-          [id, userId],
-        );
+      const rows: { id: number; status: number }[] = await queryRunner.manager.query(
+        'SELECT id, status FROM orders WHERE id = ? AND user_id = ? FOR UPDATE',
+        [id, userId],
+      );
       if (rows.length === 0) {
         throw new NotFoundException({
           code: ErrorCode.ORDER_NOT_FOUND,
@@ -57,26 +43,24 @@ export class OrderLifecycleService {
       });
       const productIds = items.map((i) => i.productId);
       if (productIds.length > 0) {
-        await queryRunner.manager.query(
-          'SELECT id FROM products WHERE id IN (?) FOR UPDATE',
-          [productIds],
-        );
+        await queryRunner.manager.query('SELECT id FROM products WHERE id IN (?) FOR UPDATE', [
+          productIds,
+        ]);
         for (const item of items) {
-          await queryRunner.manager.query(
-            'UPDATE products SET stock = stock + ? WHERE id = ?',
-            [item.quantity, item.productId],
-          );
+          await queryRunner.manager.query('UPDATE products SET stock = stock + ? WHERE id = ?', [
+            item.quantity,
+            item.productId,
+          ]);
         }
       }
-      await queryRunner.manager.query(
-        'UPDATE orders SET status = ? WHERE id = ?',
-        [OrderStatus.CANCELLED, id],
+      await queryRunner.manager.query('UPDATE orders SET status = ? WHERE id = ?', [
+        OrderStatus.CANCELLED,
+        id,
+      ]);
+      const couponRows: { coupon_id: number | null }[] = await queryRunner.manager.query(
+        'SELECT coupon_id FROM orders WHERE id = ?',
+        [id],
       );
-      const couponRows: { coupon_id: number | null }[] =
-        await queryRunner.manager.query(
-          'SELECT coupon_id FROM orders WHERE id = ?',
-          [id],
-        );
       const cid = couponRows[0]?.coupon_id;
       if (cid) {
         await queryRunner.manager.query(
@@ -95,20 +79,15 @@ export class OrderLifecycleService {
   }
 
   /** 支付 */
-  async pay(
-    userId: number,
-    id: number,
-    findOne: (uid: number, oid: number) => Promise<any>,
-  ) {
+  async pay(userId: number, id: number, findOne: (uid: number, oid: number) => Promise<any>) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const rows: { id: number; status: number }[] =
-        await queryRunner.manager.query(
-          'SELECT id, status FROM orders WHERE id = ? AND user_id = ? FOR UPDATE',
-          [id, userId],
-        );
+      const rows: { id: number; status: number }[] = await queryRunner.manager.query(
+        'SELECT id, status FROM orders WHERE id = ? AND user_id = ? FOR UPDATE',
+        [id, userId],
+      );
       if (rows.length === 0) {
         throw new NotFoundException({
           code: ErrorCode.ORDER_NOT_FOUND,
@@ -136,20 +115,15 @@ export class OrderLifecycleService {
   }
 
   /** 发货 (Admin) */
-  async ship(
-    id: number,
-    dto: ShipDto,
-    findOne: (oid: number) => Promise<any>,
-  ) {
+  async ship(id: number, dto: ShipDto, findOne: (oid: number) => Promise<any>) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const rows: { id: number; status: number }[] =
-        await queryRunner.manager.query(
-          'SELECT id, status FROM orders WHERE id = ? FOR UPDATE',
-          [id],
-        );
+      const rows: { id: number; status: number }[] = await queryRunner.manager.query(
+        'SELECT id, status FROM orders WHERE id = ? FOR UPDATE',
+        [id],
+      );
       if (rows.length === 0) {
         throw new NotFoundException({
           code: ErrorCode.ORDER_NOT_FOUND,
@@ -185,20 +159,15 @@ export class OrderLifecycleService {
   }
 
   /** 确认收货 */
-  async confirm(
-    userId: number,
-    id: number,
-    findOne: (uid: number, oid: number) => Promise<any>,
-  ) {
+  async confirm(userId: number, id: number, findOne: (uid: number, oid: number) => Promise<any>) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const rows: { id: number; status: number }[] =
-        await queryRunner.manager.query(
-          'SELECT id, status FROM orders WHERE id = ? AND user_id = ? FOR UPDATE',
-          [id, userId],
-        );
+      const rows: { id: number; status: number }[] = await queryRunner.manager.query(
+        'SELECT id, status FROM orders WHERE id = ? AND user_id = ? FOR UPDATE',
+        [id, userId],
+      );
       if (rows.length === 0) {
         throw new NotFoundException({
           code: ErrorCode.ORDER_NOT_FOUND,
@@ -211,10 +180,10 @@ export class OrderLifecycleService {
           message: ErrorMessage[ErrorCode.ORDER_STATUS_ERROR],
         });
       }
-      await queryRunner.manager.query(
-        'UPDATE orders SET status = ? WHERE id = ?',
-        [OrderStatus.COMPLETED, id],
-      );
+      await queryRunner.manager.query('UPDATE orders SET status = ? WHERE id = ?', [
+        OrderStatus.COMPLETED,
+        id,
+      ]);
       await queryRunner.commitTransaction();
     } catch (err) {
       await queryRunner.rollbackTransaction();
@@ -236,11 +205,10 @@ export class OrderLifecycleService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const rows: { id: number; status: number }[] =
-        await queryRunner.manager.query(
-          'SELECT id, status FROM orders WHERE id = ? AND user_id = ? FOR UPDATE',
-          [id, userId],
-        );
+      const rows: { id: number; status: number }[] = await queryRunner.manager.query(
+        'SELECT id, status FROM orders WHERE id = ? AND user_id = ? FOR UPDATE',
+        [id, userId],
+      );
       if (rows.length === 0) {
         throw new NotFoundException({
           code: ErrorCode.ORDER_NOT_FOUND,
@@ -248,10 +216,7 @@ export class OrderLifecycleService {
         });
       }
       const currentStatus = rows[0].status;
-      if (
-        currentStatus !== OrderStatus.PAID &&
-        currentStatus !== OrderStatus.SHIPPED
-      ) {
+      if (currentStatus !== OrderStatus.PAID && currentStatus !== OrderStatus.SHIPPED) {
         throw new BadRequestException({
           code: ErrorCode.REFUND_NOT_ALLOWED,
           message: ErrorMessage[ErrorCode.REFUND_NOT_ALLOWED],
@@ -265,10 +230,10 @@ export class OrderLifecycleService {
         status: RefundStatus.PENDING,
       });
       await queryRunner.manager.save(RefundEntity, refund);
-      await queryRunner.manager.query(
-        'UPDATE orders SET status = ? WHERE id = ?',
-        [OrderStatus.REFUNDING, id],
-      );
+      await queryRunner.manager.query('UPDATE orders SET status = ? WHERE id = ?', [
+        OrderStatus.REFUNDING,
+        id,
+      ]);
       await queryRunner.commitTransaction();
     } catch (err) {
       await queryRunner.rollbackTransaction();

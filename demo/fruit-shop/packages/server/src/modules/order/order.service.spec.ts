@@ -70,9 +70,9 @@ describe('OrderService', () => {
   describe('create', () => {
     it('should throw BadRequest when cart empty', async () => {
       checkoutService.create.mockRejectedValue(new BadRequestException());
-      await expect(
-        service.create(1, { address: 'a', phone: 'p' } as any),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.create(1, { address: 'a', phone: 'p' } as any)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should return order with items on success', async () => {
@@ -90,9 +90,9 @@ describe('OrderService', () => {
 
     it('should propagate error from checkoutService', async () => {
       checkoutService.create.mockRejectedValue(new Error('db down'));
-      await expect(
-        service.create(1, { address: 'a', phone: 'p' } as any),
-      ).rejects.toThrow('db down');
+      await expect(service.create(1, { address: 'a', phone: 'p' } as any)).rejects.toThrow(
+        'db down',
+      );
     });
   });
 

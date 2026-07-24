@@ -17,11 +17,7 @@ import { UserEntity } from '../../entities/user.entity';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import {
-  UserRole,
-  ErrorCode,
-  ErrorMessage,
-} from 'shared';
+import { UserRole, ErrorCode, ErrorMessage } from 'shared';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -38,22 +34,19 @@ export class AuthService implements OnModuleInit {
   }
 
   onModuleInit() {
-    const secret = this.configService.get<string>(
-      'JWT_SECRET',
-      'your-jwt-secret-change-in-prod',
-    );
+    const secret = this.configService.get<string>('JWT_SECRET', 'your-jwt-secret-change-in-prod');
 
     const DEFAULT_SECRET = 'your-jwt-secret-change-in-prod';
     if (secret === DEFAULT_SECRET) {
       if (process.env.NODE_ENV === 'production') {
         throw new Error(
           '[FATAL] JWT_SECRET is using the default value in production. ' +
-          'Set a strong random string via JWT_SECRET environment variable.',
+            'Set a strong random string via JWT_SECRET environment variable.',
         );
       }
       console.warn(
         '[WARNING] JWT_SECRET is using the default value. ' +
-        'This is unsafe for production. Set JWT_SECRET environment variable.',
+          'This is unsafe for production. Set JWT_SECRET environment variable.',
       );
     }
   }
@@ -126,10 +119,7 @@ export class AuthService implements OnModuleInit {
     // 生成 token
     const tokens = await this.generateTokens(user.id, user.phone, user.role);
 
-    this.logger.info(
-      { userId: user.id },
-      '用户登录成功',
-    );
+    this.logger.info({ userId: user.id }, '用户登录成功');
 
     // 返回时排除 password
     const { password: _, ...userWithoutPassword } = user;
@@ -154,19 +144,13 @@ export class AuthService implements OnModuleInit {
 
       // 必须是 refresh 类型的 token
       if (payload.type !== 'refresh') {
-        throw new UnauthorizedException(
-          ErrorMessage[ErrorCode.REFRESH_TOKEN_INVALID],
-        );
+        throw new UnauthorizedException(ErrorMessage[ErrorCode.REFRESH_TOKEN_INVALID]);
       }
 
       // 检查 refresh token 是否在黑名单中
-      const isBlacklisted = await this.redis.get(
-        `token:blacklist:${payload.jti}`,
-      );
+      const isBlacklisted = await this.redis.get(`token:blacklist:${payload.jti}`);
       if (isBlacklisted) {
-        throw new UnauthorizedException(
-          ErrorMessage[ErrorCode.REFRESH_TOKEN_INVALID],
-        );
+        throw new UnauthorizedException(ErrorMessage[ErrorCode.REFRESH_TOKEN_INVALID]);
       }
 
       // 验证用户是否仍存在
@@ -174,26 +158,18 @@ export class AuthService implements OnModuleInit {
         where: { id: payload.sub },
       });
       if (!user) {
-        throw new UnauthorizedException(
-          ErrorMessage[ErrorCode.REFRESH_TOKEN_INVALID],
-        );
+        throw new UnauthorizedException(ErrorMessage[ErrorCode.REFRESH_TOKEN_INVALID]);
       }
 
       // 仅返回新的 accessToken，refreshToken 不自动续期
-      const accessToken = this.generateAccessToken(
-        user.id,
-        user.phone,
-        user.role,
-      );
+      const accessToken = this.generateAccessToken(user.id, user.phone, user.role);
 
       return { accessToken };
     } catch (error) {
       if (error instanceof UnauthorizedException) {
         throw error;
       }
-      throw new UnauthorizedException(
-        ErrorMessage[ErrorCode.REFRESH_TOKEN_INVALID],
-      );
+      throw new UnauthorizedException(ErrorMessage[ErrorCode.REFRESH_TOKEN_INVALID]);
     }
   }
 
@@ -211,12 +187,7 @@ export class AuthService implements OnModuleInit {
       if (decoded?.exp) {
         const ttl = decoded.exp - Math.floor(Date.now() / 1000);
         if (ttl > 0) {
-          await this.redis.set(
-            `token:blacklist:${jti}`,
-            '1',
-            'EX',
-            ttl,
-          );
+          await this.redis.set(`token:blacklist:${jti}`, '1', 'EX', ttl);
 
           this.logger.info(
             {
@@ -242,17 +213,11 @@ export class AuthService implements OnModuleInit {
    * accessToken:  15 min, payload 含 jti + type='access'
    * refreshToken: 7 days, payload 含 jti + type='refresh'
    */
-  private async generateTokens(
-    userId: number,
-    phone: string,
-    role: string,
-  ) {
+  private async generateTokens(userId: number, phone: string, role: string) {
     const accessJti = uuidv4();
     const refreshJti = uuidv4();
 
-    const accessExpiresIn = Number(
-      this.configService.get<string>('JWT_ACCESS_EXPIRES_IN', '900'),
-    ); // 15 min = 900s
+    const accessExpiresIn = Number(this.configService.get<string>('JWT_ACCESS_EXPIRES_IN', '900')); // 15 min = 900s
     const refreshExpiresIn = Number(
       this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '604800'),
     ); // 7 days = 604800s
@@ -291,15 +256,9 @@ export class AuthService implements OnModuleInit {
     return { accessToken, refreshToken };
   }
 
-  private generateAccessToken(
-    userId: number,
-    phone: string,
-    role: string,
-  ): string {
+  private generateAccessToken(userId: number, phone: string, role: string): string {
     const accessJti = uuidv4();
-    const accessExpiresIn = Number(
-      this.configService.get<string>('JWT_ACCESS_EXPIRES_IN', '900'),
-    );
+    const accessExpiresIn = Number(this.configService.get<string>('JWT_ACCESS_EXPIRES_IN', '900'));
 
     return this.jwtService.sign(
       {

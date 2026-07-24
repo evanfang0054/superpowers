@@ -3,22 +3,26 @@
 ## Definition of Done
 
 ### 路由与死代码清理
+
 - [ ] 删除 `packages/web/src/router/ProtectedRoute.tsx` 与 `packages/web/src/router/AdminRoute.tsx`（全代码搜索无 import 引用）
 - [ ] `packages/web/src/router/index.tsx` 内联 `ProtectedRoute` 补 `useLocation` + `state={{ from: location }}`，未登录跳 `/login` 时携带来源路径
 - [ ] 新增 `/profile` 路由，用内联 `ProtectedRoute` 包裹，`React.lazy` 懒加载 `@/pages/Profile`
 - [ ] 回归验证：未登录访问 `/cart`、`/orders`、`/order/:id`、`/admin/products`、`/profile` 均跳 `/login` 且登录后能回到原页面（state.from 生效）
 
 ### auth store logout async 改造
+
 - [ ] `packages/web/src/store/auth.store.ts` 的 `logout` 改为 async，先 `try { await authApi.logout() } catch {}`（动态 import 规避循环依赖），再 `set({ user: null, token: null, refreshToken: null, error: null })`
 - [ ] `packages/web/src/api/client.ts` 401 兜底改为直接 `useAuthStore.setState({ user: null, token: null, refreshToken: null, error: null })` + `window.location.href = '/login'`（不调后端 logout，token 已失效）
 - [ ] TypeScript：`pnpm --filter web build` 通过，无类型错误
 
 ### App.tsx 启动刷新
+
 - [ ] `packages/web/src/App.tsx` 新增 `useEffect`，依赖 `[token]`，仅当 `token` 存在时调 `useAuthStore.getState().refreshUserInfo()`
 - [ ] 场景 A 验证：登录后刷新浏览器 → Network 看到 `GET /api/user/profile` 200 → store user 字段为后端最新值
 - [ ] 场景 B 验证：未登录刷新浏览器 → Network 无 `/api/user/profile` 请求
 
 ### Profile 页 + Avatar 组件 + TabBar
+
 - [ ] 新建 `packages/web/src/components/Avatar.tsx`：props `{ src?, alt?, size? }`；src 为空或 onError 时显示 alt 首字（无则 🍊 emoji）；`rounded-full border border-brand-border`，size 默认 56
 - [ ] 新建 `packages/web/src/pages/Profile.tsx`：
   - 顶部 sticky header「个人中心」+ 主卡片（Avatar 72px + 昵称 22px/900 + 脱敏手机号 📱 138****1234 + admin 角色标签 + 编辑资料 PrimaryButton + 退出登录 SecondaryButton 边框 coral）
@@ -47,6 +51,7 @@
 ## Acceptance Criteria
 
 ### Computational（可执行验证）
+
 - **TypeScript 构建**: `pnpm --filter web build` 成功无错误
 - **后端 e2e 回归**: `pnpm --filter server test:e2e` 全部通过（auth.e2e 含 logout 黑名单场景 F）
 - **后端 unit 回归**: `pnpm --filter server test` 全部通过（P1-A 不改后端，但确认无意外影响）
@@ -54,6 +59,7 @@
 - **手动场景 A-H**: docker compose 环境浏览器走查，全部符合预期
 
 ### Inferential（review 验证）
+
 - spec reviewer review `router/index.tsx`：内联 ProtectedRoute 补 state.from 后，5 个受保护路由的鉴权与回跳行为一致
 - spec reviewer review `auth.store.ts`：logout async 化 + 动态 import 循环依赖规避正确
 - spec reviewer review `client.ts`：401 兜底不调后端 logout 的判断成立（token 已被后端拒绝）

@@ -74,13 +74,14 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 }
 
 // 静态方法：允许在非 React 组件中调用
-(ToastProvider as unknown as { show: (message: string, type?: ToastType) => void }).show = function (message: string, type: ToastType = 'info') {
-  if (externalShowToast) {
-    externalShowToast(message, type);
-  } else {
-    console.warn('Toast.show() called before ToastProvider mounted');
-  }
-};
+(ToastProvider as unknown as { show: (message: string, type?: ToastType) => void }).show =
+  function (message: string, type: ToastType = 'info') {
+    if (externalShowToast) {
+      externalShowToast(message, type);
+    } else {
+      console.warn('Toast.show() called before ToastProvider mounted');
+    }
+  };
 
 // 导出 Toast 对象，便于在 React 组件中以 Toast.show() 形式调用
 export const Toast = {

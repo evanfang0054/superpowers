@@ -45,10 +45,7 @@ export class CartController {
   }
 
   @Delete(':id')
-  remove(
-    @CurrentUser('id') userId: number,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  remove(@CurrentUser('id') userId: number, @Param('id', ParseIntPipe) id: number) {
     return this.cartService.remove(id, userId);
   }
 }

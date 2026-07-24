@@ -9,10 +9,12 @@
 **Tech Stack:** Jest 30 + ts-jest + supertest + NestJS Testing Module
 
 **关联文档：**
+
 - Spec: `docs/agent-harness/specs/2026-06-19-server-test-coverage-design.md`
 - Contract: `docs/agent-harness/contracts/server-test-coverage.contract.md`
 
 **通用约定（所有 service spec）：**
+
 - `mockRepository = { findOne: jest.fn(), find: jest.fn(), count: jest.fn(), create: jest.fn(), save: jest.fn(), remove: jest.fn(), createQueryBuilder: jest.fn() }`
 - `mockLogger = { setContext: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest.fn() }`
 - `mockRedis = { get: jest.fn(), set: jest.fn(), keys: jest.fn(), del: jest.fn() }`
@@ -20,6 +22,7 @@
 - 异常断言用 `await expect(fn()).rejects.toThrow(ConflictException)` 或 `.rejects.toMatchObject({ message })`
 
 **前置条件（一次性，Task 0 完成后所有 task 复用）：**
+
 - `pnpm --filter shared build` 已执行（保证 shared dist 最新，否则 jest moduleNameMapper 拉到旧 dist）
 
 ---
@@ -27,6 +30,7 @@
 ## Task 0: 前置准备
 
 **Files:**
+
 - 验证：`packages/shared/dist/`、`packages/server/.env.test`
 
 - [ ] **Step 1: 构建 shared**
@@ -34,6 +38,7 @@
 ```bash
 pnpm --filter shared build
 ```
+
 Expected: `dist/` 下生成 `constants.js`、`types/*.js`
 
 - [ ] **Step 2: 确认 .env.test 存在且指向 test 库**
@@ -46,6 +51,7 @@ Expected: `DB_DATABASE=fruit_shop_test`、`REDIS_DB=1`。若不存在，复制 `
 ```bash
 pnpm --filter server test:unit
 ```
+
 Expected: 6 个 controller spec 全部 PASS
 
 ---
@@ -53,6 +59,7 @@ Expected: 6 个 controller spec 全部 PASS
 ## Task 1: user.service.spec.ts（最简单的 service，作为模板）
 
 **Files:**
+
 - Create: `packages/server/src/modules/user/user.service.spec.ts`
 - Source: `packages/server/src/modules/user/user.service.ts`
 
@@ -107,7 +114,9 @@ describe('UserService', () => {
     it('should throw NotFoundException when user not found', async () => {
       userRepo.findOne.mockResolvedValue(null);
 
-      await expect(service.updateProfile(999, { nickname: 'x' })).rejects.toThrow(NotFoundException);
+      await expect(service.updateProfile(999, { nickname: 'x' })).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });
@@ -118,6 +127,7 @@ describe('UserService', () => {
 ```bash
 pnpm --filter server test:unit -- src/modules/user/user.service.spec.ts
 ```
+
 Expected: 4 passed
 
 - [ ] **Step 3: Commit**
@@ -132,6 +142,7 @@ git commit -m "test(user): user.service 单测覆盖 getProfile/updateProfile"
 ## Task 2: cart.service.spec.ts
 
 **Files:**
+
 - Create: `packages/server/src/modules/cart/cart.service.spec.ts`
 - Source: `packages/server/src/modules/cart/cart.service.ts`
 
@@ -165,16 +176,32 @@ describe('CartService', () => {
     it('should map fields and handle null product', async () => {
       cartRepo.find.mockResolvedValue([
         {
-          id: 1, userId: 10, productId: 100, specLabel: '1kg', quantity: 2,
-          createdAt: new Date(), updatedAt: new Date(),
+          id: 1,
+          userId: 10,
+          productId: 100,
+          specLabel: '1kg',
+          quantity: 2,
+          createdAt: new Date(),
+          updatedAt: new Date(),
           product: {
-            id: 100, name: 'Apple', price: 9.9, originalPrice: 12, image: 'i',
-            unit: '斤', stock: 50, status: 1,
+            id: 100,
+            name: 'Apple',
+            price: 9.9,
+            originalPrice: 12,
+            image: 'i',
+            unit: '斤',
+            stock: 50,
+            status: 1,
           },
         },
         {
-          id: 2, userId: 10, productId: 200, specLabel: '2kg', quantity: 1,
-          createdAt: new Date(), updatedAt: new Date(),
+          id: 2,
+          userId: 10,
+          productId: 200,
+          specLabel: '2kg',
+          quantity: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
           product: null,
         },
       ]);
@@ -190,7 +217,9 @@ describe('CartService', () => {
   describe('add', () => {
     it('should throw NotFound when product missing', async () => {
       productRepo.findOne.mockResolvedValue(null);
-      await expect(service.add(10, { productId: 999, specLabel: '1kg' })).rejects.toThrow(NotFoundException);
+      await expect(service.add(10, { productId: 999, specLabel: '1kg' })).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should merge quantity when item exists', async () => {
@@ -256,7 +285,13 @@ describe('CartService', () => {
 
     it('should execute delete when non-empty', async () => {
       const execute = jest.fn();
-      const qb = { delete: jest.fn().mockReturnThis(), from: jest.fn().mockReturnThis(), where: jest.fn().mockReturnThis(), andWhere: jest.fn().mockReturnThis(), execute };
+      const qb = {
+        delete: jest.fn().mockReturnThis(),
+        from: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        execute,
+      };
       cartRepo.createQueryBuilder.mockReturnValue(qb);
       await service.removeByUserAndProductIds(10, [1, 2]);
       expect(execute).toHaveBeenCalled();
@@ -270,6 +305,7 @@ describe('CartService', () => {
 ```bash
 pnpm --filter server test:unit -- src/modules/cart/cart.service.spec.ts
 ```
+
 Expected: 9 passed
 
 - [ ] **Step 3: Commit**
@@ -284,6 +320,7 @@ git commit -m "test(cart): cart.service 单测覆盖 add/update/remove/find/批�
 ## Task 3: product.service.spec.ts
 
 **Files:**
+
 - Create: `packages/server/src/modules/product/product.service.spec.ts`
 - Source: `packages/server/src/modules/product/product.service.ts`
 
@@ -345,7 +382,8 @@ describe('ProductService', () => {
       expect(redis.set).toHaveBeenCalledWith(
         expect.stringMatching(/^products:/),
         expect.any(String),
-        'EX', 60,
+        'EX',
+        60,
       );
     });
 
@@ -457,6 +495,7 @@ describe('ProductService', () => {
 ```bash
 pnpm --filter server test:unit -- src/modules/product/product.service.spec.ts
 ```
+
 Expected: 12 passed
 
 - [ ] **Step 3: Commit**
@@ -471,6 +510,7 @@ git commit -m "test(product): product.service 单测覆盖缓存/CRUD/分类"
 ## Task 4: order.service.spec.ts（含事务 mock）
 
 **Files:**
+
 - Create: `packages/server/src/modules/order/order.service.spec.ts`
 - Source: `packages/server/src/modules/order/order.service.ts`
 
@@ -492,7 +532,13 @@ describe('OrderService', () => {
 
   beforeEach(() => {
     const execute = jest.fn();
-    const deleteQb = { delete: jest.fn().mockReturnThis(), from: jest.fn().mockReturnThis(), where: jest.fn().mockReturnThis(), andWhere: jest.fn().mockReturnThis(), execute };
+    const deleteQb = {
+      delete: jest.fn().mockReturnThis(),
+      from: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      execute,
+    };
     queryRunner = {
       connect: jest.fn(),
       startTransaction: jest.fn(),
@@ -517,14 +563,26 @@ describe('OrderService', () => {
   describe('create', () => {
     it('should throw BadRequest when cart empty', async () => {
       cartRepo.find.mockResolvedValue([]);
-      await expect(service.create(1, { address: 'a', phone: 'p' } as any)).rejects.toThrow(BadRequestException);
+      await expect(service.create(1, { address: 'a', phone: 'p' } as any)).rejects.toThrow(
+        BadRequestException,
+      );
       expect(dataSource.createQueryRunner).not.toHaveBeenCalled();
     });
 
     it('should compute totalAmount and commit in order', async () => {
       cartRepo.find.mockResolvedValue([
-        { productId: 1, specLabel: '1kg', quantity: 2, product: { id: 1, name: 'A', price: '9.9', image: 'i' } },
-        { productId: 2, specLabel: '2kg', quantity: 1, product: { id: 2, name: 'B', price: '5', image: 'j' } },
+        {
+          productId: 1,
+          specLabel: '1kg',
+          quantity: 2,
+          product: { id: 1, name: 'A', price: '9.9', image: 'i' },
+        },
+        {
+          productId: 2,
+          specLabel: '2kg',
+          quantity: 1,
+          product: { id: 2, name: 'B', price: '5', image: 'j' },
+        },
       ]);
       queryRunner.manager.save.mockResolvedValueOnce({ id: 100 } as any); // savedOrder
       orderRepo.createQueryBuilder.mockReturnValue({
@@ -536,17 +594,25 @@ describe('OrderService', () => {
       const result = await service.create(1, { address: 'a', phone: 'p' } as any);
 
       // totalAmount = 9.9*2 + 5*1 = 24.8
-      expect(queryRunner.manager.save).toHaveBeenNthCalledWith(1, expect.anything(), expect.objectContaining({ totalAmount: 24.8 }));
+      expect(queryRunner.manager.save).toHaveBeenNthCalledWith(
+        1,
+        expect.anything(),
+        expect.objectContaining({ totalAmount: 24.8 }),
+      );
       expect(queryRunner.commitTransaction).toHaveBeenCalled();
       expect(queryRunner.rollbackTransaction).not.toHaveBeenCalled();
       expect(queryRunner.release).toHaveBeenCalled();
     });
 
     it('should rollback and rethrow on save error', async () => {
-      cartRepo.find.mockResolvedValue([{ productId: 1, quantity: 1, product: { price: '1', name: 'A', image: 'i' } }]);
+      cartRepo.find.mockResolvedValue([
+        { productId: 1, quantity: 1, product: { price: '1', name: 'A', image: 'i' } },
+      ]);
       queryRunner.manager.save.mockRejectedValue(new Error('db down'));
 
-      await expect(service.create(1, { address: 'a', phone: 'p' } as any)).rejects.toThrow('db down');
+      await expect(service.create(1, { address: 'a', phone: 'p' } as any)).rejects.toThrow(
+        'db down',
+      );
 
       expect(queryRunner.rollbackTransaction).toHaveBeenCalled();
       expect(queryRunner.commitTransaction).not.toHaveBeenCalled();
@@ -556,7 +622,15 @@ describe('OrderService', () => {
 
   describe('findAll', () => {
     it('should apply status filter', async () => {
-      const qb = { where: jest.fn().mockReturnThis(), andWhere: jest.fn().mockReturnThis(), getCount: jest.fn().mockResolvedValue(0), orderBy: jest.fn().mockReturnThis(), skip: jest.fn().mockReturnThis(), take: jest.fn().mockReturnThis(), getMany: jest.fn().mockResolvedValue([]) };
+      const qb = {
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        getCount: jest.fn().mockResolvedValue(0),
+        orderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([]),
+      };
       orderRepo.createQueryBuilder.mockReturnValue(qb);
       const r = await service.findAll(1, { status: 1, page: 2, limit: 5 });
       expect(qb.andWhere).toHaveBeenCalledWith('o.status = :status', { status: 1 });
@@ -566,7 +640,15 @@ describe('OrderService', () => {
     });
 
     it('should default page/limit', async () => {
-      const qb = { where: jest.fn().mockReturnThis(), andWhere: jest.fn().mockReturnThis(), getCount: jest.fn().mockResolvedValue(0), orderBy: jest.fn().mockReturnThis(), skip: jest.fn().mockReturnThis(), take: jest.fn().mockReturnThis(), getMany: jest.fn().mockResolvedValue([]) };
+      const qb = {
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        getCount: jest.fn().mockResolvedValue(0),
+        orderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([]),
+      };
       orderRepo.createQueryBuilder.mockReturnValue(qb);
       const r = await service.findAll(1, {});
       expect(qb.skip).toHaveBeenCalledWith(0);
@@ -619,6 +701,7 @@ describe('OrderService', () => {
 ```bash
 pnpm --filter server test:unit -- src/modules/order/order.service.spec.ts
 ```
+
 Expected: 10 passed
 
 - [ ] **Step 3: Commit**
@@ -633,6 +716,7 @@ git commit -m "test(order): order.service 单测覆盖事务/取消/查询"
 ## Task 5: auth.service.spec.ts
 
 **Files:**
+
 - Create: `packages/server/src/modules/auth/auth.service.spec.ts`
 - Source: `packages/server/src/modules/auth/auth.service.ts`
 
@@ -663,14 +747,22 @@ describe('AuthService', () => {
   beforeEach(() => {
     userRepo = { findOne: jest.fn(), count: jest.fn(), create: jest.fn((x) => x), save: jest.fn() };
     jwtService = { sign: jest.fn(), verify: jest.fn(), decode: jest.fn() };
-    configService = { get: jest.fn((k: string) => {
-      if (k === 'JWT_SECRET') return 'test-secret';
-      if (k === 'JWT_ACCESS_EXPIRES_IN') return '900';
-      if (k === 'JWT_REFRESH_EXPIRES_IN') return '604800';
-      return undefined;
-    }) };
+    configService = {
+      get: jest.fn((k: string) => {
+        if (k === 'JWT_SECRET') return 'test-secret';
+        if (k === 'JWT_ACCESS_EXPIRES_IN') return '900';
+        if (k === 'JWT_REFRESH_EXPIRES_IN') return '604800';
+        return undefined;
+      }),
+    };
     redis = { get: jest.fn(), set: jest.fn() };
-    logger = { setContext: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest.fn() };
+    logger = {
+      setContext: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+      debug: jest.fn(),
+    };
     service = new AuthService(userRepo, jwtService, configService, redis, logger);
     jest.clearAllMocks();
   });
@@ -704,7 +796,9 @@ describe('AuthService', () => {
 
     it('should throw Conflict when phone exists', async () => {
       userRepo.findOne.mockResolvedValue({ id: 1 });
-      await expect(service.register({ phone: '13800000001', password: 'pass1234' })).rejects.toThrow(ConflictException);
+      await expect(
+        service.register({ phone: '13800000001', password: 'pass1234' }),
+      ).rejects.toThrow(ConflictException);
     });
 
     it('should hash password with salt 10', async () => {
@@ -727,17 +821,25 @@ describe('AuthService', () => {
 
     it('should throw Unauthorized when user not found', async () => {
       userRepo.createQueryBuilder = jest.fn(() => buildQb(null));
-      await expect(service.login({ phone: 'p', password: 'x' })).rejects.toThrow(UnauthorizedException);
+      await expect(service.login({ phone: 'p', password: 'x' })).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should throw Unauthorized when password wrong', async () => {
-      userRepo.createQueryBuilder = jest.fn(() => buildQb({ id: 1, phone: 'p', password: 'hashed', role: 'user' }));
+      userRepo.createQueryBuilder = jest.fn(() =>
+        buildQb({ id: 1, phone: 'p', password: 'hashed', role: 'user' }),
+      );
       mockedBcrypt.compare.mockResolvedValue(false as never);
-      await expect(service.login({ phone: 'p', password: 'wrong' })).rejects.toThrow(UnauthorizedException);
+      await expect(service.login({ phone: 'p', password: 'wrong' })).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should return tokens and user on success', async () => {
-      userRepo.createQueryBuilder = jest.fn(() => buildQb({ id: 1, phone: 'p', password: 'hashed', role: 'user' }));
+      userRepo.createQueryBuilder = jest.fn(() =>
+        buildQb({ id: 1, phone: 'p', password: 'hashed', role: 'user' }),
+      );
       mockedBcrypt.compare.mockResolvedValue(true as never);
       jwtService.sign.mockReturnValue('token');
 
@@ -769,7 +871,9 @@ describe('AuthService', () => {
     });
 
     it('should throw when jwt.verify fails (expired)', async () => {
-      jwtService.verify.mockImplementation(() => { throw new Error('expired'); });
+      jwtService.verify.mockImplementation(() => {
+        throw new Error('expired');
+      });
       await expect(service.refresh({ refreshToken: 't' })).rejects.toThrow(UnauthorizedException);
     });
 
@@ -809,7 +913,9 @@ describe('AuthService', () => {
     });
 
     it('should swallow decode error silently', async () => {
-      jwtService.decode.mockImplementation(() => { throw new Error('decode fail'); });
+      jwtService.decode.mockImplementation(() => {
+        throw new Error('decode fail');
+      });
       const r = await service.logout(1, 'abc', 't');
       expect(r).toBeNull();
     });
@@ -822,6 +928,7 @@ describe('AuthService', () => {
 ```bash
 pnpm --filter server test:unit -- src/modules/auth/auth.service.spec.ts
 ```
+
 Expected: 14 passed
 
 - [ ] **Step 3: Commit**
@@ -836,6 +943,7 @@ git commit -m "test(auth): auth.service 单测覆盖 register/login/refresh/logo
 ## Task 6: jwt.strategy.spec.ts
 
 **Files:**
+
 - Create: `packages/server/src/modules/auth/jwt.strategy.spec.ts`
 - Source: `packages/server/src/modules/auth/jwt.strategy.ts`
 
@@ -860,19 +968,27 @@ describe('JwtStrategy.validate', () => {
   });
 
   it('should throw TOKEN_INVALID when type is not access', async () => {
-    await expect(strategy.validate({ sub: 1, phone: 'p', role: 'user', jti: 'j', type: 'refresh' }))
-      .rejects.toThrow(UnauthorizedException);
+    await expect(
+      strategy.validate({ sub: 1, phone: 'p', role: 'user', jti: 'j', type: 'refresh' }),
+    ).rejects.toThrow(UnauthorizedException);
   });
 
   it('should throw TOKEN_EXPIRED when blacklisted', async () => {
     redis.get.mockResolvedValue('1');
-    await expect(strategy.validate({ sub: 1, phone: 'p', role: 'user', jti: 'j', type: 'access' }))
-      .rejects.toThrow(UnauthorizedException);
+    await expect(
+      strategy.validate({ sub: 1, phone: 'p', role: 'user', jti: 'j', type: 'access' }),
+    ).rejects.toThrow(UnauthorizedException);
   });
 
   it('should return payload when valid', async () => {
     redis.get.mockResolvedValue(null);
-    const result = await strategy.validate({ sub: 1, phone: 'p', role: 'user', jti: 'j', type: 'access' });
+    const result = await strategy.validate({
+      sub: 1,
+      phone: 'p',
+      role: 'user',
+      jti: 'j',
+      type: 'access',
+    });
     expect(result).toEqual({ id: 1, phone: 'p', role: 'user', jti: 'j' });
   });
 });
@@ -883,6 +999,7 @@ describe('JwtStrategy.validate', () => {
 ```bash
 pnpm --filter server test:unit -- src/modules/auth/jwt.strategy.spec.ts
 ```
+
 Expected: 3 passed
 
 - [ ] **Step 3: Commit**
@@ -897,6 +1014,7 @@ git commit -m "test(auth): jwt.strategy.validate 单测覆盖类型/黑名单"
 ## Task 7: jwt-auth.guard.spec.ts
 
 **Files:**
+
 - Create: `packages/server/src/common/guards/jwt-auth.guard.spec.ts`
 - Source: `packages/server/src/common/guards/jwt-auth.guard.ts`
 
@@ -917,11 +1035,13 @@ describe('JwtAuthGuard', () => {
     guard = new JwtAuthGuard(reflector);
     // super.canActivate 默认抛错，mock 掉
     (guard as any).canActivate = JwtAuthGuard.prototype.canActivate;
-    jest.spyOn(Object.getPrototypeOf(Object.getPrototypeOf(guard)), 'canActivate').mockReturnValue(true);
+    jest
+      .spyOn(Object.getPrototypeOf(Object.getPrototypeOf(guard)), 'canActivate')
+      .mockReturnValue(true);
   });
 
   const mockCtx = (handler: any, clazz: any): ExecutionContext =>
-    ({ getHandler: () => handler, getClass: () => clazz } as any);
+    ({ getHandler: () => handler, getClass: () => clazz }) as any;
 
   it('should return true when @Public', () => {
     reflector.getAllAndOverride.mockReturnValue(true);
@@ -958,6 +1078,7 @@ describe('JwtAuthGuard', () => {
 ```bash
 pnpm --filter server test:unit -- src/common/guards/jwt-auth.guard.spec.ts
 ```
+
 Expected: 5 passed
 
 - [ ] **Step 3: Commit**
@@ -972,6 +1093,7 @@ git commit -m "test(common): jwt-auth.guard 单测覆盖 @Public/handleRequest"
 ## Task 8: roles.guard.spec.ts
 
 **Files:**
+
 - Create: `packages/server/src/common/guards/roles.guard.spec.ts`
 - Source: `packages/server/src/common/guards/roles.guard.ts`
 
@@ -994,7 +1116,11 @@ describe('RolesGuard', () => {
   });
 
   const ctx = (user: any) =>
-    ({ getHandler: () => ({}), getClass: () => ({}), switchToHttp: () => ({ getRequest: () => ({ user }) }) } as any);
+    ({
+      getHandler: () => ({}),
+      getClass: () => ({}),
+      switchToHttp: () => ({ getRequest: () => ({ user }) }),
+    }) as any;
 
   it('should return true when no @Roles', () => {
     reflector.getAllAndOverride.mockReturnValue(undefined);
@@ -1023,6 +1149,7 @@ describe('RolesGuard', () => {
 ```bash
 pnpm --filter server test:unit -- src/common/guards/roles.guard.spec.ts
 ```
+
 Expected: 4 passed
 
 - [ ] **Step 3: Commit**
@@ -1037,6 +1164,7 @@ git commit -m "test(common): roles.guard 单测覆盖角色匹配/缺失"
 ## Task 9: transform.interceptor.spec.ts
 
 **Files:**
+
 - Create: `packages/server/src/common/interceptors/transform.interceptor.spec.ts`
 - Source: `packages/server/src/common/interceptors/transform.interceptor.ts`
 
@@ -1087,6 +1215,7 @@ describe('TransformInterceptor', () => {
 ```bash
 pnpm --filter server test:unit -- src/common/interceptors/transform.interceptor.spec.ts
 ```
+
 Expected: 3 passed
 
 - [ ] **Step 3: Commit**
@@ -1101,15 +1230,14 @@ git commit -m "test(common): transform.interceptor 单测覆盖包装/透传"
 ## Task 10: http-exception.filter.spec.ts
 
 **Files:**
+
 - Create: `packages/server/src/common/filters/http-exception.filter.spec.ts`
 - Source: `packages/server/src/common/filters/http-exception.filter.ts`
 
 - [ ] **Step 1: 写 spec 文件**
 
 ```typescript
-import {
-  HttpException, HttpStatus, ServiceUnavailableException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, ServiceUnavailableException } from '@nestjs/common';
 import { ThrottlerException } from '@nestjs/throttler';
 import { HttpExceptionFilter } from './http-exception.filter';
 
@@ -1132,14 +1260,20 @@ describe('HttpExceptionFilter', () => {
   });
 
   it('should pass through business code', () => {
-    filter.catch(new HttpException({ code: 40001, message: 'phone exists' }, HttpStatus.CONFLICT), host);
+    filter.catch(
+      new HttpException({ code: 40001, message: 'phone exists' }, HttpStatus.CONFLICT),
+      host,
+    );
     expect(response.json).toHaveBeenCalledWith({ code: 40001, message: 'phone exists' });
     expect(response.status).toHaveBeenCalledWith(HttpStatus.OK);
   });
 
   it('should join class-validator array messages', () => {
     filter.catch(
-      new HttpException({ message: ['phone invalid', 'password short'], error: 'Bad Request', statusCode: 400 }, HttpStatus.BAD_REQUEST),
+      new HttpException(
+        { message: ['phone invalid', 'password short'], error: 'Bad Request', statusCode: 400 },
+        HttpStatus.BAD_REQUEST,
+      ),
       host,
     );
     const args = response.json.mock.calls[0][0];
@@ -1185,6 +1319,7 @@ describe('HttpExceptionFilter', () => {
 ```bash
 pnpm --filter server test:unit -- src/common/filters/http-exception.filter.spec.ts
 ```
+
 Expected: 7 passed
 
 - [ ] **Step 3: Commit**
@@ -1205,6 +1340,7 @@ git commit -m "test(common): http-exception.filter 单测覆盖各类异常分�
 ```bash
 pnpm --filter server test:unit
 ```
+
 Expected: 所有单测（含原有 controller spec + 10 个新增 spec）PASS
 
 - [ ] **Step 2: 若有失败，定位修复**（仅测试代码层）
@@ -1216,6 +1352,7 @@ Expected: 所有单测（含原有 controller spec + 10 个新增 spec）PASS
 ## Task 12: TestHelper 扩展
 
 **Files:**
+
 - Modify: `packages/server/test/helpers/test-helper.ts`（在类末尾追加方法）
 
 - [ ] **Step 1: 追加助手方法**
@@ -1286,59 +1423,60 @@ git commit -m "test(helper): 新增 createProductAsAdmin / addToCartAsUser 助�
 ## Task 13: e2e — auth 扩写（登出黑名单、token 类型、过期）
 
 **Files:**
+
 - Modify: `packages/server/test/auth.e2e-spec.ts`（在 Rate limiting describe **之前**插入新 describe）
 
 - [ ] **Step 1: 在 logout describe 块之后、Rate limiting 之前，插入**
 
 ```typescript
-  describe('Logout 黑名单 + token 类型校验', () => {
-    let accessToken: string;
-    let refreshToken: string;
-    let userTokens: { accessToken: string; refreshToken: string };
+describe('Logout 黑名单 + token 类型校验', () => {
+  let accessToken: string;
+  let refreshToken: string;
+  let userTokens: { accessToken: string; refreshToken: string };
 
-    beforeAll(async () => {
-      userTokens = await helper.registerAndLogin('13800000010', 'test123456');
-      accessToken = userTokens.accessToken;
-      refreshToken = userTokens.refreshToken;
-    });
-
-    it('should reject access after logout (Redis blacklist)', async () => {
-      // 先登出
-      await request(helper.httpServer)
-        .post('/api/auth/logout')
-        .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200);
-
-      // 再用同一 token 访问需鉴权接口 → 401
-      return request(helper.httpServer)
-        .get('/api/user/profile')
-        .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.code).toBe(401);
-        });
-    });
-
-    it('should reject refresh with access token (wrong type)', () => {
-      return request(helper.httpServer)
-        .post('/api/auth/refresh')
-        .send({ refreshToken: accessToken }) // 误用 accessToken
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.code).toBe(401);
-        });
-    });
-
-    it('should reject invalid/expired refresh token', () => {
-      return request(helper.httpServer)
-        .post('/api/auth/refresh')
-        .send({ refreshToken: 'aaa.bbb.ccc' }) // 非法 JWT
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.code).toBe(401);
-        });
-    });
+  beforeAll(async () => {
+    userTokens = await helper.registerAndLogin('13800000010', 'test123456');
+    accessToken = userTokens.accessToken;
+    refreshToken = userTokens.refreshToken;
   });
+
+  it('should reject access after logout (Redis blacklist)', async () => {
+    // 先登出
+    await request(helper.httpServer)
+      .post('/api/auth/logout')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+
+    // 再用同一 token 访问需鉴权接口 → 401
+    return request(helper.httpServer)
+      .get('/api/user/profile')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.code).toBe(401);
+      });
+  });
+
+  it('should reject refresh with access token (wrong type)', () => {
+    return request(helper.httpServer)
+      .post('/api/auth/refresh')
+      .send({ refreshToken: accessToken }) // 误用 accessToken
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.code).toBe(401);
+      });
+  });
+
+  it('should reject invalid/expired refresh token', () => {
+    return request(helper.httpServer)
+      .post('/api/auth/refresh')
+      .send({ refreshToken: 'aaa.bbb.ccc' }) // 非法 JWT
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.code).toBe(401);
+      });
+  });
+});
 ```
 
 **注意**：此 describe 必须位于 "Rate limiting" describe 之前，避免限流配额被消耗导致 flaky。
@@ -1349,6 +1487,7 @@ git commit -m "test(helper): 新增 createProductAsAdmin / addToCartAsUser 助�
 docker compose up -d mysql redis
 pnpm --filter server test:e2e -- test/auth.e2e-spec.ts
 ```
+
 Expected: 含新 3 用例全绿
 
 - [ ] **Step 3: Commit**
@@ -1363,6 +1502,7 @@ git commit -m "test(e2e/auth): 补登出黑名单/token 类型/非法 refresh �
 ## Task 14: e2e — product 扩写（权限、筛选、缓存）
 
 **Files:**
+
 - Modify: `packages/server/test/product.e2e-spec.ts`
 
 - [ ] **Step 1: 先读现有文件，在末尾追加 describe**
@@ -1374,86 +1514,86 @@ cat packages/server/test/product.e2e-spec.ts
 - [ ] **Step 2: 在文件末尾 `});` 之前追加**
 
 ```typescript
-  describe('权限控制（非 admin）', () => {
-    let userToken: string;
+describe('权限控制（非 admin）', () => {
+  let userToken: string;
 
-    beforeAll(async () => {
-      // 此文件 beforeAll 中 admin 已注册（参考现有写法），此处再注册一个普通 USER
-      const u = await helper.registerAndLogin('13800000050', 'test123456');
-      userToken = u.accessToken;
-    });
-
-    it('should reject USER creating product (403)', () => {
-      return request(helper.httpServer)
-        .post('/api/products')
-        .set('Authorization', `Bearer ${userToken}`)
-        .send({ name: 'x', price: 1, categoryId: 1, stock: 1 })
-        .expect(200)
-        .expect((res) => {
-          // ForbiddenException(403) → code 403
-          expect(res.body.code).toBe(403);
-        });
-    });
-
-    it('should reject USER updating product (403)', () => {
-      return request(helper.httpServer)
-        .put('/api/products/1')
-        .set('Authorization', `Bearer ${userToken}`)
-        .send({ name: 'y' })
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.code).toBe(403);
-        });
-    });
-
-    it('should reject USER deleting product (403)', () => {
-      return request(helper.httpServer)
-        .delete('/api/products/1')
-        .set('Authorization', `Bearer ${userToken}`)
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.code).toBe(403);
-        });
-    });
+  beforeAll(async () => {
+    // 此文件 beforeAll 中 admin 已注册（参考现有写法），此处再注册一个普通 USER
+    const u = await helper.registerAndLogin('13800000050', 'test123456');
+    userToken = u.accessToken;
   });
 
-  describe('查询与筛选', () => {
-    it('should filter by categoryId', () => {
-      return request(helper.httpServer)
-        .get('/api/products?categoryId=1')
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.code).toBe(0);
-          expect(Array.isArray(res.body.data.list)).toBe(true);
-          res.body.data.list.forEach((p: any) => {
-            expect(p.categoryId).toBe(1);
-          });
-        });
-    });
-
-    it('should filter by keyword', () => {
-      return request(helper.httpServer)
-        .get('/api/products?keyword=' + encodeURIComponent('商品'))
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.code).toBe(0);
-          res.body.data.list.forEach((p: any) => {
-            expect(p.name).toContain('商品');
-          });
-        });
-    });
-
-    it('should respect pagination', () => {
-      return request(helper.httpServer)
-        .get('/api/products?page=1&limit=2')
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.code).toBe(0);
-          expect(res.body.data.limit).toBe(2);
-          expect(res.body.data.list.length).toBeLessThanOrEqual(2);
-        });
-    });
+  it('should reject USER creating product (403)', () => {
+    return request(helper.httpServer)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({ name: 'x', price: 1, categoryId: 1, stock: 1 })
+      .expect(200)
+      .expect((res) => {
+        // ForbiddenException(403) → code 403
+        expect(res.body.code).toBe(403);
+      });
   });
+
+  it('should reject USER updating product (403)', () => {
+    return request(helper.httpServer)
+      .put('/api/products/1')
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({ name: 'y' })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.code).toBe(403);
+      });
+  });
+
+  it('should reject USER deleting product (403)', () => {
+    return request(helper.httpServer)
+      .delete('/api/products/1')
+      .set('Authorization', `Bearer ${userToken}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.code).toBe(403);
+      });
+  });
+});
+
+describe('查询与筛选', () => {
+  it('should filter by categoryId', () => {
+    return request(helper.httpServer)
+      .get('/api/products?categoryId=1')
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.code).toBe(0);
+        expect(Array.isArray(res.body.data.list)).toBe(true);
+        res.body.data.list.forEach((p: any) => {
+          expect(p.categoryId).toBe(1);
+        });
+      });
+  });
+
+  it('should filter by keyword', () => {
+    return request(helper.httpServer)
+      .get('/api/products?keyword=' + encodeURIComponent('商品'))
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.code).toBe(0);
+        res.body.data.list.forEach((p: any) => {
+          expect(p.name).toContain('商品');
+        });
+      });
+  });
+
+  it('should respect pagination', () => {
+    return request(helper.httpServer)
+      .get('/api/products?page=1&limit=2')
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.code).toBe(0);
+        expect(res.body.data.limit).toBe(2);
+        expect(res.body.data.list.length).toBeLessThanOrEqual(2);
+      });
+  });
+});
 ```
 
 **注**：GET /products 无 @Public，但作为全局默认受 JwtAuthGuard 保护。如需无 token 用例，需先确认此点（在本文件的已有 beforeAll 中通常已有 userToken，可补一个无 token 请求）。
@@ -1463,6 +1603,7 @@ cat packages/server/test/product.e2e-spec.ts
 ```bash
 pnpm --filter server test:e2e -- test/product.e2e-spec.ts
 ```
+
 Expected: 新增 6 用例全绿
 
 - [ ] **Step 4: Commit**
@@ -1477,79 +1618,91 @@ git commit -m "test(e2e/product): 补权限/筛选/分页用例"
 ## Task 15: e2e — cart 扩写（越权、商品不存在）
 
 **Files:**
+
 - Modify: `packages/server/test/cart.e2e-spec.ts`
 
 - [ ] **Step 1: 读现有文件，在末尾追加**
 
 ```typescript
-  describe('越权与边界', () => {
-    let userA: { accessToken: string; userId: number };
-    let userB: { accessToken: string; userId: number };
-    let userBCartId: number;
+describe('越权与边界', () => {
+  let userA: { accessToken: string; userId: number };
+  let userB: { accessToken: string; userId: number };
+  let userBCartId: number;
 
-    beforeAll(async () => {
-      userA = await helper.registerAndLogin('13800000060', 'test123456');
-      userB = await helper.registerAndLogin('13800000061', 'test123456');
-      // B 加一个商品到购物车
-      const productRes = await request(helper.httpServer)
-        .post('/api/products')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send({ name: 'Cart 越权测试商品', price: 1, categoryId: 1, stock: 10, unit: '斤', origin: 'x', sweetness: '甜', weight: '1kg', image: 'i', color: '#fff' });
-      // 注：adminToken 需在此文件 beforeAll 已定义；若未定义需先在文件顶部 beforeAll 注册 admin
-      const productId = productRes.body.data.id;
-      const addRes = await request(helper.httpServer)
-        .post('/api/cart')
-        .set('Authorization', `Bearer ${userB.accessToken}`)
-        .send({ productId, specLabel: '1kg', quantity: 1 });
-      userBCartId = addRes.body.data.id ?? addRes.body.data[0]?.id; // 取列表中 B 的 cart id
-      // 若返回是 list，需从 list 找：
-      const listRes = await request(helper.httpServer)
-        .get('/api/cart')
-        .set('Authorization', `Bearer ${userB.accessToken}`);
-      userBCartId = listRes.body.data[0].id;
-    });
-
-    it('should reject adding non-existent product (404)', () => {
-      return request(helper.httpServer)
-        .post('/api/cart')
-        .set('Authorization', `Bearer ${userA.accessToken}`)
-        .send({ productId: 999999, specLabel: '1kg', quantity: 1 })
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.code).toBe(404);
-        });
-    });
-
-    it('should reject A updating B cart (404)', () => {
-      return request(helper.httpServer)
-        .put(`/api/cart/${userBCartId}`)
-        .set('Authorization', `Bearer ${userA.accessToken}`)
-        .send({ quantity: 99 })
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.code).toBe(404);
-        });
-    });
-
-    it('should reject A deleting B cart (404)', () => {
-      return request(helper.httpServer)
-        .delete(`/api/cart/${userBCartId}`)
-        .set('Authorization', `Bearer ${userA.accessToken}`)
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.code).toBe(404);
-        });
-    });
-
-    it('should reject no-token GET /cart (401)', () => {
-      return request(helper.httpServer)
-        .get('/api/cart')
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.code).toBe(401);
-        });
-    });
+  beforeAll(async () => {
+    userA = await helper.registerAndLogin('13800000060', 'test123456');
+    userB = await helper.registerAndLogin('13800000061', 'test123456');
+    // B 加一个商品到购物车
+    const productRes = await request(helper.httpServer)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Cart 越权测试商品',
+        price: 1,
+        categoryId: 1,
+        stock: 10,
+        unit: '斤',
+        origin: 'x',
+        sweetness: '甜',
+        weight: '1kg',
+        image: 'i',
+        color: '#fff',
+      });
+    // 注：adminToken 需在此文件 beforeAll 已定义；若未定义需先在文件顶部 beforeAll 注册 admin
+    const productId = productRes.body.data.id;
+    const addRes = await request(helper.httpServer)
+      .post('/api/cart')
+      .set('Authorization', `Bearer ${userB.accessToken}`)
+      .send({ productId, specLabel: '1kg', quantity: 1 });
+    userBCartId = addRes.body.data.id ?? addRes.body.data[0]?.id; // 取列表中 B 的 cart id
+    // 若返回是 list，需从 list 找：
+    const listRes = await request(helper.httpServer)
+      .get('/api/cart')
+      .set('Authorization', `Bearer ${userB.accessToken}`);
+    userBCartId = listRes.body.data[0].id;
   });
+
+  it('should reject adding non-existent product (404)', () => {
+    return request(helper.httpServer)
+      .post('/api/cart')
+      .set('Authorization', `Bearer ${userA.accessToken}`)
+      .send({ productId: 999999, specLabel: '1kg', quantity: 1 })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.code).toBe(404);
+      });
+  });
+
+  it('should reject A updating B cart (404)', () => {
+    return request(helper.httpServer)
+      .put(`/api/cart/${userBCartId}`)
+      .set('Authorization', `Bearer ${userA.accessToken}`)
+      .send({ quantity: 99 })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.code).toBe(404);
+      });
+  });
+
+  it('should reject A deleting B cart (404)', () => {
+    return request(helper.httpServer)
+      .delete(`/api/cart/${userBCartId}`)
+      .set('Authorization', `Bearer ${userA.accessToken}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.code).toBe(404);
+      });
+  });
+
+  it('should reject no-token GET /cart (401)', () => {
+    return request(helper.httpServer)
+      .get('/api/cart')
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.code).toBe(401);
+      });
+  });
+});
 ```
 
 **注**：若 cart.e2e 现有 beforeAll 没有注册 admin，需要在追加前先在文件 beforeAll 中补 admin 注册（参考 order.e2e 的写法）。
@@ -1559,6 +1712,7 @@ git commit -m "test(e2e/product): 补权限/筛选/分页用例"
 ```bash
 pnpm --filter server test:e2e -- test/cart.e2e-spec.ts
 ```
+
 Expected: 新增 4 用例全绿
 
 - [ ] **Step 3: Commit**
@@ -1573,69 +1727,70 @@ git commit -m "test(e2e/cart): 补越权改/删与商品不存在用例"
 ## Task 16: e2e — order 扩写（取消/查询他人订单）
 
 **Files:**
+
 - Modify: `packages/server/test/order.e2e-spec.ts`
 
 - [ ] **Step 1: 在末尾追加**
 
 ```typescript
-  describe('越权与边界', () => {
-    let userA: { accessToken: string; userId: number };
-    let userB: { accessToken: string; userId: number };
-    let userBOrderId: number;
+describe('越权与边界', () => {
+  let userA: { accessToken: string; userId: number };
+  let userB: { accessToken: string; userId: number };
+  let userBOrderId: number;
 
-    beforeAll(async () => {
-      userA = await helper.registerAndLogin('13800000070', 'test123456');
-      userB = await helper.registerAndLogin('13800000071', 'test123456');
-      // 为 B 创建一笔订单
-      const productId = await helper.createProductAsAdmin(adminToken, { name: 'B 的订单商品' });
-      await helper.addToCartAsUser(userB.accessToken, productId, '1kg', 1);
-      const res = await request(helper.httpServer)
-        .post('/api/orders')
-        .set('Authorization', `Bearer ${userB.accessToken}`)
-        .send({ address: '北京市', phone: '13800000071' });
-      userBOrderId = res.body.data.id;
-    });
-
-    it('should reject A cancelling B order (404)', () => {
-      return request(helper.httpServer)
-        .put(`/api/orders/${userBOrderId}/cancel`)
-        .set('Authorization', `Bearer ${userA.accessToken}`)
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.code).toBe(404);
-        });
-    });
-
-    it('should reject A viewing B order detail (404)', () => {
-      return request(helper.httpServer)
-        .get(`/api/orders/${userBOrderId}`)
-        .set('Authorization', `Bearer ${userA.accessToken}`)
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.code).toBe(404);
-        });
-    });
-
-    it('should reject no-token POST /orders (401)', () => {
-      return request(helper.httpServer)
-        .post('/api/orders')
-        .send({ address: 'x', phone: '13800000099' })
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.code).toBe(401);
-        });
-    });
-
-    it('should reject cancelling non-existent order (404)', () => {
-      return request(helper.httpServer)
-        .put('/api/orders/99999/cancel')
-        .set('Authorization', `Bearer ${userA.accessToken}`)
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.code).toBe(404);
-        });
-    });
+  beforeAll(async () => {
+    userA = await helper.registerAndLogin('13800000070', 'test123456');
+    userB = await helper.registerAndLogin('13800000071', 'test123456');
+    // 为 B 创建一笔订单
+    const productId = await helper.createProductAsAdmin(adminToken, { name: 'B 的订单商品' });
+    await helper.addToCartAsUser(userB.accessToken, productId, '1kg', 1);
+    const res = await request(helper.httpServer)
+      .post('/api/orders')
+      .set('Authorization', `Bearer ${userB.accessToken}`)
+      .send({ address: '北京市', phone: '13800000071' });
+    userBOrderId = res.body.data.id;
   });
+
+  it('should reject A cancelling B order (404)', () => {
+    return request(helper.httpServer)
+      .put(`/api/orders/${userBOrderId}/cancel`)
+      .set('Authorization', `Bearer ${userA.accessToken}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.code).toBe(404);
+      });
+  });
+
+  it('should reject A viewing B order detail (404)', () => {
+    return request(helper.httpServer)
+      .get(`/api/orders/${userBOrderId}`)
+      .set('Authorization', `Bearer ${userA.accessToken}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.code).toBe(404);
+      });
+  });
+
+  it('should reject no-token POST /orders (401)', () => {
+    return request(helper.httpServer)
+      .post('/api/orders')
+      .send({ address: 'x', phone: '13800000099' })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.code).toBe(401);
+      });
+  });
+
+  it('should reject cancelling non-existent order (404)', () => {
+    return request(helper.httpServer)
+      .put('/api/orders/99999/cancel')
+      .set('Authorization', `Bearer ${userA.accessToken}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.code).toBe(404);
+      });
+  });
+});
 ```
 
 - [ ] **Step 2: 跑 e2e**
@@ -1643,6 +1798,7 @@ git commit -m "test(e2e/cart): 补越权改/删与商品不存在用例"
 ```bash
 pnpm --filter server test:e2e -- test/order.e2e-spec.ts
 ```
+
 Expected: 新增 4 用例全绿
 
 - [ ] **Step 3: Commit**
@@ -1657,54 +1813,55 @@ git commit -m "test(e2e/order): 补取消/查询他人订单与无 token 用例"
 ## Task 17: e2e — user 扩写（无 token、更新 profile、串号校验）
 
 **Files:**
+
 - Modify: `packages/server/test/user.e2e-spec.ts`
 
 - [ ] **Step 1: 在末尾追加**
 
 ```typescript
-  describe('权限与更新', () => {
-    let userA: { accessToken: string; userId: number };
-    let userB: { accessToken: string; userId: number };
+describe('权限与更新', () => {
+  let userA: { accessToken: string; userId: number };
+  let userB: { accessToken: string; userId: number };
 
-    beforeAll(async () => {
-      userA = await helper.registerAndLogin('13800000080', 'test123456', 'A');
-      userB = await helper.registerAndLogin('13800000081', 'test123456', 'B');
-    });
-
-    it('should reject no-token GET /user/profile (401)', () => {
-      return request(helper.httpServer)
-        .get('/api/user/profile')
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.code).toBe(401);
-        });
-    });
-
-    it('should update own nickname', () => {
-      return request(helper.httpServer)
-        .put('/api/user/profile')
-        .set('Authorization', `Bearer ${userA.accessToken}`)
-        .send({ nickname: 'New Nickname' })
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.code).toBe(0);
-          expect(res.body.data.nickname).toBe('New Nickname');
-        });
-    });
-
-    it('should not leak B profile to A token (based on JWT userId)', () => {
-      // A 的 token 只能查 A 自己的 profile
-      return request(helper.httpServer)
-        .get('/api/user/profile')
-        .set('Authorization', `Bearer ${userA.accessToken}`)
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.code).toBe(0);
-          expect(res.body.data.id).toBe(userA.userId);
-          expect(res.body.data.id).not.toBe(userB.userId);
-        });
-    });
+  beforeAll(async () => {
+    userA = await helper.registerAndLogin('13800000080', 'test123456', 'A');
+    userB = await helper.registerAndLogin('13800000081', 'test123456', 'B');
   });
+
+  it('should reject no-token GET /user/profile (401)', () => {
+    return request(helper.httpServer)
+      .get('/api/user/profile')
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.code).toBe(401);
+      });
+  });
+
+  it('should update own nickname', () => {
+    return request(helper.httpServer)
+      .put('/api/user/profile')
+      .set('Authorization', `Bearer ${userA.accessToken}`)
+      .send({ nickname: 'New Nickname' })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.code).toBe(0);
+        expect(res.body.data.nickname).toBe('New Nickname');
+      });
+  });
+
+  it('should not leak B profile to A token (based on JWT userId)', () => {
+    // A 的 token 只能查 A 自己的 profile
+    return request(helper.httpServer)
+      .get('/api/user/profile')
+      .set('Authorization', `Bearer ${userA.accessToken}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.code).toBe(0);
+        expect(res.body.data.id).toBe(userA.userId);
+        expect(res.body.data.id).not.toBe(userB.userId);
+      });
+  });
+});
 ```
 
 - [ ] **Step 2: 跑 e2e**
@@ -1712,6 +1869,7 @@ git commit -m "test(e2e/order): 补取消/查询他人订单与无 token 用例"
 ```bash
 pnpm --filter server test:e2e -- test/user.e2e-spec.ts
 ```
+
 Expected: 新增 3 用例全绿
 
 - [ ] **Step 3: Commit**
@@ -1744,6 +1902,7 @@ pnpm --filter shared build
 ```bash
 pnpm --filter server test:e2e
 ```
+
 Expected: 所有 e2e（6 个文件）全部 PASS，无 flaky
 
 - [ ] **Step 4: 把输出贴给用户**
@@ -1778,6 +1937,7 @@ git commit -m "test(server): 全套测试补齐收尾"
 ## Self-Review
 
 **1. Spec coverage:**
+
 - service 单测 5 个 → Task 1-5 ✓
 - common 单测 5 个 → Task 6-10 ✓
 - TestHelper 扩展 → Task 12 ✓
@@ -1787,17 +1947,20 @@ git commit -m "test(server): 全套测试补齐收尾"
 - 最终验证 → Task 19 ✓
 
 **2. Placeholder scan:**
+
 - Task 4 Step 1 有「重要修正」提示（orderRepo.save 需在 beforeEach 加）→ 已显式说明，非占位
 - Task 15/16 中 adminToken 引用：已在步骤内注明「若未定义需先补」，属可执行提示，非占位
 - 无 "TBD/TODO"
 
 **3. Type consistency:**
+
 - `createProductAsAdmin(token, overrides)` 在 Task 12 定义，Task 16 使用 ✓
 - `addToCartAsUser(token, productId, specLabel, quantity)` 同上 ✓
 - mock Redis 方法名（get/set/keys/del）在 product/cart/auth spec 一致 ✓
 - queryRunner.manager.createQueryBuilder 链式签名一致 ✓
 
 **4. 已知风险（实施时注意）：**
+
 - Task 5 `jest.mock('uuid')` 可能影响其他 module 对 uuid 的引用 —— 因 spec 文件独立 jest 作用域，OK
 - Task 7 `super.canActivate` mock 方式：用 spyOn 原型链，若 NestJS 版本升级可能失效 —— 本项目 NestJS 10 固定，OK
 - e2e 手机号必须跨文件唯一，本计划已分配号段（80/70/60/50/10），避免冲突

@@ -146,7 +146,14 @@ export default function Addresses() {
             onClick={() => navigate(-1)}
             className="w-9 h-9 flex items-center justify-center rounded-full bg-brand-btn-bg hover:bg-brand-border transition-colors"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
           </button>
@@ -171,19 +178,14 @@ export default function Addresses() {
           </div>
         ) : (
           list.map((addr) => (
-            <div
-              key={addr.id}
-              className="bg-white rounded-2xl border border-brand-border p-4"
-            >
+            <div key={addr.id} className="bg-white rounded-2xl border border-brand-border p-4">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="text-[15px] font-bold text-brand-dark">
                       {addr.recipientName}
                     </span>
-                    <span className="text-[13px] text-brand-muted">
-                      {addr.phone}
-                    </span>
+                    <span className="text-[13px] text-brand-muted">{addr.phone}</span>
                     {addr.isDefault && (
                       <span className="px-1.5 py-0.5 rounded-md bg-brand-peach text-brand-primary text-[10px] font-bold">
                         默认
@@ -291,9 +293,7 @@ export default function Addresses() {
                 />
               </div>
               <div>
-                <label className="block text-[12px] text-brand-muted mb-1">
-                  详细地址
-                </label>
+                <label className="block text-[12px] text-brand-muted mb-1">详细地址</label>
                 <textarea
                   value={form.detail}
                   onChange={(e) => setForm({ ...form, detail: e.target.value })}
@@ -306,9 +306,7 @@ export default function Addresses() {
                 <input
                   type="checkbox"
                   checked={form.isDefault}
-                  onChange={(e) =>
-                    setForm({ ...form, isDefault: e.target.checked })
-                  }
+                  onChange={(e) => setForm({ ...form, isDefault: e.target.checked })}
                   className="w-4 h-4 accent-brand-primary"
                 />
                 <span className="text-[13px] text-brand-dark">设为默认地址</span>

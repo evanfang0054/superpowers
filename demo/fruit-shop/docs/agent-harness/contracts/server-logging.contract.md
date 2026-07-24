@@ -41,16 +41,16 @@
 
 ### Round 2 — Evaluator 挑战
 
-| 原条目 | 挑战 | 修订 |
-|---|---|---|
-| D2「未认证 userId 为空」 | "为空"语义模糊（null/undefined/缺失？） | 明确为「字段缺失（undefined）」 |
-| D3 X-Request-ID 一致性 | 验证方法不清 | 明确 `curl -i` + grep 命令 |
-| D6/D7 脱敏 | 仅列 password/token，未覆盖 `authorization` header 与 `oldPassword/newPassword` | 合并为完整清单 |
-| D9 下单日志 | 「成功」判定不清 | 明确 = 响应 `code:0`；失败场景由 D4 覆盖 |
-| D11 LOG_LEVEL | 缺一条：默认 info 下应见 access log | 补充三条级别断言 |
-| D12 回归 | 「无报错」太弱 | 明确为端到端购买流程全 `code:0`，无 5xx |
-| 缺失 | 服务启动日志未列入（`console.log` 被替换后端口信息是否保留） | 补 D1 |
-| 缺失 | TypeORM SQL 日志兼容性未列入 | 补 D13 |
+| 原条目                   | 挑战                                                                            | 修订                                     |
+| ------------------------ | ------------------------------------------------------------------------------- | ---------------------------------------- |
+| D2「未认证 userId 为空」 | "为空"语义模糊（null/undefined/缺失？）                                         | 明确为「字段缺失（undefined）」          |
+| D3 X-Request-ID 一致性   | 验证方法不清                                                                    | 明确 `curl -i` + grep 命令               |
+| D6/D7 脱敏               | 仅列 password/token，未覆盖 `authorization` header 与 `oldPassword/newPassword` | 合并为完整清单                           |
+| D9 下单日志              | 「成功」判定不清                                                                | 明确 = 响应 `code:0`；失败场景由 D4 覆盖 |
+| D11 LOG_LEVEL            | 缺一条：默认 info 下应见 access log                                             | 补充三条级别断言                         |
+| D12 回归                 | 「无报错」太弱                                                                  | 明确为端到端购买流程全 `code:0`，无 5xx  |
+| 缺失                     | 服务启动日志未列入（`console.log` 被替换后端口信息是否保留）                    | 补 D1                                    |
+| 缺失                     | TypeORM SQL 日志兼容性未列入                                                    | 补 D13                                   |
 
 ### Round 3 — 最终共识
 

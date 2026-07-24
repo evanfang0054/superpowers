@@ -1,7 +1,7 @@
 export enum CouponType {
-  FULL_REDUCTION = 0,  // 满减
-  DISCOUNT = 1,        // 折扣
-  NO_THRESHOLD = 2,    // 无门槛
+  FULL_REDUCTION = 0, // 满减
+  DISCOUNT = 1, // 折扣
+  NO_THRESHOLD = 2, // 无门槛
 }
 
 export interface CouponTemplate {

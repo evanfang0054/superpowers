@@ -24,25 +24,18 @@ describe('Coupon (e2e)', () => {
       .set('Authorization', `Bearer ${adminToken}`)
       .send(payload);
     if (res.body?.code !== 0) {
-      throw new Error(
-        `createCoupon failed: code=${res.body?.code} message=${res.body?.message}`,
-      );
+      throw new Error(`createCoupon failed: code=${res.body?.code} message=${res.body?.message}`);
     }
     return res.body.data.id;
   }
 
   // 辅助：领券并返回 userCoupon DB id
-  async function claimCoupon(
-    token: string,
-    couponId: number,
-  ): Promise<number> {
+  async function claimCoupon(token: string, couponId: number): Promise<number> {
     const res = await request(helper.httpServer)
       .post(`/api/coupons/${couponId}/claim`)
       .set('Authorization', `Bearer ${token}`);
     if (res.body?.code !== 0) {
-      throw new Error(
-        `claimCoupon failed: code=${res.body?.code} message=${res.body?.message}`,
-      );
+      throw new Error(`claimCoupon failed: code=${res.body?.code} message=${res.body?.message}`);
     }
     return res.body.data.id;
   }
@@ -59,9 +52,7 @@ describe('Coupon (e2e)', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({ productId: pId, specLabel, quantity });
     if (res.body?.code !== 0) {
-      throw new Error(
-        `addToCart failed: code=${res.body?.code} message=${res.body?.message}`,
-      );
+      throw new Error(`addToCart failed: code=${res.body?.code} message=${res.body?.message}`);
     }
   }
 
@@ -189,9 +180,7 @@ describe('Coupon (e2e)', () => {
       expect(Array.isArray(res.body.data)).toBe(true);
       expect(res.body.data.length).toBeGreaterThanOrEqual(3);
       // 未领取时 claimed=false
-      const target = res.body.data.find(
-        (c: any) => c.id === fullReductionCouponId,
-      );
+      const target = res.body.data.find((c: any) => c.id === fullReductionCouponId);
       expect(target.claimed).toBe(false);
     });
   });
@@ -218,9 +207,7 @@ describe('Coupon (e2e)', () => {
       const res = await request(helper.httpServer)
         .get('/api/coupons/available')
         .set('Authorization', `Bearer ${userAToken}`);
-      const target = res.body.data.find(
-        (c: any) => c.id === fullReductionCouponId,
-      );
+      const target = res.body.data.find((c: any) => c.id === fullReductionCouponId);
       expect(target.claimed).toBe(true);
     });
 
@@ -243,9 +230,7 @@ describe('Coupon (e2e)', () => {
       expect(res.body.code).toBe(0);
       expect(Array.isArray(res.body.data.list)).toBe(true);
       expect(res.body.data.list.length).toBeGreaterThanOrEqual(1);
-      const uc = res.body.data.list.find(
-        (x: any) => x.couponId === fullReductionCouponId,
-      );
+      const uc = res.body.data.list.find((x: any) => x.couponId === fullReductionCouponId);
       expect(uc).toBeDefined();
       expect(uc.coupon).toBeDefined();
       expect(uc.coupon.name).toContain('满49减10');

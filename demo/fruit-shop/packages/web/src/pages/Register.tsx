@@ -51,9 +51,7 @@ export default function Register() {
       <main className="max-w-lg mx-auto w-full px-4 flex-1">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-brand-dark mb-1.5">
-              手机号
-            </label>
+            <label className="block text-sm font-medium text-brand-dark mb-1.5">手机号</label>
             <input
               type="tel"
               value={phone}
@@ -65,9 +63,7 @@ export default function Register() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-brand-dark mb-1.5">
-              密码
-            </label>
+            <label className="block text-sm font-medium text-brand-dark mb-1.5">密码</label>
             <input
               type="password"
               value={password}

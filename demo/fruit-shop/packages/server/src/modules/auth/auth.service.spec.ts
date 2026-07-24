@@ -22,14 +22,22 @@ describe('AuthService', () => {
   beforeEach(() => {
     userRepo = { findOne: jest.fn(), count: jest.fn(), create: jest.fn((x) => x), save: jest.fn() };
     jwtService = { sign: jest.fn(), verify: jest.fn(), decode: jest.fn() };
-    configService = { get: jest.fn((k: string) => {
-      if (k === 'JWT_SECRET') return 'test-secret';
-      if (k === 'JWT_ACCESS_EXPIRES_IN') return '900';
-      if (k === 'JWT_REFRESH_EXPIRES_IN') return '604800';
-      return undefined;
-    }) };
+    configService = {
+      get: jest.fn((k: string) => {
+        if (k === 'JWT_SECRET') return 'test-secret';
+        if (k === 'JWT_ACCESS_EXPIRES_IN') return '900';
+        if (k === 'JWT_REFRESH_EXPIRES_IN') return '604800';
+        return undefined;
+      }),
+    };
     redis = { get: jest.fn(), set: jest.fn() };
-    logger = { setContext: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest.fn() };
+    logger = {
+      setContext: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+      debug: jest.fn(),
+    };
     service = new AuthService(userRepo, jwtService, configService, redis, logger);
     jest.clearAllMocks();
   });
@@ -63,7 +71,9 @@ describe('AuthService', () => {
 
     it('should throw Conflict when phone exists', async () => {
       userRepo.findOne.mockResolvedValue({ id: 1 });
-      await expect(service.register({ phone: '13800000001', password: 'pass1234' })).rejects.toThrow(ConflictException);
+      await expect(
+        service.register({ phone: '13800000001', password: 'pass1234' }),
+      ).rejects.toThrow(ConflictException);
     });
 
     it('should hash password with salt 10', async () => {
@@ -86,17 +96,25 @@ describe('AuthService', () => {
 
     it('should throw Unauthorized when user not found', async () => {
       userRepo.createQueryBuilder = jest.fn(() => buildQb(null));
-      await expect(service.login({ phone: 'p', password: 'x' })).rejects.toThrow(UnauthorizedException);
+      await expect(service.login({ phone: 'p', password: 'x' })).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should throw Unauthorized when password wrong', async () => {
-      userRepo.createQueryBuilder = jest.fn(() => buildQb({ id: 1, phone: 'p', password: 'hashed', role: 'user' }));
+      userRepo.createQueryBuilder = jest.fn(() =>
+        buildQb({ id: 1, phone: 'p', password: 'hashed', role: 'user' }),
+      );
       mockedBcrypt.compare.mockResolvedValue(false as never);
-      await expect(service.login({ phone: 'p', password: 'wrong' })).rejects.toThrow(UnauthorizedException);
+      await expect(service.login({ phone: 'p', password: 'wrong' })).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should return tokens and user on success', async () => {
-      userRepo.createQueryBuilder = jest.fn(() => buildQb({ id: 1, phone: 'p', password: 'hashed', role: 'user' }));
+      userRepo.createQueryBuilder = jest.fn(() =>
+        buildQb({ id: 1, phone: 'p', password: 'hashed', role: 'user' }),
+      );
       mockedBcrypt.compare.mockResolvedValue(true as never);
       jwtService.sign.mockReturnValue('token');
 
@@ -128,7 +146,9 @@ describe('AuthService', () => {
     });
 
     it('should throw when jwt.verify fails (expired)', async () => {
-      jwtService.verify.mockImplementation(() => { throw new Error('expired'); });
+      jwtService.verify.mockImplementation(() => {
+        throw new Error('expired');
+      });
       await expect(service.refresh({ refreshToken: 't' })).rejects.toThrow(UnauthorizedException);
     });
 
@@ -168,7 +188,9 @@ describe('AuthService', () => {
     });
 
     it('should swallow decode error silently', async () => {
-      jwtService.decode.mockImplementation(() => { throw new Error('decode fail'); });
+      jwtService.decode.mockImplementation(() => {
+        throw new Error('decode fail');
+      });
       const r = await service.logout(1, 'abc', 't');
       expect(r).toBeNull();
     });

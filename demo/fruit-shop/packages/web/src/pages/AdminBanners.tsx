@@ -112,7 +112,8 @@ export default function AdminBanners() {
     }
   };
 
-  const inputCls = 'w-full border border-brand-border rounded-2xl px-3 py-2 focus:ring-2 focus:ring-brand-primary/30';
+  const inputCls =
+    'w-full border border-brand-border rounded-2xl px-3 py-2 focus:ring-2 focus:ring-brand-primary/30';
 
   return (
     <div className="min-h-screen bg-brand-bg p-6">
@@ -146,9 +147,13 @@ export default function AdminBanners() {
               <tr key={b.id} className="border-t border-brand-border">
                 <td className="p-3 font-medium">{b.title}</td>
                 <td className="p-3">
-                  <span className={`px-2 py-0.5 rounded text-xs font-bold ${
-                    b.status === 1 ? 'bg-brand-green/15 text-brand-green' : 'bg-brand-btn-bg text-brand-muted'
-                  }`}>
+                  <span
+                    className={`px-2 py-0.5 rounded text-xs font-bold ${
+                      b.status === 1
+                        ? 'bg-brand-green/15 text-brand-green'
+                        : 'bg-brand-btn-bg text-brand-muted'
+                    }`}
+                  >
                     {b.status === 1 ? '上架' : '下架'}
                   </span>
                 </td>
@@ -158,11 +163,15 @@ export default function AdminBanners() {
                   <button
                     onClick={() => openEdit(b)}
                     className="text-brand-primary text-sm font-bold"
-                  >编辑</button>
+                  >
+                    编辑
+                  </button>
                   <button
                     onClick={() => handleDelete(b.id)}
                     className="text-red-500 text-sm font-bold"
-                  >删除</button>
+                  >
+                    删除
+                  </button>
                 </td>
               </tr>
             ))}
@@ -173,9 +182,7 @@ export default function AdminBanners() {
       {modalOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="bg-brand-card rounded-3xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4">
-              {editingId ? '编辑 Banner' : '新建 Banner'}
-            </h2>
+            <h2 className="text-xl font-bold mb-4">{editingId ? '编辑 Banner' : '新建 Banner'}</h2>
             <div className="space-y-3">
               <input
                 value={form.title}
@@ -204,7 +211,9 @@ export default function AdminBanners() {
               />
               <select
                 value={form.linkType}
-                onChange={(e) => setForm({ ...form, linkType: e.target.value as BannerFormData['linkType'] })}
+                onChange={(e) =>
+                  setForm({ ...form, linkType: e.target.value as BannerFormData['linkType'] })
+                }
                 className={inputCls}
               >
                 <option value="none">不跳转</option>
@@ -238,11 +247,15 @@ export default function AdminBanners() {
               <button
                 onClick={handleSubmit}
                 className="flex-1 py-2.5 rounded-2xl bg-brand-primary text-white font-bold"
-              >保存</button>
+              >
+                保存
+              </button>
               <button
                 onClick={() => setModalOpen(false)}
                 className="flex-1 py-2.5 rounded-2xl border border-brand-border font-bold"
-              >取消</button>
+              >
+                取消
+              </button>
             </div>
           </div>
         </div>

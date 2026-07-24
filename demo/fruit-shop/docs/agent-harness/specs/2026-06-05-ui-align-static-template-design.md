@@ -20,21 +20,21 @@ React 前端 (`packages/web`) 的首页和详情页与静态模板 (`index.html`
 
 新增 `brand-*` 色板，与模板 `@theme` 一一对应：
 
-| Token | 值 | 用途 |
-|-------|-----|------|
-| `--color-brand-bg` | `#FFF8F0` | 页面背景（暖奶油色） |
-| `--color-brand-primary` | `#FF6B35` | 主色（橙色） |
-| `--color-brand-secondary` | `#F7C948` | 辅色（金黄） |
-| `--color-brand-accent` | `#E84393` | 强调色（粉红） |
-| `--color-brand-green` | `#00B894` | 绿色标签 |
-| `--color-brand-dark` | `#2D3436` | 主文字色 |
-| `--color-brand-muted` | `#636E72` | 次要文字 |
-| `--color-brand-card` | `#FFFFFF` | 卡片背景 |
-| `--color-brand-peach` | `#FFEAA7` | 装饰桃色 |
-| `--color-brand-coral` | `#FF7675` | 珊瑚色 |
-| `--color-brand-border` | `#f0ece6` | 边框色 |
-| `--color-brand-btn-bg` | `#f5f1eb` | 按钮背景 |
-| `--font-display` | `'Fredoka', 'Noto Sans SC', sans-serif` | 品牌字体 |
+| Token                     | 值                                      | 用途                 |
+| ------------------------- | --------------------------------------- | -------------------- |
+| `--color-brand-bg`        | `#FFF8F0`                               | 页面背景（暖奶油色） |
+| `--color-brand-primary`   | `#FF6B35`                               | 主色（橙色）         |
+| `--color-brand-secondary` | `#F7C948`                               | 辅色（金黄）         |
+| `--color-brand-accent`    | `#E84393`                               | 强调色（粉红）       |
+| `--color-brand-green`     | `#00B894`                               | 绿色标签             |
+| `--color-brand-dark`      | `#2D3436`                               | 主文字色             |
+| `--color-brand-muted`     | `#636E72`                               | 次要文字             |
+| `--color-brand-card`      | `#FFFFFF`                               | 卡片背景             |
+| `--color-brand-peach`     | `#FFEAA7`                               | 装饰桃色             |
+| `--color-brand-coral`     | `#FF7675`                               | 珊瑚色               |
+| `--color-brand-border`    | `#f0ece6`                               | 边框色               |
+| `--color-brand-btn-bg`    | `#f5f1eb`                               | 按钮背景             |
+| `--font-display`          | `'Fredoka', 'Noto Sans SC', sans-serif` | 品牌字体             |
 
 body 背景改为 `#FFF8F0`。
 

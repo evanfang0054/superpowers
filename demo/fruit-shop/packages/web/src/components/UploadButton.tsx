@@ -12,11 +12,7 @@ interface UploadButtonProps {
  * 图片上传按钮：包装 input[type=file]，调用 /upload/image，
  * 将返回的 url 写回表单字段，并显示预览。
  */
-export function UploadButton({
-  value,
-  onChange,
-  accept = 'image/*',
-}: UploadButtonProps) {
+export function UploadButton({ value, onChange, accept = 'image/*' }: UploadButtonProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -65,11 +61,7 @@ export function UploadButton({
       />
       {value && (
         <div className="w-12 h-12 rounded-2xl overflow-hidden bg-brand-btn-bg flex-shrink-0">
-          <img
-            src={value}
-            alt="preview"
-            className="w-full h-full object-cover"
-          />
+          <img src={value} alt="preview" className="w-full h-full object-cover" />
         </div>
       )}
     </div>

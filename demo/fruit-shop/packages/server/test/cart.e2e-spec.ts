@@ -123,9 +123,7 @@ describe('Cart (e2e)', () => {
         .expect(200)
         .expect((res) => {
           expect(res.body.code).toBe(0);
-          expect(
-            res.body.data.find((i: any) => i.id === cartItemId).quantity,
-          ).toBe(10);
+          expect(res.body.data.find((i: any) => i.id === cartItemId).quantity).toBe(10);
         });
     });
 

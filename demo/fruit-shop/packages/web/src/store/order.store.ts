@@ -33,7 +33,10 @@ export const useOrderStore = create<OrderState>()((set, get) => ({
       const response = await orderApi.getList(params);
       const paginatedData = response.data.data!;
       set((state) => ({
-        orders: params?.page === 1 || !params?.page ? paginatedData.list : [...state.orders, ...paginatedData.list],
+        orders:
+          params?.page === 1 || !params?.page
+            ? paginatedData.list
+            : [...state.orders, ...paginatedData.list],
         total: paginatedData.total,
         totalPages: Math.ceil(paginatedData.total / (params?.limit || 10)),
         page: params?.page ?? 1,

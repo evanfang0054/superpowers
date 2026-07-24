@@ -15,9 +15,7 @@ export function PriceSection({ price, originalPrice, unit, tags }: PriceSectionP
         </span>
         {unit && <span className="text-[13px] text-brand-muted">/ {unit}</span>}
         {originalPrice && originalPrice > price && (
-          <span className="text-[13px] text-brand-muted line-through ml-1">
-            ¥{originalPrice}
-          </span>
+          <span className="text-[13px] text-brand-muted line-through ml-1">¥{originalPrice}</span>
         )}
       </div>
       {tags && tags.length > 0 && (
@@ -27,13 +25,15 @@ export function PriceSection({ price, originalPrice, unit, tags }: PriceSectionP
               key={i}
               className="py-1 px-3 rounded-full text-[11px] font-semibold"
               style={{
-                background: i === 0
-                  ? 'color-mix(in srgb, var(--color-brand-primary) 9%, transparent)'
-                  : 'color-mix(in srgb, var(--color-brand-secondary) 19%, transparent)',
+                background:
+                  i === 0
+                    ? 'color-mix(in srgb, var(--color-brand-primary) 9%, transparent)'
+                    : 'color-mix(in srgb, var(--color-brand-secondary) 19%, transparent)',
                 color: i === 0 ? 'var(--color-brand-primary)' : 'var(--color-brand-dark)',
-                border: i === 0
-                  ? '1.5px solid color-mix(in srgb, var(--color-brand-primary) 27%, transparent)'
-                  : '1.5px solid color-mix(in srgb, var(--color-brand-secondary) 33%, transparent)',
+                border:
+                  i === 0
+                    ? '1.5px solid color-mix(in srgb, var(--color-brand-primary) 27%, transparent)'
+                    : '1.5px solid color-mix(in srgb, var(--color-brand-secondary) 33%, transparent)',
               }}
             >
               {tag}

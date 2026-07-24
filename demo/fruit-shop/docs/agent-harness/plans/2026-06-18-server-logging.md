@@ -9,6 +9,7 @@
 **Tech Stack:** NestJS 10、nestjs-pino 4.x、pino-http、pino-pretty（dev）、pino `redact` + 自定义 serializer。
 
 **关联文档：**
+
 - Spec: `docs/agent-harness/specs/2026-06-18-server-logging-design.md`
 - Contract: `docs/agent-harness/contracts/server-logging.contract.md`（DoD D1–D13）
 
@@ -36,30 +37,37 @@ packages/server/src/
 ## Task 1: 安装依赖
 
 **Files:**
+
 - Modify: `packages/server/package.json`
 
 - [ ] **Step 1: 安装生产依赖**
 
 Run:
+
 ```bash
 pnpm --filter server add nestjs-pino@^4.0.0 pino-http
 ```
+
 Expected: `package.json` 的 `dependencies` 出现 `nestjs-pino` 和 `pino-http`，`pnpm-lock.yaml` 更新。
 
 - [ ] **Step 2: 安装开发依赖（pino-pretty）**
 
 Run:
+
 ```bash
 pnpm --filter server add -D pino-pretty
 ```
+
 Expected: `package.json` 的 `devDependencies` 出现 `pino-pretty`。
 
 - [ ] **Step 3: 验证可导入**
 
 Run:
+
 ```bash
 cd packages/server && node -e "require('nestjs-pino'); require('pino-http'); require('pino-pretty'); console.log('OK')"
 ```
+
 Expected: 输出 `OK`，无报错。
 
 - [ ] **Step 4: 提交**
@@ -74,6 +82,7 @@ git commit -m "chore(server): 引入 nestjs-pino / pino-http / pino-pretty"
 ## Task 2: 编写脱敏模块 `redact.serializer.ts`
 
 **Files:**
+
 - Create: `packages/server/src/common/logging/redact.serializer.ts`
 
 - [ ] **Step 1: 编写文件**
@@ -148,9 +157,11 @@ export function maskPersonalData<T>(obj: T): T {
 - [ ] **Step 2: 编译验证**
 
 Run:
+
 ```bash
 cd packages/server && pnpm exec tsc --noEmit
 ```
+
 Expected: 无报错。
 
 - [ ] **Step 3: 提交**
@@ -165,6 +176,7 @@ git commit -m "feat(logging): 新增脱敏工具 redact.serializer"
 ## Task 3: 编写 pino 配置工厂 `pino.config.ts`
 
 **Files:**
+
 - Create: `packages/server/src/common/logging/pino.config.ts`
 
 **说明（实现 vs 设计差异）：** 设计文档第 5 节 `customProps` 直接读 `req.user?.id`，但 pino-http 的 `customProps` 在中间件阶段执行，此时 JWT 守卫尚未运行（`req.user` 为 undefined）。**实现改为**在 `pino-http` 的 `serializers.req` 中读取 `req.user?.id`（serializer 在请求处理后期才被调用，此时 `req.user` 已被 passport 注入）。
@@ -232,15 +244,11 @@ export function buildPinoOptions(): Params {
       // 慢请求标记
       customSuccessMessage: (req: any, res: any, time: number) => {
         const slow = time > SLOW_REQUEST_MS;
-        return `${req.method} ${req.url} ${res.statusCode} ${time}ms${
-          slow ? ' [SLOW]' : ''
-        }`;
+        return `${req.method} ${req.url} ${res.statusCode} ${time}ms${slow ? ' [SLOW]' : ''}`;
       },
       customErrorMessage: (req: any, res: any, time: number) => {
         const slow = time > SLOW_REQUEST_MS;
-        return `${req.method} ${req.url} ${res.statusCode} ${time}ms${
-          slow ? ' [SLOW]' : ''
-        }`;
+        return `${req.method} ${req.url} ${res.statusCode} ${time}ms${slow ? ' [SLOW]' : ''}`;
       },
       // 响应头回写 X-Request-ID（pino-http 默认开启）
     },
@@ -251,9 +259,11 @@ export function buildPinoOptions(): Params {
 - [ ] **Step 2: 编译验证**
 
 Run:
+
 ```bash
 cd packages/server && pnpm exec tsc --noEmit
 ```
+
 Expected: 无报错。
 
 - [ ] **Step 3: 提交**
@@ -268,6 +278,7 @@ git commit -m "feat(logging): 新增 pino 配置工厂"
 ## Task 4: 编写 `logging.module.ts`
 
 **Files:**
+
 - Create: `packages/server/src/common/logging/logging.module.ts`
 
 - [ ] **Step 1: 编写文件**
@@ -309,9 +320,11 @@ imports: [
 - [ ] **Step 3: 编译验证**
 
 Run:
+
 ```bash
 cd packages/server && pnpm exec tsc --noEmit
 ```
+
 Expected: 无报错。
 
 - [ ] **Step 4: 提交**
@@ -326,6 +339,7 @@ git commit -m "feat(logging): 新增 LoggingModule 并接入 AppModule"
 ## Task 5: 改造 `main.ts` — 注册 PinoLogger
 
 **Files:**
+
 - Modify: `packages/server/src/main.ts`
 
 - [ ] **Step 1: 改造文件**
@@ -383,6 +397,7 @@ bootstrap();
 ```
 
 变化点：
+
 1. import `Logger` from `nestjs-pino`
 2. `NestFactory.create(AppModule, { bufferLogs: true })` — 缓冲启动期日志
 3. `app.useLogger(app.get(Logger))` — 注册
@@ -391,9 +406,11 @@ bootstrap();
 - [ ] **Step 2: 启动验证 D1**
 
 Run（终端 1）:
+
 ```bash
 pnpm --filter server dev
 ```
+
 Expected: 启动时 stdout 输出含 `Application is running on: http://localhost:3000` 的 pretty 行（含 timestamp + level + context）。
 
 - [ ] **Step 3: 提交**
@@ -408,22 +425,18 @@ git commit -m "feat(logging): main.ts 接入 PinoLogger 替换 console.log"
 ## Task 6: 改造 `HttpExceptionFilter` — 分级日志
 
 **Files:**
+
 - Modify: `packages/server/src/common/filters/http-exception.filter.ts`
 
 **说明：** 原 filter 仅对「未知异常」打日志。改为：
+
 - 业务异常（HttpException）→ `logger.warn`，记录 code / message / path
 - 未知异常 → `logger.error` + 完整 stack
 
 - [ ] **Step 1: 完整替换文件**
 
 ```ts
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { PinoLogger } from 'nestjs-pino';
 import { Response } from 'express';
 
@@ -514,25 +527,31 @@ app.useGlobalFilters(app.get(HttpExceptionFilter));
 - [ ] **Step 3: 编译验证**
 
 Run:
+
 ```bash
 cd packages/server && pnpm exec tsc --noEmit
 ```
+
 Expected: 无报错。
 
 - [ ] **Step 4: 启动验证 D4（业务异常 warn）**
 
 终端 1 启动：
+
 ```bash
 pnpm --filter server dev
 ```
 
 终端 2 触发参数校验失败：
+
 ```bash
 curl -sX POST http://localhost:3000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"phone":"not-a-phone"}' | head
 ```
+
 Expected（终端 1 stdout）：
+
 - 出现一条 `WARN` 级别日志
 - 含 `code: 400` 与 `message: phone must ...`（class-validator 报错合并）
 - 含 `method / url`
@@ -540,16 +559,21 @@ Expected（终端 1 stdout）：
 - [ ] **Step 5: 启动验证 D5（未知异常 error）**
 
 临时在 `packages/server/src/modules/product/product.controller.ts` 的任一 handler 顶部加入：
+
 ```ts
 throw new Error('test-unhandled');
 ```
+
 （验证后**必须删除**）
 
 终端 2 触发：
+
 ```bash
 curl -s http://localhost:3000/api/products | head
 ```
+
 Expected（终端 1 stdout）：
+
 - 出现一条 `ERROR` 级别日志
 - `message: Unhandled exception`
 - `err.stack` 含 `Error: test-unhandled` 与完整堆栈
@@ -557,6 +581,7 @@ Expected（终端 1 stdout）：
 - [ ] **Step 6: 删除临时 throw 并提交**
 
 恢复 `product.controller.ts`，然后：
+
 ```bash
 git add packages/server/src/common/filters/http-exception.filter.ts packages/server/src/main.ts
 git commit -m "feat(logging): HttpExceptionFilter 分级日志（warn/error）"
@@ -567,16 +592,19 @@ git commit -m "feat(logging): HttpExceptionFilter 分级日志（warn/error）"
 ## Task 7: `auth.service` 注入 PinoLogger + 业务埋点
 
 **Files:**
+
 - Modify: `packages/server/src/modules/auth/auth.service.ts`
 
 - [ ] **Step 1: 修改 import 与构造函数**
 
 在文件顶部 import 区追加：
+
 ```ts
 import { PinoLogger } from 'nestjs-pino';
 ```
 
 构造函数追加 `private readonly logger: PinoLogger` 参数：
+
 ```ts
 constructor(
   @InjectRepository(UserEntity)
@@ -590,6 +618,7 @@ constructor(
 ```
 
 并在构造函数体内设置 context：
+
 ```ts
 constructor(/* ...params..., */ private readonly logger: PinoLogger) {
   this.logger.setContext(AuthService.name);
@@ -613,7 +642,7 @@ this.logger.info(
 
 // 返回时排除 password
 const { password: _, ...userWithoutPassword } = user;
-return { /* ...existing */ };
+return {/* ...existing */};
 ```
 
 - [ ] **Step 3: 在 `generateTokens` 内埋点 JWT 签发（debug 级）**
@@ -638,12 +667,7 @@ return { accessToken, refreshToken };
 修改 `logout` 方法中 `await this.redis.set(...)` 之后插入：
 
 ```ts
-await this.redis.set(
-  `token:blacklist:${jti}`,
-  '1',
-  'EX',
-  ttl,
-);
+await this.redis.set(`token:blacklist:${jti}`, '1', 'EX', ttl);
 
 this.logger.info(
   {
@@ -664,15 +688,18 @@ this.logger.info(
 - [ ] **Step 6: 编译验证**
 
 Run:
+
 ```bash
 cd packages/server && pnpm exec tsc --noEmit
 ```
+
 Expected: 无报错。
 
 - [ ] **Step 7: 启动验证 D10（登录 + JWT 日志）**
 
 终端 1：`pnpm --filter server dev`
 终端 2（注册 + 登录）：
+
 ```bash
 TOKEN=$(curl -sX POST http://localhost:3000/api/auth/register \
   -H "Content-Type: application/json" \
@@ -683,15 +710,20 @@ curl -sX POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"phone":"13900000001","password":"Pass1234"}' >/dev/null
 ```
+
 Expected（终端 1）：
+
 - 出现 `INFO` 日志：`用户登录成功`，含 `userId / phone: "139****0001"`
 - 出现 `DEBUG` 日志：`JWT 签发`，含 `accessJti / refreshJti`
 
 终端 2（登出）：
+
 ```bash
 curl -sX POST http://localhost:3000/api/auth/logout -H "Authorization: Bearer $TOKEN" >/dev/null
 ```
+
 Expected（终端 1）：
+
 - 出现 `INFO` 日志：`JWT 已加入黑名单（登出）`，含 `userId / jti / ttl`
 
 - [ ] **Step 8: 提交**
@@ -706,16 +738,19 @@ git commit -m "feat(logging): auth.service 接入 PinoLogger（登录/JWT/登出
 ## Task 8: `order.service` 注入 PinoLogger + 下单埋点
 
 **Files:**
+
 - Modify: `packages/server/src/modules/order/order.service.ts`
 
 - [ ] **Step 1: 修改 import 与构造函数**
 
 文件顶部 import 区追加：
+
 ```ts
 import { PinoLogger } from 'nestjs-pino';
 ```
 
 构造函数追加 `private readonly logger: PinoLogger` 参数，并在体内设置 context：
+
 ```ts
 constructor(
   @InjectRepository(OrderEntity)
@@ -756,14 +791,17 @@ return this.findOne(userId, savedOrder.id);
 - [ ] **Step 3: 编译验证**
 
 Run:
+
 ```bash
 cd packages/server && pnpm exec tsc --noEmit
 ```
+
 Expected: 无报错。
 
 - [ ] **Step 4: 启动验证 D9（下单业务日志）**
 
 前置：需先注册并登录、加购商品。完整 curl 链：
+
 ```bash
 # 1. 登录拿 token
 TOKEN=$(curl -sX POST http://localhost:3000/api/auth/login \
@@ -786,7 +824,9 @@ curl -sX POST http://localhost:3000/api/orders \
   -H "Content-Type: application/json" \
   -d '{"address":"测试地址","phone":"13900000001"}' >/dev/null
 ```
+
 Expected（终端 1）：
+
 - 出现 `INFO` 日志：`订单创建成功`
 - 字段含 `orderId / orderNo / userId / totalAmount / itemCount`
 - 该日志的 `requestId` 与对应 access log 的 `requestId` 一致
@@ -803,6 +843,7 @@ git commit -m "feat(logging): order.service 接入 PinoLogger（下单成功）"
 ## Task 9: 更新 `.env.example` 与 contract 验证
 
 **Files:**
+
 - Modify: `packages/server/.env.example`
 
 - [ ] **Step 1: 追加 LOG_LEVEL**
@@ -886,6 +927,7 @@ git commit -am "chore(logging): 验证后微调"
 ## Self-Review 结果
 
 **Spec 覆盖**：
+
 - 第 2 节选型 → Task 1 ✓
 - 第 3 节三层架构（access / error / 业务）→ Task 5（access via pino-http）/ Task 6（error）/ Task 7–8（业务）✓
 - 第 4 节文件结构 → Task 2–4 ✓
@@ -899,10 +941,12 @@ git commit -am "chore(logging): 验证后微调"
 **占位符扫描**：无 TBD/TODO，所有 step 含完整代码或完整命令。
 
 **类型一致性**：
+
 - `PinoLogger` 统一从 `nestjs-pino` 导入 ✓
 - `redactPaths` / `maskPersonalData` 定义点（Task 2）与使用点（Task 3）签名一致 ✓
 - `buildPinoOptions` 返回 `Params`（nestjs-pino 类型），与 Task 4 `LoggerModule.forRoot` 入参一致 ✓
 - `HttpExceptionFilter` 构造函数改为注入 `PinoLogger`，Task 6 Step 2 同步更新了 `main.ts` 的实例化方式 ✓
 
 **实现 vs 设计的偏离（已显式记录）：**
+
 - 设计第 5 节 `customProps(req) => ({ userId: req.user?.id })` 在中间件阶段拿不到 user。改为在 `serializers.req` 里读 `req.user?.id`（serializer 在请求处理后期才调用）。已在 Task 3 顶部说明。

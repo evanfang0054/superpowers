@@ -63,27 +63,27 @@ docs/agent-harness/plans/
 
 ### 4.2 文档统一约定（写入 `docs/api/README.md`）
 
-| 维度 | 约定 |
-|---|---|
-| Base URL | `/api`（保持现状，不引入版本前缀） |
-| 协议 | HTTPS（生产）/ HTTP（本地开发） |
-| 编码 | UTF-8，JSON body |
-| 成功响应 | `{ code: 0, data: T, message: "success" }`（HTTP 200） |
-| 错误响应 | HTTP 200 + body 内业务 `code` 非 0（沿用现有 `HttpExceptionFilter`） |
-| 鉴权 | 除显式标 `@Public` 外全部需 JWT Bearer；写商品/分类/轮播/优惠券模板等需 `@Roles(ADMIN)` |
-| C 端业务 | 下单、地址、评价、收藏、优惠券领取、订单流转一律需登录 |
-| 分页 | `?page=1&limit=20`；响应 `{ list: T[], total: number, page: number, limit: number }` |
-| 时间 | ISO 8601 字符串，UTC+8（与 TypeORM 实体一致） |
-| 限流 | 全局 60 次/60 秒；注册/登录单独 10 次/60 秒（沿用 ThrottlerGuard） |
+| 维度      | 约定                                                                                                                          |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Base URL  | `/api`（保持现状，不引入版本前缀）                                                                                            |
+| 协议      | HTTPS（生产）/ HTTP（本地开发）                                                                                               |
+| 编码      | UTF-8，JSON body                                                                                                              |
+| 成功响应  | `{ code: 0, data: T, message: "success" }`（HTTP 200）                                                                        |
+| 错误响应  | HTTP 200 + body 内业务 `code` 非 0（沿用现有 `HttpExceptionFilter`）                                                          |
+| 鉴权      | 除显式标 `@Public` 外全部需 JWT Bearer；写商品/分类/轮播/优惠券模板等需 `@Roles(ADMIN)`                                       |
+| C 端业务  | 下单、地址、评价、收藏、优惠券领取、订单流转一律需登录                                                                        |
+| 分页      | `?page=1&limit=20`；响应 `{ list: T[], total: number, page: number, limit: number }`                                          |
+| 时间      | ISO 8601 字符串，UTC+8（与 TypeORM 实体一致）                                                                                 |
+| 限流      | 全局 60 次/60 秒；注册/登录单独 10 次/60 秒（沿用 ThrottlerGuard）                                                            |
 | 日志/脱敏 | 复用 pino redact 机制；涉及手机号、地址、姓名等 PII 在业务层手动脱敏（参考已有 learning `pino_redact_no_cover_custom_calls`） |
 
 ### 4.3 实现优先级分批
 
-| 批次 | 范围 | 触发原因 |
-|---|---|---|
-| **P0** | 修复已有接口 bug + 库存校验/扣减 | 已有功能静默失败，用户可感知 |
-| **P1** | 半成品功能 + 推荐位 + 规格字典 + Banner + Admin 表单补字段 | UI 已渲染但数据空，体验差 |
-| **P2** | 全新业务（优惠券/评价/收藏/地址簿/物流/上传/筛选/分类 Admin/退款） | 功能增量 |
+| 批次   | 范围                                                               | 触发原因                     |
+| ------ | ------------------------------------------------------------------ | ---------------------------- |
+| **P0** | 修复已有接口 bug + 库存校验/扣减                                   | 已有功能静默失败，用户可感知 |
+| **P1** | 半成品功能 + 推荐位 + 规格字典 + Banner + Admin 表单补字段         | UI 已渲染但数据空，体验差    |
+| **P2** | 全新业务（优惠券/评价/收藏/地址簿/物流/上传/筛选/分类 Admin/退款） | 功能增量                     |
 
 ## 5. P0 详细设计：接口修复与库存扣减
 
@@ -91,9 +91,9 @@ docs/agent-harness/plans/
 
 后端统一用 `@Put`，前端错误地用了 `@Patch`，导致三处 405：
 
-| 前端调用位置 | 当前 | 修复后 |
-|---|---|---|
-| `packages/web/src/api/cart.ts:20` `updateQuantity` | `PATCH /cart/:id` | `PUT /cart/:id` |
+| 前端调用位置                                            | 当前                  | 修复后              |
+| ------------------------------------------------------- | --------------------- | ------------------- |
+| `packages/web/src/api/cart.ts:20` `updateQuantity`      | `PATCH /cart/:id`     | `PUT /cart/:id`     |
 | `packages/web/src/pages/AdminProducts.tsx:166` 编辑商品 | `PATCH /products/:id` | `PUT /products/:id` |
 
 **决策**：修改前端对齐后端（后端方法不改，避免破坏其他潜在调用方）。这是最小改动，且符合"后端契约优先"的原则。
@@ -132,18 +132,22 @@ DELETE /api/cart
 涉及订单创建与取消流程：
 
 **新增 `POST /orders` 内部逻辑（不新增路由）**：
+
 - 下单前校验每个购物车项的 `quantity <= product.stock`
 - 库存不足时抛业务码 `40901`（新增），返回缺货商品列表
 - 下单成功（事务内）扣减对应商品 `stock`
 
 **修改 `PUT /orders/:id/cancel` 内部逻辑**：
+
 - 取消成功后回补对应订单项的商品 `stock`
 
 **`POST /cart` 内部逻辑**：
+
 - 加购前校验 `product.stock > 0`，不足时返回业务码 `40902`
 - （可选）加购数量上限不超过 stock
 
 **新增业务码**（写入 `packages/shared/src/constants.ts` `ErrorCode`）：
+
 - `40901 STOCK_INSUFFICIENT` — 库存不足，无法下单
 - `40902 PRODUCT_OUT_OF_STOCK` — 商品已售罄，无法加购
 
@@ -158,38 +162,46 @@ DELETE /api/cart
 > P1 的完整接口定义写入 `docs/api/*.md`，本节只列范围与决策要点。
 
 ### P1-1：登出 UI 接线
+
 - 在个人中心入口（P1-3）或 NavBar 添加「退出登录」按钮
 - 调用 `POST /api/auth/logout`（后端已存在，将 access jti 加入 Redis 黑名单）
 - 成功后清前端 auth store
 
 ### P1-2：应用启动刷新 profile
+
 - 在 `App.tsx` 或 `ProtectedRoute` mount 时调一次 `userApi.getProfile()`，用最新数据覆盖 localStorage 中的过期 user
 
 ### P1-3：个人中心页
+
 - 新增路由 `/profile`（需登录）
 - 展示 nickname / avatar / phone（脱敏显示 138****1234）
 - 编辑入口调 `PUT /api/user/profile`（修复 P0-2 后已可用）
 
 ### P1-4：Admin 商品表单补字段
+
 - AdminProducts 表单补录入项：`sweetness`、`weight`、`color`、`tags`、`specs`（结构化规格字典）
 - 后端 `CreateProductDto` / `UpdateProductDto` 已有 sweetness/weight/color/tags 字段；`specs` 需新增（见 P1-5）
 
 ### P1-5：商品规格字典
+
 - 在 `ProductEntity` 新增 `specs` 字段（`simple-json` 存结构化数组，例如 `[{label:"500g/盒", price:29.9}, ...]`）
 - 同步到 `packages/shared/src/types/product.ts` 的 `Product` 类型
 - `SpecSelector` 组件从 `product.specs` 读取渲染
 - BuyBar 加购时 `specLabel` 取自选中规格而非硬编码 `'默认'`
 
 ### P1-6：推荐位（依赖 P0-3 已建好的接口）
+
 - MVP 算法见 P0-3；P1 阶段引入权重：同分类优先 + 销量（基于订单 item 聚合）+ 库存适中优先
 
 ### P1-7：首页轮播 / Banner
+
 - 新增 `BannerEntity`：id / title / imageUrl / linkType / linkValue / sortOrder / status / 时间戳
 - 新增 `GET /api/banners`（`@Public`）按 `sortOrder ASC` 返回上架 Banner
 - 新增 Admin CRUD（仅 `/api/admin/banners`，`@Roles(ADMIN)`）
 - 前端 `PromoBanner.tsx` 从硬编码改为从接口拉取
 
 ### P1-8：清空购物车 UI
+
 - 在 `Cart.tsx` 增加「清空」按钮，调 `DELETE /api/cart`（P0-4 已建好）
 
 ## 7. P2 详细设计：全新业务域
@@ -197,51 +209,62 @@ DELETE /api/cart
 > P2 的完整接口定义写入 `docs/api/*.md`，本节只列范围与决策要点。每个业务域独立成 spec。
 
 ### P2-1：地址簿 `address.md`
+
 - `AddressEntity`：id / userId / recipientName / phone / province / city / district / detail / isDefault / 时间戳
 - 接口：`GET /addresses`、`POST /addresses`、`PUT /addresses/:id`、`DELETE /addresses/:id`、`PUT /addresses/:id/default`
 - Checkout 页接入：选择已有地址或新建
 
 ### P2-2：商品评价 `review.md`
+
 - `ReviewEntity`：id / productId / userId / orderId（防止重复评价，仅已完成订单可评）/ rating(1-5) / content / images(json) / 时间戳
 - 接口：`GET /products/:id/reviews?page=&limit=`（`@Public`）、`POST /orders/:id/reviews`（JWT，已完成订单）、`GET /reviews/mine`（JWT）
 - 详情页新增评价模块
 
 ### P2-3：收藏 `favorite.md`
+
 - `FavoriteEntity`：id / userId / productId / 时间戳，唯一约束 `(userId, productId)`
 - 接口：`POST /products/:id/favorite`、`DELETE /products/:id/favorite`、`GET /favorites?page=&limit=`
 - 详情页与个人中心接入
 
 ### P2-4：优惠券 `coupon.md`
+
 - `CouponTemplateEntity`（Admin 配置）+ `UserCouponEntity`（用户领取实例）
 - 接口：Admin `POST /admin/coupons`（模板）、`GET /coupons`（用户可用券）、`POST /coupons/:id/claim`（领取）、下单时 `couponId` 入参抵扣
 - `OrderEntity` 新增 `couponId` / `discountAmount`
 
 ### P2-5：物流跟踪 `shipping.md`
+
 - `ShippingEntity`：id / orderId / company / trackingNo / shippedAt / status
 - Admin 发货接口 `POST /admin/orders/:id/ship`、用户 `GET /orders/:id/shipping`
 
 ### P2-6：订单状态流转（依赖 P2-5）
+
 - `POST /orders/:id/pay`（模拟支付，PENDING → PAID）
 - Admin `POST /admin/orders/:id/ship`（PAID → SHIPPED，创建 ShippingEntity）
 - `POST /orders/:id/confirm`（SHIPPED → COMPLETED，触发可评价状态）
 
 ### P2-7：退款
+
 - `POST /orders/:id/refund`（PAID/SHIPPED → 申请退款）
 - `RefundEntity`：id / orderId / reason / status / adminNote / 时间戳
 - Admin `POST /admin/refunds/:id/approve|reject`
 
 ### P2-8：图片上传 `upload.md`
+
 - `POST /upload/image`（JWT）multipart/form-data，单文件 ≤ 2MB，存到本地 `uploads/` 或对象存储
 - 返回 `{ url: string }`，Admin 表单图片字段改用上传组件
 
 ### P2-9：搜索与筛选增强（不新增 entity）
+
 - `QueryProductDto` 扩展：`minPrice` / `maxPrice` / `tags` / `origin` / `sortBy`（price_asc/price_desc/sales_desc/created_desc）
 - 销量排序依赖订单 item 聚合（可能需要物化视图或定时统计表，P2 spec 详定）
 
 ### P2-10：搜索联想
+
 - `GET /products/suggestions?keyword=&limit=10`（`@Public`）返回热门匹配商品名前缀，前端 SearchBar debounce 调用
 
 ### P2-11：分类 Admin CRUD
+
 - `POST /categories`、`PUT /categories/:id`、`DELETE /categories/:id`（全部 `@Roles(ADMIN)`）
 - 删除时检查是否有关联商品（拒绝或级联，P2 spec 详定）
 
@@ -249,31 +272,32 @@ DELETE /api/cart
 
 P0 ~ P2 涉及的 `packages/shared/src` 变更（每批实施时同步）：
 
-| 批次 | 文件 | 变更 |
-|---|---|---|
-| P0 | `constants.ts` | 新增 `STOCK_INSUFFICIENT=40901`、`PRODUCT_OUT_OF_STOCK=40902` |
-| P1 | `types/product.ts` | `Product` 新增 `specs?: ProductSpec[]`；新增 `ProductSpec` 类型 |
-| P1 | — | 新增 `types/banner.ts` |
-| P2 | — | 新增 `types/address.ts`、`types/review.ts`、`types/favorite.ts`、`types/coupon.ts`、`types/shipping.ts`、`types/refund.ts` |
-| P2 | `types/order.ts` | `Order` 新增 `couponId?`、`discountAmount?` |
+| 批次 | 文件               | 变更                                                                                                                       |
+| ---- | ------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| P0   | `constants.ts`     | 新增 `STOCK_INSUFFICIENT=40901`、`PRODUCT_OUT_OF_STOCK=40902`                                                              |
+| P1   | `types/product.ts` | `Product` 新增 `specs?: ProductSpec[]`；新增 `ProductSpec` 类型                                                            |
+| P1   | —                  | 新增 `types/banner.ts`                                                                                                     |
+| P2   | —                  | 新增 `types/address.ts`、`types/review.ts`、`types/favorite.ts`、`types/coupon.ts`、`types/shipping.ts`、`types/refund.ts` |
+| P2   | `types/order.ts`   | `Order` 新增 `couponId?`、`discountAmount?`                                                                                |
 
 每次改 `shared` 必须重 build：`pnpm --filter shared build`，否则 server 运行时拉到旧 `dist`。
 
 ## 9. 风险与权衡
 
-| 风险 | 影响 | 缓解 |
-|---|---|---|
-| 推荐位 MVP 算法简单（仅 createdAt DESC） | 推荐质量低，可能不够"个性化" | P1 引入销量权重；P2+ 视需要引入用户行为 |
-| 库存扣减与并发下单 | 高并发下可能超卖 | 事务内 `SELECT ... FOR UPDATE` 锁行；MVP 流量不大可接受 |
-| 大量新业务一次性推进 | 实现失控、PR 巨大 | 严格按 P0/P1/P2 分批，每批独立 spec → plan → 实施 |
-| `specs` 用 simple-json 存结构化数据 | 无法在 DB 层查询规格字段 | MVP 可接受；如需按规格筛选再迁移到关联表 |
-| 个人中心页未在 P0 包含 | P0 完成后 logout/userApi 仍未被 UI 触发 | P0 仅修后端契约与 bug；P1 再补 UI |
-| 引入新业务码 | 前端处理需要时间 | 沿用现有 `ErrorCode` 命名空间，前端按 code 区分 Toast 文案 |
-| Markdown 文档与代码可能漂移 | 文档过期 | 每次实施新接口时，PR 必须同步更新 `docs/api/*.md`；纳入 PR 模板检查 |
+| 风险                                     | 影响                                    | 缓解                                                                |
+| ---------------------------------------- | --------------------------------------- | ------------------------------------------------------------------- |
+| 推荐位 MVP 算法简单（仅 createdAt DESC） | 推荐质量低，可能不够"个性化"            | P1 引入销量权重；P2+ 视需要引入用户行为                             |
+| 库存扣减与并发下单                       | 高并发下可能超卖                        | 事务内 `SELECT ... FOR UPDATE` 锁行；MVP 流量不大可接受             |
+| 大量新业务一次性推进                     | 实现失控、PR 巨大                       | 严格按 P0/P1/P2 分批，每批独立 spec → plan → 实施                   |
+| `specs` 用 simple-json 存结构化数据      | 无法在 DB 层查询规格字段                | MVP 可接受；如需按规格筛选再迁移到关联表                            |
+| 个人中心页未在 P0 包含                   | P0 完成后 logout/userApi 仍未被 UI 触发 | P0 仅修后端契约与 bug；P1 再补 UI                                   |
+| 引入新业务码                             | 前端处理需要时间                        | 沿用现有 `ErrorCode` 命名空间，前端按 code 区分 Toast 文案          |
+| Markdown 文档与代码可能漂移              | 文档过期                                | 每次实施新接口时，PR 必须同步更新 `docs/api/*.md`；纳入 PR 模板检查 |
 
 ## 10. 验收标准
 
 P0 完成后可验证：
+
 - [ ] web 端购物车加减数量成功（不再 405）
 - [ ] web 端 Admin 编辑商品成功（不再 405）
 - [ ] web 端商品详情页推荐位有数据

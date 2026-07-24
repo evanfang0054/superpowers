@@ -26,10 +26,7 @@ export class AddressController {
   }
 
   @Post()
-  create(
-    @CurrentUser('id') userId: number,
-    @Body() dto: CreateAddressDto,
-  ) {
+  create(@CurrentUser('id') userId: number, @Body() dto: CreateAddressDto) {
     return this.addressService.create(userId, dto);
   }
 
@@ -43,18 +40,12 @@ export class AddressController {
   }
 
   @Delete(':id')
-  remove(
-    @CurrentUser('id') userId: number,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  remove(@CurrentUser('id') userId: number, @Param('id', ParseIntPipe) id: number) {
     return this.addressService.remove(userId, id);
   }
 
   @Put(':id/default')
-  setDefault(
-    @CurrentUser('id') userId: number,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  setDefault(@CurrentUser('id') userId: number, @Param('id', ParseIntPipe) id: number) {
     return this.addressService.setDefault(userId, id);
   }
 }

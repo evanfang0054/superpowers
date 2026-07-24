@@ -24,19 +24,11 @@ describe('Favorite (e2e)', () => {
     const admin = await helper.registerAdmin('13900000098', 'admin123456');
     adminToken = admin.accessToken;
 
-    const a = await helper.registerAndLogin(
-      '13800000091',
-      'test123456',
-      'UserA',
-    );
+    const a = await helper.registerAndLogin('13800000091', 'test123456', 'UserA');
     userAToken = a.accessToken;
     userAId = a.userId;
 
-    const b = await helper.registerAndLogin(
-      '13800000092',
-      'test123456',
-      'UserB',
-    );
+    const b = await helper.registerAndLogin('13800000092', 'test123456', 'UserB');
     userBToken = b.accessToken;
     userBId = b.userId;
 
@@ -75,9 +67,7 @@ describe('Favorite (e2e)', () => {
     });
 
     it('未登录返回 401', async () => {
-      const res = await request(helper.httpServer).post(
-        `/api/products/${productIdA}/favorite`,
-      );
+      const res = await request(helper.httpServer).post(`/api/products/${productIdA}/favorite`);
       expect(res.body.code).toBe(401);
     });
   });
@@ -195,9 +185,7 @@ describe('Favorite (e2e)', () => {
     });
 
     it('未登录返回 401', async () => {
-      const res = await request(helper.httpServer).delete(
-        `/api/products/${productIdA}/favorite`,
-      );
+      const res = await request(helper.httpServer).delete(`/api/products/${productIdA}/favorite`);
       expect(res.body.code).toBe(401);
     });
   });

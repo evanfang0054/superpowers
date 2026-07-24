@@ -54,9 +54,7 @@ export function PromoBanner() {
       <div className="relative p-5 flex items-center justify-between">
         <div className="flex-1">
           <div className="text-white font-bold text-lg">{banner.title}</div>
-          {banner.subtitle && (
-            <div className="text-white/90 text-sm mt-1">{banner.subtitle}</div>
-          )}
+          {banner.subtitle && <div className="text-white/90 text-sm mt-1">{banner.subtitle}</div>}
         </div>
         {banner.ctaText && (
           <button

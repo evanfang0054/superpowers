@@ -28,19 +28,11 @@ describe('Review (e2e)', () => {
     const admin = await helper.registerAdmin('13900000088', 'admin123456');
     adminToken = admin.accessToken;
 
-    const a = await helper.registerAndLogin(
-      '13800000081',
-      'test123456',
-      'UserA',
-    );
+    const a = await helper.registerAndLogin('13800000081', 'test123456', 'UserA');
     userAToken = a.accessToken;
     userAId = a.userId;
 
-    const b = await helper.registerAndLogin(
-      '13800000082',
-      'test123456',
-      'UserB',
-    );
+    const b = await helper.registerAndLogin('13800000082', 'test123456', 'UserB');
     userBToken = b.accessToken;
     userBId = b.userId;
   });
@@ -163,9 +155,7 @@ describe('Review (e2e)', () => {
       const res = await request(helper.httpServer)
         .post(`/api/orders/${completedOrderId}/reviews`)
         .send({
-          reviews: [
-            { productId: completedProductId, rating: 5, content: 'x' },
-          ],
+          reviews: [{ productId: completedProductId, rating: 5, content: 'x' }],
         });
       expect(res.body.code).toBe(401);
     });

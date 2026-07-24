@@ -36,12 +36,15 @@ pnpm clean                        # 删除所有 dist 与 node_modules
 ## 架构要点
 
 ### shared（`packages/shared`）
+
 - 纯 TypeScript，`tsc` 输出 CommonJS 到 `dist/`
 - 单一事实源：`constants.ts`（`ErrorCode` 业务码 40001–40499）、`types/`（user/product/cart/order/api）
 - server 通过 `tsconfig` paths 指向 `../shared/dist`；web 通过 Vite alias 指向 `../shared/src`（源码直读，无需先构建）
 
 ### server（`packages/server`）
+
 NestJS 10，全局 API 前缀 `/api`。
+
 - `main.ts`：全局 `ValidationPipe`（whitelist + forbidNonWhitelisted + transform）、`TransformInterceptor`（包装成 `{ code, data, message }`）、`HttpExceptionFilter`（错误也走 HTTP 200，业务码在 body 的 `code` 中）
 - 5 个 feature module：`auth / user / product / cart / order`
 - 6 个 TypeORM entity（`src/entities/`）；`synchronize: true`（开发用），timezone `+08:00`，charset `utf8mb4`
@@ -52,7 +55,9 @@ NestJS 10，全局 API 前缀 `/api`。
 - 注册时第一个用户自动获得 `ADMIN` 角色
 
 ### web（`packages/web`）
+
 React 18 SPA，Vite 6，端口 **5177**。
+
 - 入口：`main.tsx → App.tsx`（`RouterProvider` 包在 `ToastProvider` 中）
 - 路由（`src/router/index.tsx`）：`createBrowserRouter` + `lazy()` 懒加载；受保护页面内联 `ProtectedRoute` / `AdminRoute` 读 Zustand auth store
 - 状态管理 3 个 Zustand store：
@@ -63,9 +68,11 @@ React 18 SPA，Vite 6，端口 **5177**。
 - 路径别名：`@/` → `./src/`，`shared` → `../shared/src`
 
 ### 关键约定
+
 - 响应格式统一：成功 `{ code: 0, data, message: "success" }`；错误 HTTP 200 + body 内业务 `code`
 - 修改 shared 后必须重 build shared，否则 server 拉到旧 `dist`
 - 静态设计模板在仓库根：`index.html`（首页）、`product-detail.html`（详情页）—— 前端 1:1 对齐目标
+
 ## 设计规范
 
 前端 UI 实现必须严格遵循 `DESIGN.md`。该文件是鲜果集设计系统的唯一权威源，包含：
@@ -81,6 +88,7 @@ React 18 SPA，Vite 6，端口 **5177**。
 ## 环境变量
 
 server `packages/server/.env.example`：
+
 - DB: `DB_HOST / DB_PORT / DB_USERNAME / DB_PASSWORD / DB_DATABASE / DB_LOGGING`
 - Redis: `REDIS_HOST / REDIS_PORT`
 - JWT: `JWT_SECRET / JWT_ACCESS_EXPIRES_IN`（默认 900s）`/ JWT_REFRESH_EXPIRES_IN`（默认 604800s）

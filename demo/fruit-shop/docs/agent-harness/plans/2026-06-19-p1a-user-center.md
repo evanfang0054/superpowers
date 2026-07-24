@@ -15,10 +15,12 @@
 ## File Structure
 
 **Create**
+
 - `packages/web/src/pages/Profile.tsx` — 个人中心页（展示 + 行内编辑 + 登出）
 - `packages/web/src/components/Avatar.tsx` — 头像组件（带 fallback）
 
 **Modify**
+
 - `packages/web/src/router/index.tsx` — 内联 ProtectedRoute 补 state.from + 新增 /profile 路由
 - `packages/web/src/store/auth.store.ts` — logout 改 async + 调后端
 - `packages/web/src/api/client.ts` — 401 兜底改为直接清前端状态
@@ -26,6 +28,7 @@
 - `packages/web/src/components/TabBar.tsx` — 新增第 4 tab「我的」
 
 **Delete**
+
 - `packages/web/src/router/ProtectedRoute.tsx` — 死代码
 - `packages/web/src/router/AdminRoute.tsx` — 死代码
 
@@ -34,6 +37,7 @@
 ## Task 1: 死代码清理 + 内联 ProtectedRoute 补 state.from
 
 **Files:**
+
 - Delete: `packages/web/src/router/ProtectedRoute.tsx`
 - Delete: `packages/web/src/router/AdminRoute.tsx`
 - Modify: `packages/web/src/router/index.tsx`
@@ -86,6 +90,7 @@ git commit -m "refactor(web): 删除死代码 ProtectedRoute/AdminRoute 独立�
 ## Task 2: auth store logout async 改造 + client.ts 兼容
 
 **Files:**
+
 - Modify: `packages/web/src/store/auth.store.ts:16, 58-60`
 - Modify: `packages/web/src/api/client.ts:85-86`
 
@@ -94,11 +99,13 @@ git commit -m "refactor(web): 删除死代码 ProtectedRoute/AdminRoute 独立�
 在 `packages/web/src/store/auth.store.ts` 中：
 
 第 16 行 `logout: () => void;` 改为：
+
 ```typescript
-  logout: () => Promise<void>;
+logout: () => Promise<void>;
 ```
 
 第 58-60 行 `logout` 实现替换为：
+
 ```typescript
       logout: async () => {
         try {
@@ -155,6 +162,7 @@ git commit -m "feat(auth): logout 改 async 并调后端真登出，client.ts 40
 ## Task 3: App.tsx 启动刷新 profile
 
 **Files:**
+
 - Modify: `packages/web/src/App.tsx`
 
 - [ ] **Step 1: 修改 App.tsx，新增 useEffect 启动刷新**
@@ -205,6 +213,7 @@ git commit -m "feat(app): 启动时刷新 profile（仅登录用户），避免 
 ## Task 4: Avatar 组件
 
 **Files:**
+
 - Create: `packages/web/src/components/Avatar.tsx`
 
 - [ ] **Step 1: 创建 Avatar 组件**
@@ -268,6 +277,7 @@ git commit -m "feat(web): 新增 Avatar 组件（带 fallback 显示首字或 �
 ## Task 5: TabBar 新增「我的」tab
 
 **Files:**
+
 - Modify: `packages/web/src/components/TabBar.tsx:3-37`
 
 - [ ] **Step 1: 在 tabs 数组末尾追加「我的」tab**
@@ -308,6 +318,7 @@ git commit -m "feat(web): TabBar 新增「我的」tab 指向 /profile"
 ## Task 6: 新增 /profile 路由
 
 **Files:**
+
 - Modify: `packages/web/src/router/index.tsx`
 
 - [ ] **Step 1: 在 router/index.tsx 顶部新增 Profile 懒加载 import**
@@ -340,6 +351,7 @@ const Profile = lazy(() => import('@/pages/Profile'));
 ## Task 7: Profile 页
 
 **Files:**
+
 - Create: `packages/web/src/pages/Profile.tsx`
 
 - [ ] **Step 1: 创建 Profile 页**
@@ -534,27 +546,27 @@ Run: `docker compose up -d --build`
 
 ## 验收映射（Contract → Task）
 
-| Contract 验收项 | 对应 Task |
-|---|---|
-| 删除独立 ProtectedRoute.tsx / AdminRoute.tsx | Task 1 Step 2 |
-| 内联 ProtectedRoute 补 state.from | Task 1 Step 3 |
-| 新增 /profile 路由 | Task 6 + Task 7 |
-| 回归 5 个受保护路由回跳 | Task 8 Step 6 |
-| auth.store logout async + 调后端 | Task 2 Step 1 |
-| client.ts 401 兜底直接清前端 | Task 2 Step 2 |
-| TypeScript 构建 | 各 Task 的 build step + Task 8 Step 1 |
-| App.tsx useEffect 启动刷新 | Task 3 |
-| 场景 A 启动刷新（登录态） | Task 8 Step 5 场景 A |
-| 场景 B 启动不刷新（未登录） | Task 8 Step 5 场景 B |
-| Avatar 组件 | Task 4 |
-| Profile 页（展示 + 行内编辑 + 登出） | Task 7 |
-| TabBar 新增「我的」tab | Task 5 |
-| 场景 C 进入 Profile | Task 8 Step 5 场景 C |
-| 场景 D 行内编辑 | Task 8 Step 5 场景 D |
-| 场景 E 真登出 | Task 8 Step 5 场景 E |
-| 场景 F 黑名单生效 | Task 8 Step 4（auth.e2e 已覆盖）+ Step 5 场景 F |
-| 场景 G TabBar 激活 | Task 8 Step 5 场景 G |
-| 场景 H Avatar fallback | Task 8 Step 5 场景 H |
+| Contract 验收项                              | 对应 Task                                       |
+| -------------------------------------------- | ----------------------------------------------- |
+| 删除独立 ProtectedRoute.tsx / AdminRoute.tsx | Task 1 Step 2                                   |
+| 内联 ProtectedRoute 补 state.from            | Task 1 Step 3                                   |
+| 新增 /profile 路由                           | Task 6 + Task 7                                 |
+| 回归 5 个受保护路由回跳                      | Task 8 Step 6                                   |
+| auth.store logout async + 调后端             | Task 2 Step 1                                   |
+| client.ts 401 兜底直接清前端                 | Task 2 Step 2                                   |
+| TypeScript 构建                              | 各 Task 的 build step + Task 8 Step 1           |
+| App.tsx useEffect 启动刷新                   | Task 3                                          |
+| 场景 A 启动刷新（登录态）                    | Task 8 Step 5 场景 A                            |
+| 场景 B 启动不刷新（未登录）                  | Task 8 Step 5 场景 B                            |
+| Avatar 组件                                  | Task 4                                          |
+| Profile 页（展示 + 行内编辑 + 登出）         | Task 7                                          |
+| TabBar 新增「我的」tab                       | Task 5                                          |
+| 场景 C 进入 Profile                          | Task 8 Step 5 场景 C                            |
+| 场景 D 行内编辑                              | Task 8 Step 5 场景 D                            |
+| 场景 E 真登出                                | Task 8 Step 5 场景 E                            |
+| 场景 F 黑名单生效                            | Task 8 Step 4（auth.e2e 已覆盖）+ Step 5 场景 F |
+| 场景 G TabBar 激活                           | Task 8 Step 5 场景 G                            |
+| 场景 H Avatar fallback                       | Task 8 Step 5 场景 H                            |
 
 ---
 

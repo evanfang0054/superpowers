@@ -70,8 +70,7 @@ export default function Checkout() {
       .getList()
       .then((res) => {
         const list = res.data.data ?? [];
-        const picked =
-          list.find((a) => a.isDefault) ?? (list.length > 0 ? list[0] : null);
+        const picked = list.find((a) => a.isDefault) ?? (list.length > 0 ? list[0] : null);
         if (picked) {
           setDefaultAddr(picked);
           setUseAddressBook(true);
@@ -198,9 +197,7 @@ export default function Checkout() {
                   <span className="text-[13px] font-bold text-brand-dark">
                     {defaultAddr.recipientName}
                   </span>
-                  <span className="text-[12px] text-brand-muted">
-                    {defaultAddr.phone}
-                  </span>
+                  <span className="text-[12px] text-brand-muted">{defaultAddr.phone}</span>
                   {defaultAddr.isDefault && (
                     <span className="px-1.5 py-0.5 rounded-md bg-brand-peach text-brand-primary text-[10px] font-bold">
                       默认
@@ -229,13 +226,9 @@ export default function Checkout() {
                       }}
                       className="w-3.5 h-3.5 accent-brand-primary"
                     />
-                    <span className="text-[11px] text-brand-muted">
-                      使用地址簿地址
-                    </span>
+                    <span className="text-[11px] text-brand-muted">使用地址簿地址</span>
                   </label>
-                  <span className="text-[11px] text-brand-muted">
-                    取消勾选可手动修改
-                  </span>
+                  <span className="text-[11px] text-brand-muted">取消勾选可手动修改</span>
                 </div>
               </div>
             )}
@@ -293,9 +286,7 @@ export default function Checkout() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-brand-dark line-clamp-1">{item.product.name}</p>
-                    {item.specLabel && (
-                      <p className="text-xs text-brand-muted">{item.specLabel}</p>
-                    )}
+                    {item.specLabel && <p className="text-xs text-brand-muted">{item.specLabel}</p>}
                   </div>
                   <div className="text-right flex-shrink-0">
                     <p className="text-sm font-medium text-brand-primary">
@@ -332,9 +323,7 @@ export default function Checkout() {
                 <span>优惠券</span>
                 {selectedCoupon ? (
                   <div className="flex items-center gap-2">
-                    <span className="text-brand-coral">
-                      -¥{Number(discountAmount).toFixed(2)}
-                    </span>
+                    <span className="text-brand-coral">-¥{Number(discountAmount).toFixed(2)}</span>
                     <button
                       type="button"
                       onClick={handleClearCoupon}
@@ -390,9 +379,7 @@ export default function Checkout() {
                 <LoadingSpinner />
               </div>
             ) : myCoupons.length === 0 ? (
-              <div className="text-center py-8 text-brand-muted text-sm">
-                暂无可用优惠券
-              </div>
+              <div className="text-center py-8 text-brand-muted text-sm">暂无可用优惠券</div>
             ) : (
               <div className="space-y-2">
                 {myCoupons.map((uc) => {
@@ -410,9 +397,7 @@ export default function Checkout() {
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-brand-dark">
-                          {uc.coupon.name}
-                        </span>
+                        <span className="text-sm font-bold text-brand-dark">{uc.coupon.name}</span>
                         <span className="text-[11px] text-brand-muted">
                           {TYPE_LABEL[uc.coupon.type]}
                         </span>
@@ -440,11 +425,7 @@ export default function Checkout() {
             ¥{Number(totalAmount).toFixed(2)}
           </span>
         </div>
-        <Button
-          variant="primary"
-          loading={isSubmitting}
-          onClick={handleSubmit}
-        >
+        <Button variant="primary" loading={isSubmitting} onClick={handleSubmit}>
           {isSubmitting ? '提交中...' : '提交订单'}
         </Button>
       </BottomActionBar>

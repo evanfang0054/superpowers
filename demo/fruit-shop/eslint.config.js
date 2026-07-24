@@ -31,12 +31,6 @@ module.exports = tseslint.config(
   },
   prettier,
   {
-    ignores: [
-      'dist/',
-      'node_modules/',
-      '*.config.js',
-      'coverage/',
-      'packages/server/uploads/',
-    ],
+    ignores: ['dist/', 'node_modules/', '*.config.js', 'coverage/', 'packages/server/uploads/'],
   },
 );

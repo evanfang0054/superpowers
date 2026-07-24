@@ -22,11 +22,7 @@ const SIZE_CLASS: Record<TagSize, string> = {
   md: 'px-2.5 py-1 text-[11px]',
 };
 
-export function Tag({
-  children,
-  variant = 'primary',
-  size = 'md',
-}: TagProps) {
+export function Tag({ children, variant = 'primary', size = 'md' }: TagProps) {
   return (
     <span
       className={`inline-flex items-center font-bold rounded-full ${VARIANT_CLASS[variant]} ${SIZE_CLASS[size]}`}

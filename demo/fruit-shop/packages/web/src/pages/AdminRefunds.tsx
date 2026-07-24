@@ -75,11 +75,7 @@ export default function AdminRefunds() {
       },
     };
     const s = map[status];
-    return (
-      <span className={`px-2 py-0.5 rounded text-xs font-bold ${s.cls}`}>
-        {s.label}
-      </span>
-    );
+    return <span className={`px-2 py-0.5 rounded text-xs font-bold ${s.cls}`}>{s.label}</span>;
   };
 
   return (
@@ -110,9 +106,7 @@ export default function AdminRefunds() {
                 <td className="p-3 font-medium">#{r.id}</td>
                 <td className="p-3">#{r.orderId}</td>
                 <td className="p-3">{r.userId}</td>
-                <td className="p-3 text-sm text-brand-dark max-w-xs truncate">
-                  {r.reason}
-                </td>
+                <td className="p-3 text-sm text-brand-dark max-w-xs truncate">{r.reason}</td>
                 <td className="p-3">{renderStatus(r.status)}</td>
                 <td className="p-3 flex gap-3">
                   {r.status === RefundStatus.PENDING ? (

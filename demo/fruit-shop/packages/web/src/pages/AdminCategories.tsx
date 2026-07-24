@@ -151,9 +151,7 @@ export default function AdminCategories() {
       {modalOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">
-              {editingId ? '编辑分类' : '新建分类'}
-            </h2>
+            <h2 className="text-xl font-bold mb-4">{editingId ? '编辑分类' : '新建分类'}</h2>
             <div className="space-y-3">
               <input
                 value={form.name}
@@ -170,9 +168,7 @@ export default function AdminCategories() {
               <input
                 type="number"
                 value={form.sortOrder}
-                onChange={(e) =>
-                  setForm({ ...form, sortOrder: Number(e.target.value) })
-                }
+                onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) })}
                 placeholder="排序（小的在前）"
                 className={inputCls}
               />

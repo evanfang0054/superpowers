@@ -16,10 +16,7 @@ import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole } from 'shared';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { CouponService } from './coupon.service';
-import {
-  CreateCouponTemplateDto,
-  UpdateCouponTemplateDto,
-} from './dto/create-coupon-template.dto';
+import { CreateCouponTemplateDto, UpdateCouponTemplateDto } from './dto/create-coupon-template.dto';
 import { CouponPreviewDto } from './dto/coupon-preview.dto';
 
 @Controller()
@@ -39,26 +36,16 @@ export class CouponController {
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ) {
-    return this.couponService.findMine(
-      userId,
-      page ? Number(page) : 1,
-      limit ? Number(limit) : 10,
-    );
+    return this.couponService.findMine(userId, page ? Number(page) : 1, limit ? Number(limit) : 10);
   }
 
   @Post('coupons/:id/claim')
-  claim(
-    @CurrentUser('id') userId: number,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  claim(@CurrentUser('id') userId: number, @Param('id', ParseIntPipe) id: number) {
     return this.couponService.claim(userId, id);
   }
 
   @Post('coupons/preview')
-  preview(
-    @CurrentUser('id') userId: number,
-    @Body() dto: CouponPreviewDto,
-  ) {
+  preview(@CurrentUser('id') userId: number, @Body() dto: CouponPreviewDto) {
     return this.couponService.preview(userId, dto);
   }
 
@@ -80,10 +67,7 @@ export class CouponController {
   @Put('admin/coupons/:id')
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
-  updateTemplate(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateCouponTemplateDto,
-  ) {
+  updateTemplate(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateCouponTemplateDto) {
     return this.couponService.updateTemplate(id, dto);
   }
 

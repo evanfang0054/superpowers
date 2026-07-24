@@ -173,10 +173,7 @@ describe('Product & Category (e2e)', () => {
 
     beforeAll(async () => {
       // 使用独立手机号 13800000050，避免与文件顶层 USER(13800000020) 冲突
-      const u = await helper.registerAndLogin(
-        '13800000050',
-        'test123456',
-      );
+      const u = await helper.registerAndLogin('13800000050', 'test123456');
       nonAdminToken = u.accessToken;
     });
 

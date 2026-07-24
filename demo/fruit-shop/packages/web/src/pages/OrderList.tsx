@@ -49,9 +49,7 @@ export default function OrderList() {
     setActiveTab(status);
   };
 
-  const filteredOrders = activeTab !== null
-    ? orders.filter((o) => o.status === activeTab)
-    : orders;
+  const filteredOrders = activeTab !== null ? orders.filter((o) => o.status === activeTab) : orders;
 
   const handleLoadMore = () => {
     if (page < totalPages) {
@@ -109,12 +107,7 @@ export default function OrderList() {
             {/* Load more */}
             {page < totalPages && (
               <div className="flex justify-center py-4">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  loading={isLoading}
-                  onClick={handleLoadMore}
-                >
+                <Button variant="ghost" size="sm" loading={isLoading} onClick={handleLoadMore}>
                   查看更多
                 </Button>
               </div>
@@ -155,7 +148,8 @@ function OrderCard({ order, onClick }: { order: Order; onClick: () => void }) {
             ¥{Number(order.totalAmount).toFixed(2)}
           </p>
           <p className="text-xs text-brand-muted">
-            {order.address?.slice(0, 15)}{order.address?.length > 15 ? '...' : ''}
+            {order.address?.slice(0, 15)}
+            {order.address?.length > 15 ? '...' : ''}
           </p>
         </div>
       </div>
@@ -164,7 +158,15 @@ function OrderCard({ order, onClick }: { order: Order; onClick: () => void }) {
         <span className="text-xs text-brand-muted">
           {new Date(order.createdAt).toLocaleDateString('zh-CN')}
         </span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-brand-muted/60">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          className="text-brand-muted/60"
+        >
           <path d="M9 18l6-6-6-6" />
         </svg>
       </div>

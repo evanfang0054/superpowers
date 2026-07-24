@@ -23,19 +23,11 @@ export interface ApiResponseFormat<T> {
 }
 
 @Injectable()
-export class TransformInterceptor<T>
-  implements NestInterceptor<T, ApiResponseFormat<T>>
-{
+export class TransformInterceptor<T> implements NestInterceptor<T, ApiResponseFormat<T>> {
   constructor(@Optional() private readonly reflector?: Reflector) {}
 
-  intercept(
-    context: ExecutionContext,
-    next: CallHandler,
-  ): Observable<ApiResponseFormat<T>> {
-    const skipTransform = this.reflector?.get<boolean>(
-      SKIP_TRANSFORM_KEY,
-      context.getHandler(),
-    );
+  intercept(context: ExecutionContext, next: CallHandler): Observable<ApiResponseFormat<T>> {
+    const skipTransform = this.reflector?.get<boolean>(SKIP_TRANSFORM_KEY, context.getHandler());
     if (skipTransform) {
       return next.handle() as Observable<ApiResponseFormat<T>>;
     }

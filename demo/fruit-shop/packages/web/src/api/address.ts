@@ -1,10 +1,5 @@
 import { apiClient } from './client';
-import type {
-  ApiResponse,
-  Address,
-  CreateAddressDTO,
-  UpdateAddressDTO,
-} from 'shared';
+import type { ApiResponse, Address, CreateAddressDTO, UpdateAddressDTO } from 'shared';
 
 export const addressApi = {
   getList() {

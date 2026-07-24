@@ -81,11 +81,7 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-sm font-bold text-brand-dark">
           用户评价
-          {total > 0 && (
-            <span className="ml-1.5 text-brand-muted font-medium">
-              ({total})
-            </span>
-          )}
+          {total > 0 && <span className="ml-1.5 text-brand-muted font-medium">({total})</span>}
         </h2>
       </div>
 
@@ -100,25 +96,16 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
       ) : (
         <div className="space-y-3">
           {reviews.map((r) => (
-            <div
-              key={r.id}
-              className="bg-white rounded-2xl border border-brand-border p-3.5"
-            >
+            <div key={r.id} className="bg-white rounded-2xl border border-brand-border p-3.5">
               <div className="flex items-center gap-2.5">
-                <Avatar
-                  src={r.userAvatar}
-                  alt={r.userNickname ?? '用户'}
-                  size={32}
-                />
+                <Avatar src={r.userAvatar} alt={r.userNickname ?? '用户'} size={32} />
                 <div className="flex-1 min-w-0">
                   <div className="text-[13px] font-bold text-brand-dark line-clamp-1">
                     {r.userNickname ?? `用户${r.userId.toString().slice(-4)}`}
                   </div>
                   <StarRow rating={r.rating} />
                 </div>
-                <span className="text-[11px] text-brand-muted">
-                  {formatDate(r.createdAt)}
-                </span>
+                <span className="text-[11px] text-brand-muted">{formatDate(r.createdAt)}</span>
               </div>
               {r.content && (
                 <p className="mt-2 text-[13px] text-brand-dark leading-relaxed whitespace-pre-wrap break-words">

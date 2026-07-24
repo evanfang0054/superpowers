@@ -14,19 +14,11 @@ describe('Address (e2e)', () => {
     await helper.setup();
     await helper.cleanDatabase();
 
-    const userA = await helper.registerAndLogin(
-      '13800000100',
-      'test123456',
-      'UserA',
-    );
+    const userA = await helper.registerAndLogin('13800000100', 'test123456', 'UserA');
     tokenA = userA.accessToken;
     userIdA = userA.userId;
 
-    const userB = await helper.registerAndLogin(
-      '13800000101',
-      'test123456',
-      'UserB',
-    );
+    const userB = await helper.registerAndLogin('13800000101', 'test123456', 'UserB');
     tokenB = userB.accessToken;
 
     // 清空 addresses 表（cleanDatabase 不含）
@@ -134,9 +126,7 @@ describe('Address (e2e)', () => {
     const listRes = await request(helper.httpServer)
       .get('/api/addresses')
       .set('Authorization', `Bearer ${tokenA}`);
-    const oldDefault = listRes.body.data.find(
-      (a: any) => a.id === defaultAddressId,
-    );
+    const oldDefault = listRes.body.data.find((a: any) => a.id === defaultAddressId);
     expect(oldDefault.isDefault).toBe(false);
   });
 

@@ -35,8 +35,12 @@ export function SpecSelector({ specs, onChange }: SpecSelectorProps) {
                   onClick={() => handleSelect(spec.name, value)}
                   className="py-2.5 px-[18px] rounded-2xl cursor-pointer transition-all duration-200"
                   style={{
-                    border: isActive ? '2.5px solid var(--color-brand-primary)' : '2px solid var(--color-brand-border)',
-                    background: isActive ? 'color-mix(in srgb, var(--color-brand-primary) 6%, transparent)' : 'var(--color-brand-card)',
+                    border: isActive
+                      ? '2.5px solid var(--color-brand-primary)'
+                      : '2px solid var(--color-brand-border)',
+                    background: isActive
+                      ? 'color-mix(in srgb, var(--color-brand-primary) 6%, transparent)'
+                      : 'var(--color-brand-card)',
                   }}
                 >
                   <div

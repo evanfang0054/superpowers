@@ -27,11 +27,11 @@
 
 ### 2.1 技术选型：nestjs-pino
 
-| 候选 | 周下载量 | 维护活跃度 | 关键能力 | 取舍 |
-|---|---|---|---|---|
-| **nestjs-pino**（采用） | ~205 万 | 3 个月内有更新 | 原生 request context、HTTP 自动日志、高性能 | 依赖 pino-http、pino-pretty（dev） |
-| nest-winston | ~100 万 | 1 年前最后更新 | 功能完整但 request context 需自研 | 需手动搭 access log |
-| 自研 Logger | — | — | 零依赖 | 无法覆盖 access log / request context |
+| 候选                    | 周下载量 | 维护活跃度     | 关键能力                                    | 取舍                                  |
+| ----------------------- | -------- | -------------- | ------------------------------------------- | ------------------------------------- |
+| **nestjs-pino**（采用） | ~205 万  | 3 个月内有更新 | 原生 request context、HTTP 自动日志、高性能 | 依赖 pino-http、pino-pretty（dev）    |
+| nest-winston            | ~100 万  | 1 年前最后更新 | 功能完整但 request context 需自研           | 需手动搭 access log                   |
+| 自研 Logger             | —        | —              | 零依赖                                      | 无法覆盖 access log / request context |
 
 社区调研结论（[npm trends](https://npmtrends.com/nest-winston-vs-nestjs-logger-vs-nestjs-pino) + Awesome NestJS 推荐）：nestjs-pino 是 2025 年 NestJS 日志的主流方案，性能约为 winston 的 3-5 倍，内置 `pino-http` 提供 HTTP access log 与 request context 自动注入，是当前最优选。
 
@@ -133,13 +133,13 @@ packages/server/src/
 
 ## 6. 脱敏清单
 
-| 类别 | 字段 | 处理方式 |
-|---|---|---|
-| Header | `authorization` | pino `redact.paths` → `***` |
-| Body 密码 | `password`、`oldPassword`、`newPassword` | pino `redact.paths` → `***` |
-| Body token | `token`、`refreshToken` | pino `redact.paths` → `***` |
-| 个人信息 | `phone`、`email` | 自定义 serializer，`138****8888` / `ev***@***.com` |
-| 响应中 token | `data.accessToken`、`data.refreshToken` | pino `redact.paths` → `***` |
+| 类别         | 字段                                     | 处理方式                                           |
+| ------------ | ---------------------------------------- | -------------------------------------------------- |
+| Header       | `authorization`                          | pino `redact.paths` → `***`                        |
+| Body 密码    | `password`、`oldPassword`、`newPassword` | pino `redact.paths` → `***`                        |
+| Body token   | `token`、`refreshToken`                  | pino `redact.paths` → `***`                        |
+| 个人信息     | `phone`、`email`                         | 自定义 serializer，`138****8888` / `ev***@***.com` |
+| 响应中 token | `data.accessToken`、`data.refreshToken`  | pino `redact.paths` → `***`                        |
 
 实现：
 
@@ -171,26 +171,28 @@ app.useLogger(app.get(PinoLogger));
 仅覆盖两个 service，作为示范模板，其余按需扩展：
 
 **order.service.ts**（下单成功）：
+
 ```ts
 this.logger.log({ orderId: order.id, userId, totalAmount }, '订单创建成功');
 ```
 
 **auth.service.ts**：
+
 - 登录成功：`logger.info({ userId }, '用户登录成功')`
 - JWT 签发：`logger.debug({ userId, jti }, 'JWT 签发')`
 - JWT 吊销（登出）：`logger.info({ userId, jti }, 'JWT 已加入黑名单')`
 
 ## 8. 风险与取舍
 
-| 风险 | 处理 |
-|---|---|
-| `pino-pretty` 误装到生产 | 仅在 `devDependencies`，生产 `transport: undefined` |
-| 现有 `console.log`（`main.ts:40`） | 替换为 `PinoLogger` 启动日志 |
-| 业务日志铺满所有 service | 仅示范 `order/auth` 两个，其余按需扩展，避免一次性铺满 |
-| 异步日志吞吐瓶颈 | 当前不启用 async 模式（YAGNI），同步更易调试 |
-| 与 `TransformInterceptor` 冲突 | 无冲突 — 拦截器只改响应体，不影响 pino 记录的原始请求/响应数据 |
-| `DB_LOGGING` 已存在 | 不重叠 — TypeORM 自身 logger 独立处理 SQL，本设计不新增 SQL 日志层 |
-| Redis 操作日志 | 不打日志（YAGNI）— 仅用于 JWT 黑名单，操作极轻 |
+| 风险                               | 处理                                                               |
+| ---------------------------------- | ------------------------------------------------------------------ |
+| `pino-pretty` 误装到生产           | 仅在 `devDependencies`，生产 `transport: undefined`                |
+| 现有 `console.log`（`main.ts:40`） | 替换为 `PinoLogger` 启动日志                                       |
+| 业务日志铺满所有 service           | 仅示范 `order/auth` 两个，其余按需扩展，避免一次性铺满             |
+| 异步日志吞吐瓶颈                   | 当前不启用 async 模式（YAGNI），同步更易调试                       |
+| 与 `TransformInterceptor` 冲突     | 无冲突 — 拦截器只改响应体，不影响 pino 记录的原始请求/响应数据     |
+| `DB_LOGGING` 已存在                | 不重叠 — TypeORM 自身 logger 独立处理 SQL，本设计不新增 SQL 日志层 |
+| Redis 操作日志                     | 不打日志（YAGNI）— 仅用于 JWT 黑名单，操作极轻                     |
 
 ## 9. 测试策略
 

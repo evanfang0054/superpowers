@@ -36,7 +36,11 @@ export const useCartStore = create<CartState>()((set, get) => ({
     set({ isLoading: true, loading: true });
     try {
       const { data } = await cartApi.getList();
-      set({ items: (data.data ?? []).map((item) => ({ ...item, selected: false })), isLoading: false, loading: false });
+      set({
+        items: (data.data ?? []).map((item) => ({ ...item, selected: false })),
+        isLoading: false,
+        loading: false,
+      });
     } catch {
       set({ isLoading: false, loading: false });
     }
@@ -85,7 +89,7 @@ export const useCartStore = create<CartState>()((set, get) => ({
   toggleSelect: (id) => {
     set((state) => ({
       items: state.items.map((item) =>
-        item.id === id ? { ...item, selected: !item.selected } : item
+        item.id === id ? { ...item, selected: !item.selected } : item,
       ),
     }));
   },
@@ -102,8 +106,8 @@ export const useCartStore = create<CartState>()((set, get) => ({
   },
 
   totalPrice: () => {
-    return get().items
-      .filter((item) => item.selected)
+    return get()
+      .items.filter((item) => item.selected)
       .reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   },
 

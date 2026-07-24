@@ -58,7 +58,10 @@ export default function AdminCoupons() {
   const fetchAll = async () => {
     setIsLoading(true);
     try {
-      const [tplRes, catRes] = await Promise.all([couponApi.findAllTemplates(), productApi.getCategories()]);
+      const [tplRes, catRes] = await Promise.all([
+        couponApi.findAllTemplates(),
+        productApi.getCategories(),
+      ]);
       setTemplates(tplRes.data.data ?? []);
       setCategories(catRes.data.data ?? []);
     } catch {
@@ -108,8 +111,7 @@ export default function AdminCoupons() {
       name: form.name.trim(),
       type: form.type,
       minAmount: form.type === CouponType.NO_THRESHOLD ? 0 : Number(form.minAmount) || 0,
-      discountAmount:
-        form.type === CouponType.DISCOUNT ? 0 : Number(form.discountAmount) || 0,
+      discountAmount: form.type === CouponType.DISCOUNT ? 0 : Number(form.discountAmount) || 0,
       discountRate:
         form.type === CouponType.DISCOUNT && form.discountRate !== ''
           ? Number(form.discountRate)
@@ -146,7 +148,8 @@ export default function AdminCoupons() {
     }
   };
 
-  const inputCls = 'w-full border border-brand-border rounded-2xl px-3 py-2 focus:ring-2 focus:ring-brand-primary/30';
+  const inputCls =
+    'w-full border border-brand-border rounded-2xl px-3 py-2 focus:ring-2 focus:ring-brand-primary/30';
 
   return (
     <div className="min-h-screen bg-brand-bg p-6">
@@ -186,8 +189,8 @@ export default function AdminCoupons() {
                   {t.type === CouponType.DISCOUNT
                     ? `${(Number(t.discountRate) * 10).toFixed(1)}折`
                     : t.type === CouponType.NO_THRESHOLD
-                    ? `减¥${Number(t.discountAmount).toFixed(2)}`
-                    : `满¥${Number(t.minAmount).toFixed(2)} 减¥${Number(t.discountAmount).toFixed(2)}`}
+                      ? `减¥${Number(t.discountAmount).toFixed(2)}`
+                      : `满¥${Number(t.minAmount).toFixed(2)} 减¥${Number(t.discountAmount).toFixed(2)}`}
                 </td>
                 <td className="p-3 text-sm">
                   {t.claimedCount}/{t.totalCount}
@@ -199,7 +202,9 @@ export default function AdminCoupons() {
                 <td className="p-3">
                   <span
                     className={`px-2 py-0.5 rounded text-xs font-bold ${
-                      t.status === 1 ? 'bg-brand-green/15 text-brand-green' : 'bg-brand-btn-bg text-brand-muted'
+                      t.status === 1
+                        ? 'bg-brand-green/15 text-brand-green'
+                        : 'bg-brand-btn-bg text-brand-muted'
                     }`}
                   >
                     {t.status === 1 ? '上架' : '下架'}
@@ -228,9 +233,7 @@ export default function AdminCoupons() {
       {modalOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4">
-              {editingId ? '编辑模板' : '新建模板'}
-            </h2>
+            <h2 className="text-xl font-bold mb-4">{editingId ? '编辑模板' : '新建模板'}</h2>
             <div className="space-y-3">
               <input
                 value={form.name}
@@ -266,7 +269,12 @@ export default function AdminCoupons() {
                   min="0"
                   max="1"
                   value={form.discountRate}
-                  onChange={(e) => setForm({ ...form, discountRate: e.target.value === '' ? '' : Number(e.target.value) })}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      discountRate: e.target.value === '' ? '' : Number(e.target.value),
+                    })
+                  }
                   placeholder="折扣率 0~1（如 0.85）"
                   className={inputCls}
                 />
@@ -284,7 +292,10 @@ export default function AdminCoupons() {
               <select
                 value={form.categoryId}
                 onChange={(e) =>
-                  setForm({ ...form, categoryId: e.target.value === '' ? '' : Number(e.target.value) })
+                  setForm({
+                    ...form,
+                    categoryId: e.target.value === '' ? '' : Number(e.target.value),
+                  })
                 }
                 className={inputCls}
               >

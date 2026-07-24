@@ -3,6 +3,7 @@
 ## Definition of Done
 
 ### P2-A 订单闭环
+
 - [ ] shared OrderStatus 枚举追加 REFUNDING=5/REFUNDED=6；Order 接口追加 couponId/discountAmount/paidAt/shippedAt；`pnpm --filter shared build` 成功
 - [ ] server OrderEntity 追加 couponId/discountAmount/paidAt/shippedAt 列；ShippingEntity 与 RefundEntity 新建（含 prevStatus 字段）
 - [ ] OrderService 新增 pay/ship/confirm/requestRefund/approveRefund/rejectRefund 方法，全部用 queryRunner 事务 + SELECT FOR UPDATE 行锁 + 状态机校验（非法流转抛 ORDER_STATUS_ERROR 40402）
@@ -13,6 +14,7 @@
 - [ ] e2e `test/order.flow.e2e-spec.ts` 覆盖：pay/ship/confirm 全链路、refund 申请、approve 回补+解绑券、reject 恢复 prevStatus、非法流转抛 40402
 
 ### P2-B 用户互动
+
 - [ ] AddressEntity 新建；AddressModule 含 5 接口（GET / POST / PUT / DELETE / PUT :id/default）；DELETE 默认地址抛 ADDRESS_IS_DEFAULT（40902）；设默认事务内先全置 false 再设 true
 - [ ] CreateOrderDto 扩展 addressId?；order.service.create 若有 addressId 读 AddressEntity 快照写入 Order.address/phone
 - [ ] ReviewEntity 新建（Unique(orderId, productId)）；ReviewModule 含 3 接口（GET /products/:id/reviews Public、POST /orders/:id/reviews JWT、GET /reviews/mine JWT）；评价资格校验：订单 COMPLETED + 归属用户 + 未重复
@@ -22,6 +24,7 @@
 - [ ] e2e 覆盖：address CRUD + 默认不可删 + 设默认并发；review 资格校验 + 重复拒绝；favorite toggle + 重复拒绝
 
 ### P2-C 优惠券
+
 - [ ] CouponTemplateEntity + UserCouponEntity 新建；CouponModule 含 5 接口（GET /coupons/available、GET /coupons/mine、POST /coupons/:id/claim、POST /coupons/preview、Admin CRUD /admin/coupons）
 - [ ] claim 事务内：校验 status=1 + 有效期内 + claimedCount < totalCount（超限抛 COUPON_SOLD_OUT 41004）+ claimedCount++ + 创建 UserCoupon
 - [ ] order.service.create 支持 couponId：事务内 SELECT FOR UPDATE user_coupons（行锁防并发核销）+ 校验 usedAt IS NULL + 重新计算 discountAmount（复用 preview 逻辑）+ totalAmount = subtotal - discountAmount（<0 抛 COUPON_NOT_APPLICABLE）+ UPDATE user_coupons 核销
@@ -30,6 +33,7 @@
 - [ ] e2e 覆盖：claim 成功/超限、preview 各 type 计算、下单核销、重复使用抛 COUPON_USED（41003）、门槛不满足抛 COUPON_MIN_NOT_MET（41005）、cancel/approveRefund 解绑
 
 ### P2-D 搜索增强
+
 - [ ] QueryProductDto 扩展 minPrice/maxPrice/origin/sortBy（默认 created_desc）
 - [ ] findAll 追加 andWhere 条件 + 排序分支（sales_desc 用 OrderItem 子查询 + COALESCE）；cacheKey 含全部筛选维度
 - [ ] 新增 GET /products/bestsellers（@Public，Redis 5 分钟缓存）+ GET /products/suggest（@Public，Redis 60s 缓存，返回商品名数组）
@@ -37,6 +41,7 @@
 - [ ] e2e 覆盖：价格区间/产地/sortBy 各分支、bestsellers 缓存、suggest 返回匹配名
 
 ### P2-E 基础设施
+
 - [ ] 安装 multer + @types/multer；main.ts 加 app.useStaticAssets(join(__dirname, '..', 'uploads'), { prefix: '/uploads/' })
 - [ ] 新建 packages/server/uploads/ 目录；Dockerfile 加 RUN mkdir -p uploads + VOLUME /app/uploads；docker-compose 挂载卷
 - [ ] UploadModule + UploadController：POST /upload/image（FileInterceptor）+ limits 2MB + fileFilter MIME image/*；超限抛 UPLOAD_FILE_TOO_LARGE（41101）、非图片抛 UPLOAD_INVALID_TYPE（41102）、空文件抛 UPLOAD_FAILED（41103）
@@ -46,6 +51,7 @@
 - [ ] e2e 覆盖：upload 成功/超大/非图片/空文件、category CRUD + 有关联商品不可删
 
 ### GDD 对应
+
 - [ ] GDD L4-1 ~ L4-5 e2e 全部通过（订单流转/退款闭环/优惠券抵扣/评价闭环/上传）
 - [ ] GDD L3-1 状态契约矩阵（7 状态 × 6 接口）单测或契约测试覆盖
 - [ ] GDD L3-2 优惠券并发核销集成测试（并发两订单同一 couponId 仅一成功）
@@ -75,6 +81,7 @@
 ## Acceptance Criteria
 
 ### Computational（可执行验证）
+
 - **TypeScript 构建**: `pnpm --filter web build` 成功无错误
 - **shared 构建**: `pnpm --filter shared build` 成功，dist 含新类型与新业务码段（40601-41299）
 - **server unit 测试**: `pnpm --filter server test` 全部通过（含新增状态机/券计算/上传校验/销量聚合/分类删除单测）
@@ -82,6 +89,7 @@
 - **手动场景验证**: docker compose 环境浏览器走查 spec 第 11 节全部场景（P2-A 7 + P2-B 10 + P2-C 8 + P2-D 4 + P2-E 6 = 35 项）
 
 ### Inferential（review 验证）
+
 - spec reviewer review shared 类型：Order 枚举与 7 新类型文件字段完整，与 entity/DTO 兼容
 - spec reviewer review OrderService：pay/ship/confirm/refund/approve/reject 六方法的状态机校验正确，全部用 queryRunner 事务 + FOR UPDATE
 - spec reviewer review approveRefund：库存回补与 UserCoupon 解绑在同事务内

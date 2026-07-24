@@ -13,6 +13,7 @@
 P0 修复了前端 `userApi` 的路径与方法对齐（`/user/profile` 单数、PUT），但 `userApi.getProfile` / `updateProfile` 仍**无任何 UI 触发点**，`auth.store.refreshUserInfo` 实现完整但**从未被任何组件调用**，`auth.store.logout` 仅清前端状态**不调后端**（token 在 access 过期前仍可被滥用）。
 
 P1-A 落地三件事：
+
 - **P1-1**：登出 UI + 真后端登出（jti 加 Redis 黑名单）
 - **P1-2**：应用启动时刷新 profile（仅登录用户）
 - **P1-3**：个人中心页（资料展示 + 行内编辑 + 登出）
@@ -68,10 +69,12 @@ P1-A 落地三件事：
 ### 4.2 文件清单
 
 **Create**
+
 - `packages/web/src/pages/Profile.tsx`
 - `packages/web/src/components/Avatar.tsx`
 
 **Modify**
+
 - `packages/web/src/router/index.tsx` — 新增 /profile 路由 + 内联 ProtectedRoute 补 state.from
 - `packages/web/src/store/auth.store.ts` — logout 改 async + 调后端
 - `packages/web/src/api/client.ts` — 兼容 async logout（401 兜底点）
@@ -79,6 +82,7 @@ P1-A 落地三件事：
 - `packages/web/src/components/TabBar.tsx` — 新增第 4 tab
 
 **Delete**
+
 - `packages/web/src/router/ProtectedRoute.tsx`（死代码）
 - `packages/web/src/router/AdminRoute.tsx`（死代码）
 
@@ -89,6 +93,7 @@ P1-A 落地三件事：
 **`router/index.tsx` 改动**
 
 内联 `ProtectedRoute` 改为：
+
 ```tsx
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = useAuthStore((s) => s.token);
@@ -99,6 +104,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 ```
 
 新增路由（懒加载，放在 `/orders` 之后、`/login` 之前）：
+
 ```tsx
 {
   path: '/profile',
@@ -111,6 +117,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 ```
 
 顶部 import：
+
 ```tsx
 const Profile = lazy(() => import('@/pages/Profile'));
 ```
@@ -141,19 +148,25 @@ logout: async () => {
 **`api/client.ts:85` 兼容**
 
 原：
+
 ```ts
 useAuthStore.getState().logout();
 window.location.href = '/login';
 ```
 
 改为：
+
 ```ts
-useAuthStore.getState().logout().finally(() => {
-  window.location.href = '/login';
-});
+useAuthStore
+  .getState()
+  .logout()
+  .finally(() => {
+    window.location.href = '/login';
+  });
 ```
 
 或保持同步语义（401 时 token 已无效，调后端必失败）：
+
 ```ts
 // 401 兜底：token 已无效，直接清前端状态（不调后端）
 useAuthStore.setState({ user: null, token: null, refreshToken: null, error: null });
@@ -308,7 +321,10 @@ export default function Profile() {
                   保存
                 </button>
                 <button
-                  onClick={() => { setNickname(user.nickname ?? ''); setIsEditing(false); }}
+                  onClick={() => {
+                    setNickname(user.nickname ?? '');
+                    setIsEditing(false);
+                  }}
                   className="px-4 py-1.5 rounded-2xl border border-brand-border text-sm font-bold text-brand-dark"
                 >
                   取消
@@ -327,7 +343,10 @@ export default function Profile() {
                 </span>
               )}
               <button
-                onClick={() => { setNickname(user.nickname ?? ''); setIsEditing(true); }}
+                onClick={() => {
+                  setNickname(user.nickname ?? '');
+                  setIsEditing(true);
+                }}
                 className="mt-2 w-full max-w-[200px] py-2.5 rounded-2xl bg-gradient-to-br from-brand-primary to-brand-coral text-white text-sm font-bold"
               >
                 编辑资料
@@ -356,6 +375,7 @@ export default function Profile() {
 **`components/TabBar.tsx`**
 
 在现有 3 个 tab（首页/购物车/订单）之后追加：
+
 ```tsx
 { to: '/profile', icon: '👤', label: '我的' }
 ```
@@ -405,27 +425,27 @@ Profile 页「退出登录」
 
 ## 7. 验收场景
 
-| 场景 | 触发 | 预期 |
-|---|---|---|
-| A. 启动刷新（登录态） | 登录后刷新浏览器 | App mount → Network `GET /user/profile` 200 → store user 更新 |
-| B. 启动不刷新（未登录） | 未登录刷新浏览器 | App mount → Network 无 `/user/profile` 请求 |
-| C. 进入 Profile | 点 TabBar「我的」 | 进入 `/profile`，显示头像/昵称/脱敏手机号/角色标签 |
-| D. 行内编辑 | 点「编辑资料」→ 改昵称 → 保存 | input 转 text，`PUT /user/profile` 200，store 更新，toast 成功 |
-| E. 真登出 | 点「退出登录」 | `POST /auth/logout` 200 → 清状态 → 跳 `/login` |
-| F. 黑名单生效 | 登出后用旧 token 调 API | 后端返回 401（已有 auth.e2e 覆盖） |
-| G. TabBar 激活 | 在 `/profile` | TabBar「我的」高亮 `text-brand-primary` |
-| H. Avatar fallback | user.avatar 为 null | 显示 nickname 首字（无则 🍊） |
+| 场景                    | 触发                          | 预期                                                           |
+| ----------------------- | ----------------------------- | -------------------------------------------------------------- |
+| A. 启动刷新（登录态）   | 登录后刷新浏览器              | App mount → Network `GET /user/profile` 200 → store user 更新  |
+| B. 启动不刷新（未登录） | 未登录刷新浏览器              | App mount → Network 无 `/user/profile` 请求                    |
+| C. 进入 Profile         | 点 TabBar「我的」             | 进入 `/profile`，显示头像/昵称/脱敏手机号/角色标签             |
+| D. 行内编辑             | 点「编辑资料」→ 改昵称 → 保存 | input 转 text，`PUT /user/profile` 200，store 更新，toast 成功 |
+| E. 真登出               | 点「退出登录」                | `POST /auth/logout` 200 → 清状态 → 跳 `/login`                 |
+| F. 黑名单生效           | 登出后用旧 token 调 API       | 后端返回 401（已有 auth.e2e 覆盖）                             |
+| G. TabBar 激活          | 在 `/profile`                 | TabBar「我的」高亮 `text-brand-primary`                        |
+| H. Avatar fallback      | user.avatar 为 null           | 显示 nickname 首字（无则 🍊）                                  |
 
 ## 8. 风险与权衡
 
-| 风险 | 影响 | 缓解 |
-|---|---|---|
-| StrictMode 双调用 refreshUserInfo | 开发环境发两次 `/user/profile` | 接口幂等，可接受；YAGNI 不做去重 |
-| logout async 化波及 client.ts | 401 兜底调用点签名变化 | 401 场景 token 已无效，直接清前端状态（不调后端） |
-| 内联 ProtectedRoute 补 state.from | 影响所有受保护页登录回跳 | 行为改善（原内联版无回跳），回归 `/cart`、`/orders`、`/order/:id`、`/admin/products`、`/profile` |
-| 删除独立 ProtectedRoute/AdminRoute | 万一未来有引用 | 全代码搜索确认无 import，删除安全 |
-| 真登出仅防 access token | refresh token 仍有效 | 后端 logout 只加 access jti；扩展超 P1-A 范围 |
-| Avatar onError 状态 | 图片加载失败切换 fallback | useState(errored) + onError handler |
+| 风险                               | 影响                           | 缓解                                                                                             |
+| ---------------------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------ |
+| StrictMode 双调用 refreshUserInfo  | 开发环境发两次 `/user/profile` | 接口幂等，可接受；YAGNI 不做去重                                                                 |
+| logout async 化波及 client.ts      | 401 兜底调用点签名变化         | 401 场景 token 已无效，直接清前端状态（不调后端）                                                |
+| 内联 ProtectedRoute 补 state.from  | 影响所有受保护页登录回跳       | 行为改善（原内联版无回跳），回归 `/cart`、`/orders`、`/order/:id`、`/admin/products`、`/profile` |
+| 删除独立 ProtectedRoute/AdminRoute | 万一未来有引用                 | 全代码搜索确认无 import，删除安全                                                                |
+| 真登出仅防 access token            | refresh token 仍有效           | 后端 logout 只加 access jti；扩展超 P1-A 范围                                                    |
+| Avatar onError 状态                | 图片加载失败切换 fallback      | useState(errored) + onError handler                                                              |
 
 ## 9. 测试策略
 

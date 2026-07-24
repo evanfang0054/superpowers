@@ -15,43 +15,47 @@
 
 ## File Map
 
-| Action | File | Responsibility |
-|--------|------|---------------|
-| Modify | `packages/web/index.html` | Google Fonts 字重补全 |
-| Modify | `packages/web/src/styles/index.css` | 新增语义 token（radius + gradient） |
-| Modify | `packages/web/src/components/SearchBar.tsx` | SVG stroke 改 currentColor |
-| Modify | `packages/web/src/components/ProductName.tsx` | SVG stroke 改 currentColor |
-| Modify | `packages/web/src/components/BuyBar.tsx` | 硬编码渐变 → CSS 变量 |
-| Modify | `packages/web/src/components/PromoBanner.tsx` | 硬编码渐变 → CSS 变量 |
-| Modify | `packages/web/src/components/Description.tsx` | 硬编码渐变+颜色 → CSS 变量 |
-| Modify | `packages/web/src/components/ProductHero.tsx` | 硬编码 hex → CSS 变量 |
-| Modify | `packages/web/src/components/SpecSelector.tsx` | 硬编码 hex → CSS 变量 |
-| Modify | `packages/web/src/components/PriceSection.tsx` | 硬编码 hex → CSS 变量 + rounded-full |
-| Modify | `packages/web/src/components/Toast.tsx` | 旧 token → brand token + rounded-2xl |
-| Modify | `packages/web/src/components/LoadingSpinner.tsx` | 旧 token → brand token |
-| Modify | `packages/web/src/pages/Login.tsx` | 旧 token → brand token 全量替换 |
-| Modify | `packages/web/src/pages/Register.tsx` | 旧 token → brand token 全量替换 |
-| Modify | `packages/web/src/pages/Cart.tsx` | 旧 token → brand token 全量替换 |
-| Modify | `packages/web/src/pages/Checkout.tsx` | 旧 token → brand token 全量替换 |
-| Modify | `packages/web/src/pages/OrderList.tsx` | 旧 token → brand token 全量替换 |
-| Modify | `packages/web/src/pages/OrderDetail.tsx` | 旧 token → brand token 全量替换 |
-| Modify | `packages/web/src/pages/AdminProducts.tsx` | 旧 token → brand token 全量替换 |
+| Action | File                                             | Responsibility                       |
+| ------ | ------------------------------------------------ | ------------------------------------ |
+| Modify | `packages/web/index.html`                        | Google Fonts 字重补全                |
+| Modify | `packages/web/src/styles/index.css`              | 新增语义 token（radius + gradient）  |
+| Modify | `packages/web/src/components/SearchBar.tsx`      | SVG stroke 改 currentColor           |
+| Modify | `packages/web/src/components/ProductName.tsx`    | SVG stroke 改 currentColor           |
+| Modify | `packages/web/src/components/BuyBar.tsx`         | 硬编码渐变 → CSS 变量                |
+| Modify | `packages/web/src/components/PromoBanner.tsx`    | 硬编码渐变 → CSS 变量                |
+| Modify | `packages/web/src/components/Description.tsx`    | 硬编码渐变+颜色 → CSS 变量           |
+| Modify | `packages/web/src/components/ProductHero.tsx`    | 硬编码 hex → CSS 变量                |
+| Modify | `packages/web/src/components/SpecSelector.tsx`   | 硬编码 hex → CSS 变量                |
+| Modify | `packages/web/src/components/PriceSection.tsx`   | 硬编码 hex → CSS 变量 + rounded-full |
+| Modify | `packages/web/src/components/Toast.tsx`          | 旧 token → brand token + rounded-2xl |
+| Modify | `packages/web/src/components/LoadingSpinner.tsx` | 旧 token → brand token               |
+| Modify | `packages/web/src/pages/Login.tsx`               | 旧 token → brand token 全量替换      |
+| Modify | `packages/web/src/pages/Register.tsx`            | 旧 token → brand token 全量替换      |
+| Modify | `packages/web/src/pages/Cart.tsx`                | 旧 token → brand token 全量替换      |
+| Modify | `packages/web/src/pages/Checkout.tsx`            | 旧 token → brand token 全量替换      |
+| Modify | `packages/web/src/pages/OrderList.tsx`           | 旧 token → brand token 全量替换      |
+| Modify | `packages/web/src/pages/OrderDetail.tsx`         | 旧 token → brand token 全量替换      |
+| Modify | `packages/web/src/pages/AdminProducts.tsx`       | 旧 token → brand token 全量替换      |
 
 ---
 
 ### Task 1: 补全 Google Fonts 字重 + 添加 @theme 语义变量
 
 **Files:**
+
 - Modify: `packages/web/index.html:10-13`
 - Modify: `packages/web/src/styles/index.css:4-43`
 
 - [ ] **Step 1: 修改 index.html 补全字重**
 
 将第 11 行的 Google Fonts URL 从：
+
 ```
 href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap"
 ```
+
 改为：
+
 ```
 href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap"
 ```
@@ -61,18 +65,18 @@ href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700;800&
 在 `--color-brand-btn-bg: #f5f1eb;` 之后、`/* 保留旧 token */` 之前，插入：
 
 ```css
-  /* 圆角语义 token */
-  --radius-sm: 8px;
-  --radius-md: 16px;
-  --radius-lg: 20px;
-  --radius-xl: 24px;
-  --radius-2xl: 32px;
-  --radius-full: 9999px;
+/* 圆角语义 token */
+--radius-sm: 8px;
+--radius-md: 16px;
+--radius-lg: 20px;
+--radius-xl: 24px;
+--radius-2xl: 32px;
+--radius-full: 9999px;
 
-  /* 渐变 token */
-  --gradient-cta: linear-gradient(135deg, #FF6B35, #FF7675);
-  --gradient-promo: linear-gradient(135deg, #FF6B35 0%, #FF7675 50%, #F7C948 100%);
-  --gradient-desc: linear-gradient(135deg, #FFEAA744, #F7C94822);
+/* 渐变 token */
+--gradient-cta: linear-gradient(135deg, #ff6b35, #ff7675);
+--gradient-promo: linear-gradient(135deg, #ff6b35 0%, #ff7675 50%, #f7c948 100%);
+--gradient-desc: linear-gradient(135deg, #ffeaa744, #f7c94822);
 ```
 
 - [ ] **Step 3: 更新旧 token 注释**
@@ -92,12 +96,14 @@ git commit -m "feat(web): 补全 Google Fonts 字重 + 新增 @theme 语义 toke
 ### Task 2: SVG stroke 硬编码色值改为 currentColor
 
 **Files:**
+
 - Modify: `packages/web/src/components/SearchBar.tsx:34-44`
 - Modify: `packages/web/src/components/ProductName.tsx:12-23`
 
 - [ ] **Step 1: 修改 SearchBar.tsx**
 
 将第 34-44 行的 SVG：
+
 ```tsx
         <svg
           width="18"
@@ -109,7 +115,9 @@ git commit -m "feat(web): 补全 Google Fonts 字重 + 新增 @theme 语义 toke
           strokeLinecap="round"
         >
 ```
+
 改为：
+
 ```tsx
         <svg
           width="18"
@@ -126,6 +134,7 @@ git commit -m "feat(web): 补全 Google Fonts 字重 + 新增 @theme 语义 toke
 - [ ] **Step 2: 修改 ProductName.tsx**
 
 将第 12-20 行的 SVG：
+
 ```tsx
           <svg
             width="14"
@@ -137,7 +146,9 @@ git commit -m "feat(web): 补全 Google Fonts 字重 + 新增 @theme 语义 toke
             strokeLinecap="round"
           >
 ```
+
 改为：
+
 ```tsx
           <svg
             width="14"
@@ -164,6 +175,7 @@ git commit -m "fix(web): SVG stroke 硬编码色值改为 currentColor + brand t
 ### Task 3: 硬编码渐变/颜色改用 CSS 变量（组件级）
 
 **Files:**
+
 - Modify: `packages/web/src/components/BuyBar.tsx:64-69`
 - Modify: `packages/web/src/components/PromoBanner.tsx:4-8`
 - Modify: `packages/web/src/components/Description.tsx:10-15`
@@ -174,6 +186,7 @@ git commit -m "fix(web): SVG stroke 硬编码色值改为 currentColor + brand t
 - [ ] **Step 1: 修改 BuyBar.tsx**
 
 将第 64-69 行：
+
 ```tsx
       <div
         onClick={handleBuyNow}
@@ -183,7 +196,9 @@ git commit -m "fix(web): SVG stroke 硬编码色值改为 currentColor + brand t
         style={{ background: 'linear-gradient(135deg, #FF6B35, #FF7675)' }}
       >
 ```
+
 改为：
+
 ```tsx
       <div
         onClick={handleBuyNow}
@@ -197,6 +212,7 @@ git commit -m "fix(web): SVG stroke 硬编码色值改为 currentColor + brand t
 - [ ] **Step 2: 修改 PromoBanner.tsx**
 
 将第 4-8 行：
+
 ```tsx
       <div
         className="relative rounded-3xl overflow-hidden"
@@ -205,7 +221,9 @@ git commit -m "fix(web): SVG stroke 硬编码色值改为 currentColor + brand t
         }}
       >
 ```
+
 改为：
+
 ```tsx
       <div
         className="relative rounded-3xl overflow-hidden"
@@ -218,6 +236,7 @@ git commit -m "fix(web): SVG stroke 硬编码色值改为 currentColor + brand t
 - [ ] **Step 3: 修改 Description.tsx**
 
 将第 10-15 行：
+
 ```tsx
       <div
         className="py-4 px-[18px] rounded-[20px] border-[1.5px]"
@@ -227,7 +246,9 @@ git commit -m "fix(web): SVG stroke 硬编码色值改为 currentColor + brand t
         }}
       >
 ```
+
 改为：
+
 ```tsx
       <div
         className="py-4 px-[18px] rounded-[20px] border-[1.5px]"
@@ -241,27 +262,31 @@ git commit -m "fix(web): SVG stroke 硬编码色值改为 currentColor + brand t
 - [ ] **Step 4: 修改 ProductHero.tsx**
 
 将第 14-18 行：
+
 ```tsx
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `linear-gradient(135deg, ${color}22 0%, #FFF8F0 100%)`,
-        }}
-      />
+<div
+  className="absolute inset-0"
+  style={{
+    background: `linear-gradient(135deg, ${color}22 0%, #FFF8F0 100%)`,
+  }}
+/>
 ```
+
 改为：
+
 ```tsx
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `linear-gradient(135deg, ${color}22 0%, var(--color-brand-bg) 100%)`,
-        }}
-      />
+<div
+  className="absolute inset-0"
+  style={{
+    background: `linear-gradient(135deg, ${color}22 0%, var(--color-brand-bg) 100%)`,
+  }}
+/>
 ```
 
 - [ ] **Step 5: 修改 SpecSelector.tsx**
 
 将第 33-40 行：
+
 ```tsx
                 <div
                   key={value}
@@ -273,7 +298,9 @@ git commit -m "fix(web): SVG stroke 硬编码色值改为 currentColor + brand t
                   }}
                 >
 ```
+
 改为：
+
 ```tsx
                 <div
                   key={value}
@@ -289,6 +316,7 @@ git commit -m "fix(web): SVG stroke 硬编码色值改为 currentColor + brand t
 - [ ] **Step 6: 修改 PriceSection.tsx（含 rounded-full 修正）**
 
 将第 26-33 行：
+
 ```tsx
             <span
               key={i}
@@ -300,7 +328,9 @@ git commit -m "fix(web): SVG stroke 硬编码色值改为 currentColor + brand t
               }}
             >
 ```
+
 改为：
+
 ```tsx
             <span
               key={i}
@@ -330,33 +360,38 @@ git commit -m "fix(web): 组件硬编码渐变/颜色改用 CSS 变量 + PriceSe
 ### Task 4: Toast + LoadingSpinner 迁移到 brand token
 
 **Files:**
+
 - Modify: `packages/web/src/components/Toast.tsx:46-60`
 - Modify: `packages/web/src/components/LoadingSpinner.tsx:17`
 
 - [ ] **Step 1: 修改 Toast.tsx typeStyles**
 
 将第 46-51 行：
+
 ```tsx
-  const typeStyles: Record<ToastType, string> = {
-    success: 'bg-success text-white',
-    error: 'bg-danger text-white',
-    warning: 'bg-warning text-gray-900',
-    info: 'bg-info text-white',
-  };
+const typeStyles: Record<ToastType, string> = {
+  success: 'bg-success text-white',
+  error: 'bg-danger text-white',
+  warning: 'bg-warning text-gray-900',
+  info: 'bg-info text-white',
+};
 ```
+
 改为：
+
 ```tsx
-  const typeStyles: Record<ToastType, string> = {
-    success: 'bg-brand-green text-white',
-    error: 'bg-brand-coral text-white',
-    warning: 'bg-brand-secondary text-brand-dark',
-    info: 'bg-brand-accent text-white',
-  };
+const typeStyles: Record<ToastType, string> = {
+  success: 'bg-brand-green text-white',
+  error: 'bg-brand-coral text-white',
+  warning: 'bg-brand-secondary text-brand-dark',
+  info: 'bg-brand-accent text-white',
+};
 ```
 
 - [ ] **Step 2: 修改 Toast.tsx 圆角**
 
 将第 60 行的 `rounded-lg` 改为 `rounded-2xl`：
+
 ```tsx
 className={`animate-slide-up rounded-2xl px-4 py-3 shadow-lg text-sm font-medium min-w-[240px] max-w-[360px] flex items-center justify-between ${typeStyles[toast.type]}`}
 ```
@@ -364,10 +399,13 @@ className={`animate-slide-up rounded-2xl px-4 py-3 shadow-lg text-sm font-medium
 - [ ] **Step 3: 修改 LoadingSpinner.tsx**
 
 将第 17 行：
+
 ```tsx
       style={{ color: color || 'var(--color-primary)' }}
 ```
+
 改为：
+
 ```tsx
       style={{ color: color || 'var(--color-brand-primary)' }}
 ```
@@ -385,6 +423,7 @@ git commit -m "fix(web): Toast + LoadingSpinner 迁移到 brand token"
 ### Task 5: 旧页面迁移 — Login + Register
 
 **Files:**
+
 - Modify: `packages/web/src/pages/Login.tsx`
 - Modify: `packages/web/src/pages/Register.tsx`
 
@@ -392,13 +431,13 @@ git commit -m "fix(web): Toast + LoadingSpinner 迁移到 brand token"
 
 以下 class 替换（使用 replace_all 逐项替换）：
 
-| 旧值 | 新值 |
-|------|------|
-| `bg-gray-50` | `bg-brand-bg` |
-| `text-primary` | `text-brand-primary` |
-| `bg-primary` | `bg-brand-primary` |
+| 旧值                                         | 新值                                                     |
+| -------------------------------------------- | -------------------------------------------------------- |
+| `bg-gray-50`                                 | `bg-brand-bg`                                            |
+| `text-primary`                               | `text-brand-primary`                                     |
+| `bg-primary`                                 | `bg-brand-primary`                                       |
 | `focus:ring-primary/30 focus:border-primary` | `focus:ring-brand-primary/30 focus:border-brand-primary` |
-| `rounded-xl` | `rounded-2xl` |
+| `rounded-xl`                                 | `rounded-2xl`                                            |
 
 注意：`text-primary` 出现在第 41、88 行（标题和链接），`bg-primary` 出现在第 78 行（按钮），`rounded-xl` 出现在第 58、71、78 行（输入框和按钮），`focus:ring-primary/30 focus:border-primary` 出现在第 58、71 行。
 
@@ -415,13 +454,13 @@ git commit -m "fix(web): Toast + LoadingSpinner 迁移到 brand token"
 
 与 Login 相同的替换规则：
 
-| 旧值 | 新值 |
-|------|------|
-| `bg-gray-50` | `bg-brand-bg` |
-| `text-primary` | `text-brand-primary` |
-| `bg-primary` | `bg-brand-primary` |
+| 旧值                                         | 新值                                                     |
+| -------------------------------------------- | -------------------------------------------------------- |
+| `bg-gray-50`                                 | `bg-brand-bg`                                            |
+| `text-primary`                               | `text-brand-primary`                                     |
+| `bg-primary`                                 | `bg-brand-primary`                                       |
 | `focus:ring-primary/30 focus:border-primary` | `focus:ring-brand-primary/30 focus:border-brand-primary` |
-| `rounded-xl` | `rounded-2xl` |
+| `rounded-xl`                                 | `rounded-2xl`                                            |
 
 - [ ] **Step 3: 提交**
 
@@ -436,6 +475,7 @@ git commit -m "fix(web): Login + Register 迁移到 brand token"
 ### Task 6: 旧页面迁移 — Cart + Checkout
 
 **Files:**
+
 - Modify: `packages/web/src/pages/Cart.tsx`
 - Modify: `packages/web/src/pages/Checkout.tsx`
 
@@ -443,13 +483,13 @@ git commit -m "fix(web): Login + Register 迁移到 brand token"
 
 以下 class 替换（使用 replace_all 逐项替换）：
 
-| 旧值 | 新值 |
-|------|------|
-| `bg-gray-50` | `bg-brand-bg` |
+| 旧值                        | 新值                                    |
+| --------------------------- | --------------------------------------- |
+| `bg-gray-50`                | `bg-brand-bg`                           |
 | `bg-primary border-primary` | `bg-brand-primary border-brand-primary` |
-| `bg-primary` | `bg-brand-primary` |
-| `text-primary` | `text-brand-primary` |
-| `hover:text-danger` | `hover:text-brand-coral` |
+| `bg-primary`                | `bg-brand-primary`                      |
+| `text-primary`              | `text-brand-primary`                    |
+| `hover:text-danger`         | `hover:text-brand-coral`                |
 
 注意替换顺序：先替换长字符串 `bg-primary border-primary`，再替换短的 `bg-primary` 和 `text-primary`，避免部分匹配。
 
@@ -457,14 +497,14 @@ git commit -m "fix(web): Login + Register 迁移到 brand token"
 
 以下 class 替换：
 
-| 旧值 | 新值 |
-|------|------|
-| `bg-gray-50` | `bg-brand-bg` |
+| 旧值                                         | 新值                                                     |
+| -------------------------------------------- | -------------------------------------------------------- |
+| `bg-gray-50`                                 | `bg-brand-bg`                                            |
 | `focus:ring-primary/30 focus:border-primary` | `focus:ring-brand-primary/30 focus:border-brand-primary` |
-| `rounded-xl` | `rounded-2xl` |
-| `text-primary` | `text-brand-primary` |
-| `text-success` | `text-brand-green` |
-| `bg-primary` | `bg-brand-primary` |
+| `rounded-xl`                                 | `rounded-2xl`                                            |
+| `text-primary`                               | `text-brand-primary`                                     |
+| `text-success`                               | `text-brand-green`                                       |
+| `bg-primary`                                 | `bg-brand-primary`                                       |
 
 注意：`text-success` 出现在第 166 行（地址标签），其余分布与 Login 类似。
 
@@ -481,6 +521,7 @@ git commit -m "fix(web): Cart + Checkout 迁移到 brand token"
 ### Task 7: 旧页面迁移 — OrderList + OrderDetail + AdminProducts
 
 **Files:**
+
 - Modify: `packages/web/src/pages/OrderList.tsx`
 - Modify: `packages/web/src/pages/OrderDetail.tsx`
 - Modify: `packages/web/src/pages/AdminProducts.tsx`
@@ -489,58 +530,58 @@ git commit -m "fix(web): Cart + Checkout 迁移到 brand token"
 
 STATUS_COLORS 替换（第 26-30 行附近）：
 
-| 旧值 | 新值 |
-|------|------|
+| 旧值           | 新值                   |
+| -------------- | ---------------------- |
 | `text-warning` | `text-brand-secondary` |
-| `text-info` | `text-brand-accent` |
-| `text-primary` | `text-brand-primary` |
-| `text-success` | `text-brand-green` |
+| `text-info`    | `text-brand-accent`    |
+| `text-primary` | `text-brand-primary`   |
+| `text-success` | `text-brand-green`     |
 
 其他 class 替换：
 
-| 旧值 | 新值 |
-|------|------|
-| `bg-gray-50` | `bg-brand-bg` |
-| `bg-primary text-white` | `bg-brand-primary text-white` |
+| 旧值                                    | 新值                                                |
+| --------------------------------------- | --------------------------------------------------- |
+| `bg-gray-50`                            | `bg-brand-bg`                                       |
+| `bg-primary text-white`                 | `bg-brand-primary text-white`                       |
 | `text-primary border border-primary/30` | `text-brand-primary border border-brand-primary/30` |
-| `text-primary` | `text-brand-primary` |
+| `text-primary`                          | `text-brand-primary`                                |
 
 - [ ] **Step 2: 修改 OrderDetail.tsx**
 
 STATUS_BG 替换（第 17-21 行附近）：
 
-| 旧值 | 新值 |
-|------|------|
+| 旧值         | 新值                 |
+| ------------ | -------------------- |
 | `bg-warning` | `bg-brand-secondary` |
-| `bg-info` | `bg-brand-accent` |
-| `bg-primary` | `bg-brand-primary` |
-| `bg-success` | `bg-brand-green` |
+| `bg-info`    | `bg-brand-accent`    |
+| `bg-primary` | `bg-brand-primary`   |
+| `bg-success` | `bg-brand-green`     |
 
 其他 class 替换：
 
-| 旧值 | 新值 |
-|------|------|
+| 旧值           | 新值                 |
+| -------------- | -------------------- |
 | `text-primary` | `text-brand-primary` |
-| `bg-gray-50` | `bg-brand-bg` |
-| `bg-danger` | `bg-brand-coral` |
+| `bg-gray-50`   | `bg-brand-bg`        |
+| `bg-danger`    | `bg-brand-coral`     |
 
 - [ ] **Step 3: 修改 AdminProducts.tsx**
 
 按以下顺序替换（先长后短）：
 
-| 旧值 | 新值 |
-|------|------|
-| `hover:bg-danger/10` | `hover:bg-brand-coral/10` |
-| `hover:bg-primary/10` | `hover:bg-brand-primary/10` |
+| 旧值                                         | 新值                                                     |
+| -------------------------------------------- | -------------------------------------------------------- |
+| `hover:bg-danger/10`                         | `hover:bg-brand-coral/10`                                |
+| `hover:bg-primary/10`                        | `hover:bg-brand-primary/10`                              |
 | `focus:ring-primary/30 focus:border-primary` | `focus:ring-brand-primary/30 focus:border-brand-primary` |
-| `text-danger` | `text-brand-coral` |
-| `bg-danger` | `bg-brand-coral` |
-| `text-success` | `text-brand-green` |
-| `bg-gray-50` | `bg-brand-bg` |
-| `bg-primary` | `bg-brand-primary` |
-| `text-primary` | `text-brand-primary` |
-| `rounded-xl` | `rounded-2xl` |
-| `rounded-lg` | `rounded-2xl` |
+| `text-danger`                                | `text-brand-coral`                                       |
+| `bg-danger`                                  | `bg-brand-coral`                                         |
+| `text-success`                               | `text-brand-green`                                       |
+| `bg-gray-50`                                 | `bg-brand-bg`                                            |
+| `bg-primary`                                 | `bg-brand-primary`                                       |
+| `text-primary`                               | `text-brand-primary`                                     |
+| `rounded-xl`                                 | `rounded-2xl`                                            |
+| `rounded-lg`                                 | `rounded-2xl`                                            |
 
 注意：`rounded-lg` 在 AdminProducts 中约 10 处（表单输入框），`rounded-xl` 在第 251 行（表格）。全部改为 `rounded-2xl`。
 
@@ -557,6 +598,7 @@ git commit -m "fix(web): OrderList + OrderDetail + AdminProducts 迁移到 brand
 ### Task 8: 验证 + 清理
 
 **Files:**
+
 - Verify: `packages/web/` 全部 `.tsx` 文件
 
 - [ ] **Step 1: 编译验证**

@@ -1,10 +1,5 @@
 import { apiClient } from './client';
-import type {
-  ApiResponse,
-  LoginDTO,
-  RegisterDTO,
-  LoginResponse,
-} from 'shared';
+import type { ApiResponse, LoginDTO, RegisterDTO, LoginResponse } from 'shared';
 
 export const authApi = {
   login(data: LoginDTO) {

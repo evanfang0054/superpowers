@@ -12,11 +12,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
-  primary:
-    'bg-gradient-to-br from-brand-primary to-brand-coral text-white animate-pulse-glow',
+  primary: 'bg-gradient-to-br from-brand-primary to-brand-coral text-white animate-pulse-glow',
   secondary: 'bg-brand-secondary text-brand-dark',
-  ghost:
-    'bg-transparent border border-brand-border text-brand-dark hover:bg-brand-bg',
+  ghost: 'bg-transparent border border-brand-border text-brand-dark hover:bg-brand-bg',
   danger: 'bg-brand-coral text-white',
 };
 
@@ -50,19 +48,8 @@ export function Button({
   return (
     <button className={classes} disabled={disabled || loading} {...rest}>
       {loading && (
-        <svg
-          className="animate-spin h-4 w-4 mr-2"
-          viewBox="0 0 24 24"
-          fill="none"
-        >
-          <circle
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="3"
-            opacity="0.25"
-          />
+        <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.25" />
           <path
             d="M12 2a10 10 0 0110 10"
             stroke="currentColor"

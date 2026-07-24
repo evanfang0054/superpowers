@@ -1,11 +1,4 @@
-import {
-  IsString,
-  IsOptional,
-  IsBoolean,
-  MaxLength,
-  MinLength,
-  Matches,
-} from 'class-validator';
+import { IsString, IsOptional, IsBoolean, MaxLength, MinLength, Matches } from 'class-validator';
 
 export class CreateAddressDto {
   @IsString()

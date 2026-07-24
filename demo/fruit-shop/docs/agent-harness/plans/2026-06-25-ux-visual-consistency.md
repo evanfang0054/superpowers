@@ -16,34 +16,35 @@
 
 ### 新建文件（7 个）
 
-| 文件 | 职责 |
-|---|---|
-| `packages/web/src/components/ui/NavBar.tsx` | 顶部 sticky 导航，含 showBack 自动返回 |
-| `packages/web/src/components/ui/BottomActionBar.tsx` | 底部 fixed 操作栏 |
-| `packages/web/src/components/ui/Button.tsx` | 通用按钮（4 variant × 3 size + loading） |
-| `packages/web/src/components/ui/IconButton.tsx` | 圆形/方形小按钮 |
-| `packages/web/src/components/ui/EmptyState.tsx` | 空态（图标+文案+CTA） |
-| `packages/web/src/components/ui/Tag.tsx` | 标签/Badge |
-| `packages/web/src/components/ui/index.ts` | 聚合导出 |
+| 文件                                                 | 职责                                     |
+| ---------------------------------------------------- | ---------------------------------------- |
+| `packages/web/src/components/ui/NavBar.tsx`          | 顶部 sticky 导航，含 showBack 自动返回   |
+| `packages/web/src/components/ui/BottomActionBar.tsx` | 底部 fixed 操作栏                        |
+| `packages/web/src/components/ui/Button.tsx`          | 通用按钮（4 variant × 3 size + loading） |
+| `packages/web/src/components/ui/IconButton.tsx`      | 圆形/方形小按钮                          |
+| `packages/web/src/components/ui/EmptyState.tsx`      | 空态（图标+文案+CTA）                    |
+| `packages/web/src/components/ui/Tag.tsx`             | 标签/Badge                               |
+| `packages/web/src/components/ui/index.ts`            | 聚合导出                                 |
 
 ### 修改文件（8 个页面）
 
-| 文件 | 改动要点 |
-|---|---|
-| `packages/web/src/pages/Cart.tsx` | header/底部栏/卡片/按钮/空态全换 |
-| `packages/web/src/pages/Checkout.tsx` | header/底部栏/卡片/按钮换 |
-| `packages/web/src/pages/OrderList.tsx` | header/tab/卡片/按钮/空态换 |
-| `packages/web/src/pages/OrderDetail.tsx` | header/按钮/modal 样式换 |
-| `packages/web/src/pages/Favorites.tsx` | header/空态/按钮换 |
-| `packages/web/src/pages/Profile.tsx` | canvas→bg 换、按钮换 |
-| `packages/web/src/pages/Login.tsx` | label/border/按钮换 |
-| `packages/web/src/pages/Register.tsx` | label/border/按钮换 |
+| 文件                                     | 改动要点                         |
+| ---------------------------------------- | -------------------------------- |
+| `packages/web/src/pages/Cart.tsx`        | header/底部栏/卡片/按钮/空态全换 |
+| `packages/web/src/pages/Checkout.tsx`    | header/底部栏/卡片/按钮换        |
+| `packages/web/src/pages/OrderList.tsx`   | header/tab/卡片/按钮/空态换      |
+| `packages/web/src/pages/OrderDetail.tsx` | header/按钮/modal 样式换         |
+| `packages/web/src/pages/Favorites.tsx`   | header/空态/按钮换               |
+| `packages/web/src/pages/Profile.tsx`     | canvas→bg 换、按钮换             |
+| `packages/web/src/pages/Login.tsx`       | label/border/按钮换              |
+| `packages/web/src/pages/Register.tsx`    | label/border/按钮换              |
 
 ---
 
 ## Task 1: 创建公共组件目录与 Button 组件
 
 **Files:**
+
 - Create: `packages/web/src/components/ui/Button.tsx`
 - Create: `packages/web/src/components/ui/index.ts`
 
@@ -64,11 +65,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
-  primary:
-    'bg-gradient-to-br from-brand-primary to-brand-coral text-white animate-pulse-glow',
+  primary: 'bg-gradient-to-br from-brand-primary to-brand-coral text-white animate-pulse-glow',
   secondary: 'bg-brand-secondary text-brand-dark',
-  ghost:
-    'bg-transparent border border-brand-border text-brand-dark hover:bg-brand-bg',
+  ghost: 'bg-transparent border border-brand-border text-brand-dark hover:bg-brand-bg',
   danger: 'bg-brand-coral text-white',
 };
 
@@ -102,19 +101,8 @@ export function Button({
   return (
     <button className={classes} disabled={disabled || loading} {...rest}>
       {loading && (
-        <svg
-          className="animate-spin h-4 w-4 mr-2"
-          viewBox="0 0 24 24"
-          fill="none"
-        >
-          <circle
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="3"
-            opacity="0.25"
-          />
+        <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.25" />
           <path
             d="M12 2a10 10 0 0110 10"
             stroke="currentColor"
@@ -152,6 +140,7 @@ git commit -m "feat(web): 新增 Button 公共组件与 ui/ 目录"
 ## Task 2: IconButton 组件
 
 **Files:**
+
 - Create: `packages/web/src/components/ui/IconButton.tsx`
 - Modify: `packages/web/src/components/ui/index.ts`
 
@@ -237,6 +226,7 @@ git commit -m "feat(web): 新增 IconButton 公共组件"
 ## Task 3: NavBar 组件
 
 **Files:**
+
 - Create: `packages/web/src/components/ui/NavBar.tsx`
 - Modify: `packages/web/src/components/ui/index.ts`
 
@@ -255,13 +245,7 @@ interface NavBarProps {
   sticky?: boolean;
 }
 
-export function NavBar({
-  title,
-  left,
-  right,
-  showBack = true,
-  sticky = true,
-}: NavBarProps) {
+export function NavBar({ title, left, right, showBack = true, sticky = true }: NavBarProps) {
   const navigate = useNavigate();
   const positionClass = sticky ? 'sticky top-0 z-50' : '';
 
@@ -292,9 +276,7 @@ export function NavBar({
     <header
       className={`bg-brand-bg/90 backdrop-blur-[10px] border-b border-brand-border h-12 flex items-center px-4 ${positionClass}`}
     >
-      <div className="flex items-center gap-2 min-w-0">
-        {left ?? defaultLeft}
-      </div>
+      <div className="flex items-center gap-2 min-w-0">{left ?? defaultLeft}</div>
       {title && (
         <div className="flex-1 text-center font-bold text-[17px] text-brand-dark truncate px-2">
           {title}
@@ -332,6 +314,7 @@ git commit -m "feat(web): 新增 NavBar 公共组件"
 ## Task 4: BottomActionBar 组件
 
 **Files:**
+
 - Create: `packages/web/src/components/ui/BottomActionBar.tsx`
 - Modify: `packages/web/src/components/ui/index.ts`
 
@@ -345,10 +328,7 @@ interface BottomActionBarProps {
   className?: string;
 }
 
-export function BottomActionBar({
-  children,
-  className = '',
-}: BottomActionBarProps) {
+export function BottomActionBar({ children, className = '' }: BottomActionBarProps) {
   return (
     <div
       className={`fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-[12px] border-t-[1.5px] border-brand-border z-40 safe-bottom ${className}`}
@@ -387,6 +367,7 @@ git commit -m "feat(web): 新增 BottomActionBar 公共组件"
 ## Task 5: EmptyState 组件
 
 **Files:**
+
 - Create: `packages/web/src/components/ui/EmptyState.tsx`
 - Modify: `packages/web/src/components/ui/index.ts`
 
@@ -419,19 +400,12 @@ const DEFAULT_ICON = (
   </svg>
 );
 
-export function EmptyState({
-  icon,
-  title,
-  description,
-  action,
-}: EmptyStateProps) {
+export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-32">
       <div className="text-brand-muted/60">{icon ?? DEFAULT_ICON}</div>
       <p className="text-brand-muted text-sm mt-4">{title}</p>
-      {description && (
-        <p className="text-brand-muted/70 text-xs mt-1">{description}</p>
-      )}
+      {description && <p className="text-brand-muted/70 text-xs mt-1">{description}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>
   );
@@ -465,6 +439,7 @@ git commit -m "feat(web): 新增 EmptyState 公共组件"
 ## Task 6: Tag 组件 + 完成 ui 模块
 
 **Files:**
+
 - Create: `packages/web/src/components/ui/Tag.tsx`
 - Modify: `packages/web/src/components/ui/index.ts`
 
@@ -495,11 +470,7 @@ const SIZE_CLASS: Record<TagSize, string> = {
   md: 'px-2.5 py-1 text-[11px]',
 };
 
-export function Tag({
-  children,
-  variant = 'primary',
-  size = 'md',
-}: TagProps) {
+export function Tag({ children, variant = 'primary', size = 'md' }: TagProps) {
   return (
     <span
       className={`inline-flex items-center font-bold rounded-full ${VARIANT_CLASS[variant]} ${SIZE_CLASS[size]}`}
@@ -538,6 +509,7 @@ git commit -m "feat(web): 新增 Tag 公共组件，ui 模块就位"
 ## Task 7: 改造 Login 页面
 
 **Files:**
+
 - Modify: `packages/web/src/pages/Login.tsx`
 
 - [ ] **Step 1: 用新 token 重写 Login.tsx**
@@ -594,9 +566,7 @@ export default function Login() {
       <main className="max-w-lg mx-auto w-full px-4 flex-1">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-brand-dark mb-1.5">
-              手机号
-            </label>
+            <label className="block text-sm font-medium text-brand-dark mb-1.5">手机号</label>
             <input
               type="tel"
               value={phone}
@@ -608,9 +578,7 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-brand-dark mb-1.5">
-              密码
-            </label>
+            <label className="block text-sm font-medium text-brand-dark mb-1.5">密码</label>
             <input
               type="password"
               value={password}
@@ -657,6 +625,7 @@ git commit -m "refactor(web): Login 对齐 brand token + Button 公共组件"
 ## Task 8: 改造 Register 页面
 
 **Files:**
+
 - Modify: `packages/web/src/pages/Register.tsx`
 
 - [ ] **Step 1: 同 Login 思路重写**
@@ -717,9 +686,7 @@ export default function Register() {
       <main className="max-w-lg mx-auto w-full px-4 flex-1">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-brand-dark mb-1.5">
-              手机号
-            </label>
+            <label className="block text-sm font-medium text-brand-dark mb-1.5">手机号</label>
             <input
               type="tel"
               value={phone}
@@ -731,9 +698,7 @@ export default function Register() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-brand-dark mb-1.5">
-              密码
-            </label>
+            <label className="block text-sm font-medium text-brand-dark mb-1.5">密码</label>
             <input
               type="password"
               value={password}
@@ -794,6 +759,7 @@ git commit -m "refactor(web): Register 对齐 brand token + Button 公共组件"
 ## Task 9: 改造 Favorites 页面
 
 **Files:**
+
 - Modify: `packages/web/src/pages/Favorites.tsx`
 
 - [ ] **Step 1: 用 NavBar + EmptyState + Button 重写**
@@ -867,9 +833,7 @@ export default function Favorites() {
           <span>
             我的收藏
             {total > 0 && (
-              <span className="ml-1 text-[13px] text-brand-muted font-medium">
-                ({total})
-              </span>
+              <span className="ml-1 text-[13px] text-brand-muted font-medium">({total})</span>
             )}
           </span>
         }
@@ -923,9 +887,7 @@ export default function Favorites() {
                         {product.name}
                       </p>
                       <div className="flex items-baseline gap-1 mt-1">
-                        <span className="text-xs text-brand-primary font-bold">
-                          ¥
-                        </span>
+                        <span className="text-xs text-brand-primary font-bold">¥</span>
                         <span className="text-lg font-extrabold text-brand-primary font-display leading-none">
                           {product.price}
                         </span>
@@ -993,6 +955,7 @@ git commit -m "refactor(web): Favorites 用 NavBar/EmptyState/Button 对齐设�
 ## Task 10: 改造 Profile 页面
 
 **Files:**
+
 - Modify: `packages/web/src/pages/Profile.tsx`
 
 - [ ] **Step 1: `bg-brand-canvas` → `bg-brand-bg`，按钮用 Button**
@@ -1010,7 +973,10 @@ git commit -m "refactor(web): Favorites 用 NavBar/EmptyState/Button 对齐设�
      variant="primary"
      fullWidth={false}
      className="mt-2 w-full max-w-[220px]"
-     onClick={() => { setNickname(user.nickname ?? ''); setIsEditing(true); }}
+     onClick={() => {
+       setNickname(user.nickname ?? '');
+       setIsEditing(true);
+     }}
    >
      编辑资料
    </Button>
@@ -1052,9 +1018,11 @@ git commit -m "refactor(web): Profile 修正 canvas→bg token + 用 Button"
 ## Task 11: 改造 Cart 页面
 
 **Files:**
+
 - Modify: `packages/web/src/pages/Cart.tsx`
 
 **改动要点：**
+
 - header：`bg-white/90 border-b border-gray-100` → 用 `NavBar`（无 back，title="购物车"，右侧放清空按钮）
 - 商品卡片：`bg-white shadow-sm` → `bg-brand-card border border-brand-border`；圆角保持 `rounded-2xl`
 - 数量按钮：保持原样（已用 `bg-gray-100` → `bg-brand-btn-bg`，`bg-brand-primary` 保留）
@@ -1110,10 +1078,7 @@ if (items.length === 0) {
     <div className="flex items-center gap-3">
       <span className="text-sm text-brand-muted">{items.length}件商品</span>
       {items.length > 0 && (
-        <button
-          onClick={() => setClearTarget(true)}
-          className="text-brand-coral text-sm font-bold"
-        >
+        <button onClick={() => setClearTarget(true)} className="text-brand-coral text-sm font-bold">
           清空
         </button>
       )}
@@ -1125,10 +1090,13 @@ if (items.length === 0) {
 - [ ] **Step 4: 主 return 替换商品卡片容器 className**
 
 将：
+
 ```
 className="bg-white rounded-2xl p-4 flex gap-3 shadow-sm"
 ```
+
 改为：
+
 ```
 className="bg-brand-card rounded-2xl border border-brand-border p-4 flex gap-3"
 ```
@@ -1156,9 +1124,7 @@ className="bg-brand-card rounded-2xl border border-brand-border p-4 flex gap-3"
   <button onClick={toggleSelectAll} className="flex items-center gap-2">
     <span
       className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-        isSelectedAll()
-          ? 'bg-brand-primary border-brand-primary'
-          : 'border-brand-border'
+        isSelectedAll() ? 'bg-brand-primary border-brand-primary' : 'border-brand-border'
       }`}
     >
       {isSelectedAll() && (
@@ -1173,15 +1139,9 @@ className="bg-brand-card rounded-2xl border border-brand-border p-4 flex gap-3"
   <div className="flex items-center gap-4">
     <div className="text-right">
       <span className="text-sm text-brand-muted">合计：</span>
-      <span className="text-lg font-bold text-brand-primary">
-        ¥{Number(total).toFixed(2)}
-      </span>
+      <span className="text-lg font-bold text-brand-primary">¥{Number(total).toFixed(2)}</span>
     </div>
-    <Button
-      variant="primary"
-      disabled={selectedCount === 0 || isUpdating}
-      onClick={handleCheckout}
-    >
+    <Button variant="primary" disabled={selectedCount === 0 || isUpdating} onClick={handleCheckout}>
       结算({selectedCount})
     </Button>
   </div>
@@ -1193,23 +1153,23 @@ className="bg-brand-card rounded-2xl border border-brand-border p-4 flex gap-3"
 将 modal 内 `border border-brand-border font-bold` 保持；「确定清空」按钮改用 `<Button variant="danger">`，「取消」改用 `<Button variant="ghost">`。
 
 ```tsx
-{clearTarget && (
-  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-    <div className="bg-white rounded-3xl p-6 w-full max-w-xs">
-      <p className="text-center text-brand-dark font-bold mb-4">
-        确定清空购物车？此操作不可撤销
-      </p>
-      <div className="flex gap-2">
-        <Button variant="danger" fullWidth onClick={confirmClear}>
-          确定清空
-        </Button>
-        <Button variant="ghost" fullWidth onClick={() => setClearTarget(false)}>
-          取消
-        </Button>
+{
+  clearTarget && (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-3xl p-6 w-full max-w-xs">
+        <p className="text-center text-brand-dark font-bold mb-4">确定清空购物车？此操作不可撤销</p>
+        <div className="flex gap-2">
+          <Button variant="danger" fullWidth onClick={confirmClear}>
+            确定清空
+          </Button>
+          <Button variant="ghost" fullWidth onClick={() => setClearTarget(false)}>
+            取消
+          </Button>
+        </div>
       </div>
     </div>
-  </div>
-)}
+  );
+}
 ```
 
 - [ ] **Step 8: 验证编译**
@@ -1220,6 +1180,7 @@ Expected: 编译成功
 - [ ] **Step 9: 手动验证**
 
 启动 `pnpm --filter web dev`，访问 `/cart`：
+
 - 空态显示 EmptyState
 - 有商品时卡片有边框无阴影
 - 底部栏样式正确，结算按钮可点
@@ -1236,9 +1197,11 @@ git commit -m "refactor(web): Cart 全面对齐 brand token + 公共组件"
 ## Task 12: 改造 Checkout 页面
 
 **Files:**
+
 - Modify: `packages/web/src/pages/Checkout.tsx`
 
 **改动要点：**
+
 - header 替换为 `<NavBar title="确认订单" />`
 - 3 个 section 卡片：`bg-white rounded-2xl shadow-sm` → `bg-brand-card rounded-2xl border border-brand-border`
 - 底部栏替换为 `<BottomActionBar>`
@@ -1248,6 +1211,7 @@ git commit -m "refactor(web): Cart 全面对齐 brand token + 公共组件"
 - [ ] **Step 1: imports 调整**
 
 在顶部加：
+
 ```tsx
 import { NavBar, BottomActionBar, Button } from '@/components/ui';
 ```
@@ -1263,10 +1227,13 @@ import { NavBar, BottomActionBar, Button } from '@/components/ui';
 - [ ] **Step 3: 3 个 section 卡片 className 替换**
 
 全部把：
+
 ```
 className="bg-white rounded-2xl p-4 ... shadow-sm"
 ```
+
 改为：
+
 ```
 className="bg-brand-card rounded-2xl border border-brand-border p-4 ..."
 ```
@@ -1292,15 +1259,9 @@ className="bg-brand-card rounded-2xl border border-brand-border p-4 ..."
 <BottomActionBar>
   <div>
     <span className="text-sm text-brand-muted">应付：</span>
-    <span className="text-xl font-bold text-brand-primary">
-      ¥{Number(totalAmount).toFixed(2)}
-    </span>
+    <span className="text-xl font-bold text-brand-primary">¥{Number(totalAmount).toFixed(2)}</span>
   </div>
-  <Button
-    variant="primary"
-    loading={isSubmitting}
-    onClick={handleSubmit}
-  >
+  <Button variant="primary" loading={isSubmitting} onClick={handleSubmit}>
     {isSubmitting ? '提交中...' : '提交订单'}
   </Button>
 </BottomActionBar>
@@ -1323,9 +1284,11 @@ git commit -m "refactor(web): Checkout 对齐 brand token + 公共组件"
 ## Task 13: 改造 OrderList 页面
 
 **Files:**
+
 - Modify: `packages/web/src/pages/OrderList.tsx`
 
 **改动要点：**
+
 - header + 状态 tab 整合：用 `<NavBar>` 包住 title 和 tabs（注意 tabs 需要换行布局，NavBar 单行不够；保留现有双行结构，只换外层 header 容器样式）
 - 状态 tab 默认态：`bg-gray-100 text-gray-600` → `bg-white text-brand-muted border border-brand-border`
 - 卡片：`bg-white rounded-2xl shadow-sm` → `bg-brand-card rounded-2xl border border-brand-border`；`hover:shadow-md` → `hover:border-brand-primary/30`
@@ -1378,7 +1341,8 @@ import { NavBar, EmptyState, Button } from '@/components/ui';
 - [ ] **Step 4: OrderCard 样式替换**
 
 把 OrderCard 函数内：
-- `className="bg-white rounded-2xl p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow"` 
+
+- `className="bg-white rounded-2xl p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow"`
   → `className="bg-brand-card rounded-2xl border border-brand-border p-4 cursor-pointer hover:border-brand-primary/30 transition-colors"`
 - `text-gray-400` → `text-brand-muted`
 - `text-gray-600` → `text-brand-muted`
@@ -1388,18 +1352,15 @@ import { NavBar, EmptyState, Button } from '@/components/ui';
 - [ ] **Step 5: 加载更多按钮替换**
 
 ```tsx
-{page < totalPages && (
-  <div className="flex justify-center py-4">
-    <Button
-      variant="ghost"
-      size="sm"
-      loading={isLoading}
-      onClick={handleLoadMore}
-    >
-      查看更多
-    </Button>
-  </div>
-)}
+{
+  page < totalPages && (
+    <div className="flex justify-center py-4">
+      <Button variant="ghost" size="sm" loading={isLoading} onClick={handleLoadMore}>
+        查看更多
+      </Button>
+    </div>
+  );
+}
 ```
 
 - [ ] **Step 6: 验证编译**
@@ -1419,9 +1380,11 @@ git commit -m "refactor(web): OrderList 对齐 brand token + 公共组件"
 ## Task 14: 改造 OrderDetail 页面
 
 **Files:**
+
 - Modify: `packages/web/src/pages/OrderDetail.tsx`
 
 **改动要点：**
+
 - header 替换为 `<NavBar title="订单详情" />`
 - 商品小图 `rounded-lg` → `rounded-xl`
 - 占位图背景 `bg-gray-100` → `bg-brand-btn-bg`
@@ -1456,7 +1419,7 @@ import { NavBar, BottomActionBar, Button } from '@/components/ui';
 
 - [ ] **Step 4: 商品小图占位背景**
 
-`<div className="w-14 h-14 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">` 
+`<div className="w-14 h-14 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">`
 → `<div className="w-14 h-14 rounded-xl overflow-hidden bg-brand-btn-bg flex-shrink-0">`
 
 - [ ] **Step 5: section 卡片去 shadow 加 border**
@@ -1468,48 +1431,50 @@ import { NavBar, BottomActionBar, Button } from '@/components/ui';
 把 `<div className="fixed bottom-0 ...">` 块替换为：
 
 ```tsx
-{hasActionButtons && (
-  <BottomActionBar>
-    <Button variant="ghost" fullWidth onClick={() => navigate('/orders')}>
-      返回列表
-    </Button>
-    {showPayBtn && (
-      <Button variant="primary" loading={isPaying} disabled={isCancelling} onClick={handlePay}>
-        {isPaying ? '支付中...' : '去支付'}
+{
+  hasActionButtons && (
+    <BottomActionBar>
+      <Button variant="ghost" fullWidth onClick={() => navigate('/orders')}>
+        返回列表
       </Button>
-    )}
-    {showPayBtn && (
-      <Button variant="danger" loading={isCancelling} disabled={isPaying} onClick={handleCancel}>
-        {isCancelling ? '取消中...' : '取消订单'}
-      </Button>
-    )}
-    {showConfirmBtn && (
-      <Button variant="primary" loading={isConfirming} onClick={handleConfirm}>
-        {isConfirming ? '处理中...' : '确认收货'}
-      </Button>
-    )}
-    {showRefundBtn && (
-      <Button variant="ghost" onClick={openRefundModal} disabled={isConfirming}>
-        <span className="text-brand-coral">申请退款</span>
-      </Button>
-    )}
-    {showReviewBtn && (
-      <Button
-        variant="primary"
-        onClick={() => {
-          const drafts: Record<number, { rating: number; content: string }> = {};
-          order.items.forEach((it) => {
-            drafts[it.productId] = { rating: 5, content: '' };
-          });
-          setReviewDrafts(drafts);
-          setShowReviewModal(true);
-        }}
-      >
-        去评价
-      </Button>
-    )}
-  </BottomActionBar>
-)}
+      {showPayBtn && (
+        <Button variant="primary" loading={isPaying} disabled={isCancelling} onClick={handlePay}>
+          {isPaying ? '支付中...' : '去支付'}
+        </Button>
+      )}
+      {showPayBtn && (
+        <Button variant="danger" loading={isCancelling} disabled={isPaying} onClick={handleCancel}>
+          {isCancelling ? '取消中...' : '取消订单'}
+        </Button>
+      )}
+      {showConfirmBtn && (
+        <Button variant="primary" loading={isConfirming} onClick={handleConfirm}>
+          {isConfirming ? '处理中...' : '确认收货'}
+        </Button>
+      )}
+      {showRefundBtn && (
+        <Button variant="ghost" onClick={openRefundModal} disabled={isConfirming}>
+          <span className="text-brand-coral">申请退款</span>
+        </Button>
+      )}
+      {showReviewBtn && (
+        <Button
+          variant="primary"
+          onClick={() => {
+            const drafts: Record<number, { rating: number; content: string }> = {};
+            order.items.forEach((it) => {
+              drafts[it.productId] = { rating: 5, content: '' };
+            });
+            setReviewDrafts(drafts);
+            setShowReviewModal(true);
+          }}
+        >
+          去评价
+        </Button>
+      )}
+    </BottomActionBar>
+  );
+}
 ```
 
 - [ ] **Step 7: 退款 modal 样式修正**
@@ -1540,17 +1505,20 @@ git commit -m "refactor(web): OrderDetail 对齐 brand token + 公共组件"
 ## Task 15: 全局 token 清查验收
 
 **Files:**
+
 - 验收：整个 `packages/web/src/`
 
 - [ ] **Step 1: Grep 清查 gray-\***
 
-Run: 
+Run:
+
 ```bash
 cd packages/web && grep -rn "gray-\(100\|200\|300\|400\|500\|600\|700\|800\|900\)" src/pages/ src/components/ \
   --include="*.tsx" --include="*.ts" \
   | grep -v "src/components/ui/" \
   | grep -v "LoadingSpinner"
 ```
+
 Expected: 无输出（或仅 LoadingSpinner 内部）
 
 如有残留，按映射表修正。
@@ -1558,6 +1526,7 @@ Expected: 无输出（或仅 LoadingSpinner 内部）
 - [ ] **Step 2: Grep 清查 shadow-\***
 
 Run:
+
 ```bash
 cd packages/web && grep -rn "shadow-sm\|shadow-md\|shadow-lg" src/pages/ src/components/ \
   --include="*.tsx" --include="*.ts" \
@@ -1565,6 +1534,7 @@ cd packages/web && grep -rn "shadow-sm\|shadow-md\|shadow-lg" src/pages/ src/com
   | grep -v "LoadingSpinner" \
   | grep -v "Toast"
 ```
+
 Expected: 无输出（Toast 的 shadow-lg 可保留，它是浮动提示）
 
 如有残留，改成 `border border-brand-border`。
@@ -1577,6 +1547,7 @@ Expected: 编译成功，无 TS 错误、无 warning
 - [ ] **Step 4: 手动全流程验证**
 
 启动 `pnpm --filter web dev`（需后端 + shared 先起来），跑核心流程：
+
 - 首页 → 商品详情 → 加购 → 购物车 → 结算 → 下单 → 订单列表 → 订单详情
 - 订单详情各状态按钮（支付/取消/确认/退款/评价）
 - 登录、注册、登出

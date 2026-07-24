@@ -95,8 +95,7 @@ export default function MyCoupons() {
         <div>
           <p className="text-sm font-bold text-brand-dark line-clamp-1">{t.name}</p>
           <p className="text-[11px] text-brand-muted mt-1">
-            {new Date(t.startAt).toLocaleDateString()} ~{' '}
-            {new Date(t.endAt).toLocaleDateString()}
+            {new Date(t.startAt).toLocaleDateString()} ~ {new Date(t.endAt).toLocaleDateString()}
           </p>
           <p className="text-[11px] text-brand-muted">
             剩余 {Math.max(0, t.totalCount - t.claimedCount)}/{t.totalCount}
@@ -115,7 +114,14 @@ export default function MyCoupons() {
             onClick={() => navigate(-1)}
             className="w-9 h-9 flex items-center justify-center rounded-full bg-brand-btn-bg hover:bg-brand-border transition-colors"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
           </button>
@@ -125,7 +131,9 @@ export default function MyCoupons() {
           <button
             onClick={() => setTab('mine')}
             className={`flex-1 py-2 rounded-full text-sm font-bold transition-colors ${
-              tab === 'mine' ? 'bg-brand-primary text-white' : 'bg-white text-brand-dark border border-brand-border'
+              tab === 'mine'
+                ? 'bg-brand-primary text-white'
+                : 'bg-white text-brand-dark border border-brand-border'
             }`}
           >
             我的优惠券
@@ -133,7 +141,9 @@ export default function MyCoupons() {
           <button
             onClick={() => setTab('available')}
             className={`flex-1 py-2 rounded-full text-sm font-bold transition-colors ${
-              tab === 'available' ? 'bg-brand-primary text-white' : 'bg-white text-brand-dark border border-brand-border'
+              tab === 'available'
+                ? 'bg-brand-primary text-white'
+                : 'bg-white text-brand-dark border border-brand-border'
             }`}
           >
             可领取
@@ -153,21 +163,23 @@ export default function MyCoupons() {
             </div>
           ) : (
             mine.map((uc) =>
-              renderCouponCard(uc.coupon ?? ({} as CouponTemplate), (
+              renderCouponCard(
+                uc.coupon ?? ({} as CouponTemplate),
                 <div className="flex items-center justify-between mt-2">
                   <span className="text-[11px] text-brand-muted">未使用</span>
-                  <span className="text-[11px] text-brand-muted">领取时间 {new Date(uc.createdAt).toLocaleDateString()}</span>
-                </div>
-              )),
+                  <span className="text-[11px] text-brand-muted">
+                    领取时间 {new Date(uc.createdAt).toLocaleDateString()}
+                  </span>
+                </div>,
+              ),
             )
           )
         ) : available.length === 0 ? (
-          <div className="text-center py-10 text-brand-muted text-sm">
-            暂无可领取的优惠券
-          </div>
+          <div className="text-center py-10 text-brand-muted text-sm">暂无可领取的优惠券</div>
         ) : (
           available.map((t) =>
-            renderCouponCard(t, (
+            renderCouponCard(
+              t,
               <div className="flex items-center justify-end mt-2">
                 <button
                   onClick={() => handleClaim(t.id)}
@@ -180,8 +192,8 @@ export default function MyCoupons() {
                 >
                   {t.claimed ? '已领取' : claimingId === t.id ? '领取中...' : '立即领取'}
                 </button>
-              </div>
-            )),
+              </div>,
+            ),
           )
         )}
       </main>

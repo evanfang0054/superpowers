@@ -1,4 +1,3 @@
-
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
   color?: string;
@@ -16,11 +15,7 @@ export function LoadingSpinner({ size = 'md', color }: LoadingSpinnerProps) {
       className={`${sizeMap[size]} animate-spin`}
       style={{ color: color || 'var(--color-brand-primary)' }}
     >
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        className="w-full h-full"
-      >
+      <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
         <circle
           cx="12"
           cy="12"

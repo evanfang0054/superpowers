@@ -66,9 +66,7 @@ export default function Favorites() {
           <span>
             我的收藏
             {total > 0 && (
-              <span className="ml-1 text-[13px] text-brand-muted font-medium">
-                ({total})
-              </span>
+              <span className="ml-1 text-[13px] text-brand-muted font-medium">({total})</span>
             )}
           </span>
         }
@@ -122,9 +120,7 @@ export default function Favorites() {
                         {product.name}
                       </p>
                       <div className="flex items-baseline gap-1 mt-1">
-                        <span className="text-xs text-brand-primary font-bold">
-                          ¥
-                        </span>
+                        <span className="text-xs text-brand-primary font-bold">¥</span>
                         <span className="text-lg font-extrabold text-brand-primary font-display leading-none">
                           {product.price}
                         </span>

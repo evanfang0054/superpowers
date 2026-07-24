@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Param,
-  Body,
-  Query,
-  UseGuards,
-  ParseIntPipe,
-} from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Query, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -40,10 +31,7 @@ export class RefundController {
   }
 
   @Post(':id/reject')
-  reject(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: RefundReviewDto,
-  ) {
+  reject(@Param('id', ParseIntPipe) id: number, @Body() dto: RefundReviewDto) {
     return this.refundService.reject(id, dto);
   }
 }

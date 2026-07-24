@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-  Inject,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { CartEntity, ProductEntity } from '../../entities';
@@ -131,10 +126,7 @@ export class CartService {
     return this.findAll(userId);
   }
 
-  async removeByUserAndProductIds(
-    userId: number,
-    productIds: number[],
-  ): Promise<void> {
+  async removeByUserAndProductIds(userId: number, productIds: number[]): Promise<void> {
     if (productIds.length === 0) return;
     await this.cartRepo
       .createQueryBuilder()

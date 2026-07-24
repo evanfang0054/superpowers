@@ -5,10 +5,7 @@ interface BottomActionBarProps {
   className?: string;
 }
 
-export function BottomActionBar({
-  children,
-  className = '',
-}: BottomActionBarProps) {
+export function BottomActionBar({ children, className = '' }: BottomActionBarProps) {
   return (
     <div
       className={`fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-[12px] border-t-[1.5px] border-brand-border z-40 safe-bottom ${className}`}

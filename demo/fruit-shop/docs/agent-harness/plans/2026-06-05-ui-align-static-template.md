@@ -15,35 +15,38 @@
 ## File Map
 
 ### Modify
-| File | Responsibility |
-|------|---------------|
-| `packages/web/src/styles/index.css` | 全局主题 token + body 背景 |
-| `packages/web/src/components/CategoryTabs.tsx` | 圆角药丸 + emoji 图标样式 |
-| `packages/web/src/components/PromoBanner.tsx` | 渐变促销卡片（替换图片轮播） |
-| `packages/web/src/components/ProductCard.tsx` | 重写为模板风格 FruitCard |
-| `packages/web/src/components/SearchBar.tsx` | 品牌色边框 + 圆角调整 |
-| `packages/web/src/components/TabBar.tsx` | 毛玻璃效果 |
-| `packages/web/src/components/BuyBar.tsx` | 数量按钮 + 渐变双按钮 + pulse-glow |
-| `packages/web/src/components/SpecSelector.tsx` | 圆角卡样式 |
-| `packages/web/src/pages/Home.tsx` | 整页按模板重写 |
-| `packages/web/src/pages/ProductDetail.tsx` | 整页按模板重写 |
+
+| File                                           | Responsibility                     |
+| ---------------------------------------------- | ---------------------------------- |
+| `packages/web/src/styles/index.css`            | 全局主题 token + body 背景         |
+| `packages/web/src/components/CategoryTabs.tsx` | 圆角药丸 + emoji 图标样式          |
+| `packages/web/src/components/PromoBanner.tsx`  | 渐变促销卡片（替换图片轮播）       |
+| `packages/web/src/components/ProductCard.tsx`  | 重写为模板风格 FruitCard           |
+| `packages/web/src/components/SearchBar.tsx`    | 品牌色边框 + 圆角调整              |
+| `packages/web/src/components/TabBar.tsx`       | 毛玻璃效果                         |
+| `packages/web/src/components/BuyBar.tsx`       | 数量按钮 + 渐变双按钮 + pulse-glow |
+| `packages/web/src/components/SpecSelector.tsx` | 圆角卡样式                         |
+| `packages/web/src/pages/Home.tsx`              | 整页按模板重写                     |
+| `packages/web/src/pages/ProductDetail.tsx`     | 整页按模板重写                     |
 
 ### Create
-| File | Responsibility |
-|------|---------------|
-| `packages/web/src/components/DecorDots.tsx` | 装饰圆点背景 |
-| `packages/web/src/components/ProductHero.tsx` | 详情页圆角大图 + 渐变 |
-| `packages/web/src/components/ProductName.tsx` | 商品名 + 产地 |
-| `packages/web/src/components/PriceSection.tsx` | 大数字价格 + tag 行 |
-| `packages/web/src/components/QualityInfo.tsx` | 2×2 品质网格 |
-| `packages/web/src/components/Description.tsx` | 水果故事卡片 |
-| `packages/web/src/components/RecommendFruits.tsx` | 推荐横滚列表 |
+
+| File                                              | Responsibility        |
+| ------------------------------------------------- | --------------------- |
+| `packages/web/src/components/DecorDots.tsx`       | 装饰圆点背景          |
+| `packages/web/src/components/ProductHero.tsx`     | 详情页圆角大图 + 渐变 |
+| `packages/web/src/components/ProductName.tsx`     | 商品名 + 产地         |
+| `packages/web/src/components/PriceSection.tsx`    | 大数字价格 + tag 行   |
+| `packages/web/src/components/QualityInfo.tsx`     | 2×2 品质网格          |
+| `packages/web/src/components/Description.tsx`     | 水果故事卡片          |
+| `packages/web/src/components/RecommendFruits.tsx` | 推荐横滚列表          |
 
 ---
 
 ### Task 1: 更新全局主题 Token
 
 **Files:**
+
 - Modify: `packages/web/src/styles/index.css`
 
 - [ ] **Step 1: 更新 @theme 和 body 样式**
@@ -51,41 +54,41 @@
 将 `index.css` 完整替换为以下内容：
 
 ```css
-@import "./animations.css";
-@import "tailwindcss";
+@import './animations.css';
+@import 'tailwindcss';
 
 @theme {
   /* 品牌色 — 与静态模板 1:1 */
-  --color-brand-bg: #FFF8F0;
-  --color-brand-primary: #FF6B35;
-  --color-brand-secondary: #F7C948;
-  --color-brand-accent: #E84393;
-  --color-brand-green: #00B894;
-  --color-brand-dark: #2D3436;
-  --color-brand-muted: #636E72;
-  --color-brand-card: #FFFFFF;
-  --color-brand-peach: #FFEAA7;
-  --color-brand-coral: #FF7675;
+  --color-brand-bg: #fff8f0;
+  --color-brand-primary: #ff6b35;
+  --color-brand-secondary: #f7c948;
+  --color-brand-accent: #e84393;
+  --color-brand-green: #00b894;
+  --color-brand-dark: #2d3436;
+  --color-brand-muted: #636e72;
+  --color-brand-card: #ffffff;
+  --color-brand-peach: #ffeaa7;
+  --color-brand-coral: #ff7675;
   --color-brand-border: #f0ece6;
   --color-brand-btn-bg: #f5f1eb;
 
   /* 保留旧 token 供其他页面用 */
-  --color-primary: #FF6B35;
-  --color-primary-light: #FF8C5A;
-  --color-primary-dark: #E55A2B;
-  --color-accent: #FFD32A;
-  --color-success: #26DE81;
-  --color-danger: #FF6B6B;
-  --color-warning: #FFA502;
-  --color-info: #45AAF2;
+  --color-primary: #ff6b35;
+  --color-primary-light: #ff8c5a;
+  --color-primary-dark: #e55a2b;
+  --color-accent: #ffd32a;
+  --color-success: #26de81;
+  --color-danger: #ff6b6b;
+  --color-warning: #ffa502;
+  --color-info: #45aaf2;
 
   /* 灰色梯度 */
-  --color-gray-50: #FAFAFA;
-  --color-gray-100: #F5F5F5;
-  --color-gray-200: #EEEEEE;
-  --color-gray-300: #E0E0E0;
-  --color-gray-400: #BDBDBD;
-  --color-gray-500: #9E9E9E;
+  --color-gray-50: #fafafa;
+  --color-gray-100: #f5f5f5;
+  --color-gray-200: #eeeeee;
+  --color-gray-300: #e0e0e0;
+  --color-gray-400: #bdbdbd;
+  --color-gray-500: #9e9e9e;
   --color-gray-600: #757575;
   --color-gray-700: #616161;
   --color-gray-800: #424242;
@@ -142,8 +145,13 @@ body {
 }
 
 /* 隐藏横向滚动条 */
-.scrollbar-hide::-webkit-scrollbar { display: none; }
-.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
 /* 工具类 */
 .font-display {
@@ -191,6 +199,7 @@ git commit -m "style: 更新全局主题 token 对齐静态模板"
 ### Task 2: 新建 DecorDots 组件
 
 **Files:**
+
 - Create: `packages/web/src/components/DecorDots.tsx`
 
 - [ ] **Step 1: 创建 DecorDots.tsx**
@@ -228,6 +237,7 @@ git commit -m "feat(web): 新建 DecorDots 装饰圆点组件"
 ### Task 3: 新建详情页专用组件 (ProductHero / ProductName / PriceSection / QualityInfo / Description / RecommendFruits)
 
 **Files:**
+
 - Create: `packages/web/src/components/ProductHero.tsx`
 - Create: `packages/web/src/components/ProductName.tsx`
 - Create: `packages/web/src/components/PriceSection.tsx`
@@ -302,9 +312,7 @@ export function ProductName({ name, origin }: ProductNameProps) {
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
             <circle cx="12" cy="10" r="3" />
           </svg>
-          <span className="text-[13px] text-brand-muted font-medium">
-            产地直发 · {origin}
-          </span>
+          <span className="text-[13px] text-brand-muted font-medium">产地直发 · {origin}</span>
         </div>
       )}
     </div>
@@ -332,9 +340,7 @@ export function PriceSection({ price, originalPrice, unit, tags }: PriceSectionP
         </span>
         {unit && <span className="text-[13px] text-brand-muted">/ {unit}</span>}
         {originalPrice && originalPrice > price && (
-          <span className="text-[13px] text-gray-300 line-through ml-1">
-            ¥{originalPrice}
-          </span>
+          <span className="text-[13px] text-gray-300 line-through ml-1">¥{originalPrice}</span>
         )}
       </div>
       {tags && tags.length > 0 && (
@@ -485,6 +491,7 @@ git commit -m "feat(web): 新建详情页专用组件 (Hero/Name/Price/Quality/D
 ### Task 4: 重写 CategoryTabs
 
 **Files:**
+
 - Modify: `packages/web/src/components/CategoryTabs.tsx`
 
 - [ ] **Step 1: 重写 CategoryTabs.tsx**
@@ -549,6 +556,7 @@ git commit -m "style(web): 重写 CategoryTabs 对齐模板药丸样式"
 ### Task 5: 重写 PromoBanner
 
 **Files:**
+
 - Modify: `packages/web/src/components/PromoBanner.tsx`
 
 - [ ] **Step 1: 重写 PromoBanner.tsx 为渐变促销卡片**
@@ -566,12 +574,8 @@ export function PromoBanner() {
         }}
       >
         <div className="px-6 py-5 relative z-10">
-          <div className="text-white/80 text-xs font-semibold tracking-wider mb-1">
-            限时特惠
-          </div>
-          <div className="text-white text-xl font-black leading-tight">
-            新人首单立减 ¥10
-          </div>
+          <div className="text-white/80 text-xs font-semibold tracking-wider mb-1">限时特惠</div>
+          <div className="text-white text-xl font-black leading-tight">新人首单立减 ¥10</div>
           <div className="text-white/70 text-xs mt-1">满 49 元可用 · 今日有效</div>
           <div className="mt-3 inline-block px-4 py-1.5 bg-white rounded-full text-brand-primary text-xs font-bold cursor-pointer">
             立即领取 →
@@ -603,6 +607,7 @@ git commit -m "style(web): 重写 PromoBanner 为渐变促销卡片"
 ### Task 6: 重写 SearchBar
 
 **Files:**
+
 - Modify: `packages/web/src/components/SearchBar.tsx`
 
 - [ ] **Step 1: 重写 SearchBar.tsx 品牌色样式**
@@ -685,6 +690,7 @@ git commit -m "style(web): 重写 SearchBar 对齐模板品牌色样式"
 ### Task 7: 重写 ProductCard (FruitCard)
 
 **Files:**
+
 - Modify: `packages/web/src/components/ProductCard.tsx`
 
 - [ ] **Step 1: 重写 ProductCard.tsx 为模板风格**
@@ -727,9 +733,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="p-3">
         <div className="flex items-center justify-between">
           <h3 className="text-[15px] font-bold text-brand-dark">{product.name}</h3>
-          {product.origin && (
-            <span className="text-[11px] text-brand-muted">{product.origin}</span>
-          )}
+          {product.origin && <span className="text-[11px] text-brand-muted">{product.origin}</span>}
         </div>
         <div className="flex items-baseline justify-between mt-2">
           <div className="flex items-baseline gap-1">
@@ -742,9 +746,7 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
           </div>
           {product.originalPrice && product.originalPrice > product.price && (
-            <span className="text-[11px] text-gray-300 line-through">
-              ¥{product.originalPrice}
-            </span>
+            <span className="text-[11px] text-gray-300 line-through">¥{product.originalPrice}</span>
           )}
         </div>
       </div>
@@ -770,6 +772,7 @@ git commit -m "style(web): 重写 ProductCard 对齐模板品牌风格"
 ### Task 8: 重写 BuyBar
 
 **Files:**
+
 - Modify: `packages/web/src/components/BuyBar.tsx`
 
 - [ ] **Step 1: 重写 BuyBar.tsx — 数量按钮 + 渐变双按钮 + pulse-glow**
@@ -871,6 +874,7 @@ git commit -m "style(web): 重写 BuyBar 对齐模板 — 数量按钮 + 渐变�
 ### Task 9: 重写 SpecSelector
 
 **Files:**
+
 - Modify: `packages/web/src/components/SpecSelector.tsx`
 
 - [ ] **Step 1: 重写 SpecSelector.tsx 圆角卡样式**
@@ -954,6 +958,7 @@ git commit -m "style(web): 重写 SpecSelector 对齐模板圆角卡样式"
 ### Task 10: 重写首页 Home.tsx
 
 **Files:**
+
 - Modify: `packages/web/src/pages/Home.tsx`
 
 - [ ] **Step 1: 重写 Home.tsx 按模板结构**
@@ -986,27 +991,24 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  const fetchProducts = useCallback(
-    async (p: number, kw?: string, catId?: number) => {
-      setIsLoading(true);
-      try {
-        const params: ProductQuery = { page: p, limit: 12 };
-        if (kw) params.keyword = kw;
-        if (catId) params.categoryId = catId;
+  const fetchProducts = useCallback(async (p: number, kw?: string, catId?: number) => {
+    setIsLoading(true);
+    try {
+      const params: ProductQuery = { page: p, limit: 12 };
+      if (kw) params.keyword = kw;
+      if (catId) params.categoryId = catId;
 
-        const response = await productApi.getList(params);
-        const items = response.data.data?.list || [];
+      const response = await productApi.getList(params);
+      const items = response.data.data?.list || [];
 
-        setProducts((prev) => (p === 1 ? items : [...prev, ...items]));
-        setHasMore(items.length >= 12);
-      } catch {
-        // 静默
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [],
-  );
+      setProducts((prev) => (p === 1 ? items : [...prev, ...items]));
+      setHasMore(items.length >= 12);
+    } catch {
+      // 静默
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     productApi
@@ -1169,6 +1171,7 @@ git commit -m "style(web): 重写首页对齐静态模板"
 ### Task 11: 重写详情页 ProductDetail.tsx
 
 **Files:**
+
 - Modify: `packages/web/src/pages/ProductDetail.tsx`
 
 - [ ] **Step 1: 重写 ProductDetail.tsx 按模板结构**
@@ -1225,9 +1228,7 @@ export default function ProductDetail() {
       .getRecommendations(5)
       .then((res) => {
         const items = res.data.data || [];
-        setRecommendations(
-          items.filter((p: Product) => p.id !== Number(id)).slice(0, 4),
-        );
+        setRecommendations(items.filter((p: Product) => p.id !== Number(id)).slice(0, 4));
       })
       .catch(() => {});
   }, [id]);
@@ -1246,9 +1247,7 @@ export default function ProductDetail() {
   const specs: Array<{ name: string; values: string[] }> = [];
   if ((product as Product & { specs?: string }).specs) {
     try {
-      const parsed = JSON.parse(
-        (product as Product & { specs?: string }).specs || '[]',
-      );
+      const parsed = JSON.parse((product as Product & { specs?: string }).specs || '[]');
       if (Array.isArray(parsed)) {
         parsed.forEach((s: { name: string; values: string[] }) => {
           if (s.name && Array.isArray(s.values)) {
@@ -1272,10 +1271,7 @@ export default function ProductDetail() {
 
       {/* 导航栏 */}
       <div className="flex items-center justify-between px-4 py-3 bg-brand-bg/90 backdrop-blur-[10px] sticky top-0 z-50">
-        <div
-          onClick={() => navigate(-1)}
-          className="cursor-pointer flex items-center gap-1"
-        >
+        <div onClick={() => navigate(-1)} className="cursor-pointer flex items-center gap-1">
           <svg
             width="24"
             height="24"
@@ -1383,6 +1379,7 @@ git commit -m "style(web): 重写详情页对齐静态模板"
 ### Task 12: 微调 TabBar
 
 **Files:**
+
 - Modify: `packages/web/src/components/TabBar.tsx`
 
 - [ ] **Step 1: 更新 TabBar 样式 — 毛玻璃 + 品牌色**
@@ -1407,7 +1404,15 @@ const tabs = [
     path: '/',
     label: '首页',
     icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      >
         <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
         <polyline points="9,22 9,12 15,12 15,22" />
       </svg>
@@ -1417,7 +1422,15 @@ const tabs = [
     path: '/cart',
     label: '购物车',
     icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      >
         <circle cx="9" cy="21" r="1" />
         <circle cx="20" cy="21" r="1" />
         <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
@@ -1428,7 +1441,15 @@ const tabs = [
     path: '/orders',
     label: '订单',
     icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      >
         <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
         <polyline points="14,2 14,8 20,8" />
         <line x1="16" y1="13" x2="8" y2="13" />
@@ -1445,9 +1466,8 @@ export function TabBar() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 flex items-center justify-around py-2 pb-[max(8px,env(safe-area-inset-bottom))] bg-white/95 backdrop-blur-[12px] border-t border-brand-border z-40">
       {tabs.map((tab) => {
-        const isActive = tab.path === '/'
-          ? location.pathname === '/'
-          : location.pathname.startsWith(tab.path);
+        const isActive =
+          tab.path === '/' ? location.pathname === '/' : location.pathname.startsWith(tab.path);
 
         return (
           <div
@@ -1458,9 +1478,11 @@ export function TabBar() {
             }`}
           >
             {tab.icon}
-            <span className={`text-[10px] font-semibold ${
-              isActive ? 'text-brand-primary' : 'text-brand-muted'
-            }`}>
+            <span
+              className={`text-[10px] font-semibold ${
+                isActive ? 'text-brand-primary' : 'text-brand-muted'
+              }`}
+            >
               {tab.label}
             </span>
           </div>
@@ -1502,6 +1524,7 @@ Expected: 构建成功
 Run: `cd packages/web && npx vite dev`
 
 在浏览器中验证：
+
 1. 首页 (`/`) — 暖奶油色背景、装饰圆点、Header 橘子logo、搜索框、分类药丸、促销渐变卡、商品卡 slide-up 动画
 2. 详情页 (`/product/1`) — 圆角大图 bounce-in、商品名+产地、大数字价格+彩色tag、品质2×2网格、水果故事卡片、推荐横滚、底部数量+双按钮
 3. 点击分类/搜索/分页/加入购物车 功能无回归

@@ -33,9 +33,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="p-3">
         <div className="flex items-center justify-between">
           <h3 className="text-[15px] font-bold text-brand-dark">{product.name}</h3>
-          {product.origin && (
-            <span className="text-[11px] text-brand-muted">{product.origin}</span>
-          )}
+          {product.origin && <span className="text-[11px] text-brand-muted">{product.origin}</span>}
         </div>
         <div className="flex items-baseline justify-between mt-2">
           <div className="flex items-baseline gap-1">

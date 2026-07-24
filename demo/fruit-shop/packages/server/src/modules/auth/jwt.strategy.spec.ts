@@ -16,19 +16,27 @@ describe('JwtStrategy.validate', () => {
   });
 
   it('should throw TOKEN_INVALID when type is not access', async () => {
-    await expect(strategy.validate({ sub: 1, phone: 'p', role: 'user', jti: 'j', type: 'refresh' }))
-      .rejects.toThrow(UnauthorizedException);
+    await expect(
+      strategy.validate({ sub: 1, phone: 'p', role: 'user', jti: 'j', type: 'refresh' }),
+    ).rejects.toThrow(UnauthorizedException);
   });
 
   it('should throw TOKEN_EXPIRED when blacklisted', async () => {
     redis.get.mockResolvedValue('1');
-    await expect(strategy.validate({ sub: 1, phone: 'p', role: 'user', jti: 'j', type: 'access' }))
-      .rejects.toThrow(UnauthorizedException);
+    await expect(
+      strategy.validate({ sub: 1, phone: 'p', role: 'user', jti: 'j', type: 'access' }),
+    ).rejects.toThrow(UnauthorizedException);
   });
 
   it('should return payload when valid', async () => {
     redis.get.mockResolvedValue(null);
-    const result = await strategy.validate({ sub: 1, phone: 'p', role: 'user', jti: 'j', type: 'access' });
+    const result = await strategy.validate({
+      sub: 1,
+      phone: 'p',
+      role: 'user',
+      jti: 'j',
+      type: 'access',
+    });
     expect(result).toEqual({ id: 1, phone: 'p', role: 'user', jti: 'j' });
   });
 });

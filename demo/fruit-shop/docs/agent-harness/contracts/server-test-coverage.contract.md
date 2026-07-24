@@ -47,28 +47,28 @@
 
 ### 单测（新增文件）
 
-| 文件 | it() 下限 |
-|---|---|
-| auth.service.spec.ts | 14 |
-| user.service.spec.ts | 4 |
-| product.service.spec.ts | 12 |
-| cart.service.spec.ts | 9 |
-| order.service.spec.ts | 10 |
-| jwt.strategy.spec.ts | 3 |
-| jwt-auth.guard.spec.ts | 5 |
-| roles.guard.spec.ts | 4 |
-| transform.interceptor.spec.ts | 3 |
-| http-exception.filter.spec.ts | 7 |
+| 文件                          | it() 下限 |
+| ----------------------------- | --------- |
+| auth.service.spec.ts          | 14        |
+| user.service.spec.ts          | 4         |
+| product.service.spec.ts       | 12        |
+| cart.service.spec.ts          | 9         |
+| order.service.spec.ts         | 10        |
+| jwt.strategy.spec.ts          | 3         |
+| jwt-auth.guard.spec.ts        | 5         |
+| roles.guard.spec.ts           | 4         |
+| transform.interceptor.spec.ts | 3         |
+| http-exception.filter.spec.ts | 7         |
 
 ### e2e（扩写文件，新增用例）
 
-| 文件 | 新增 it() 下限 |
-|---|---|
-| auth.e2e-spec.ts | 3 |
-| product.e2e-spec.ts | 6 |
-| cart.e2e-spec.ts | 4 |
-| order.e2e-spec.ts | 4 |
-| user.e2e-spec.ts | 3 |
+| 文件                | 新增 it() 下限 |
+| ------------------- | -------------- |
+| auth.e2e-spec.ts    | 3              |
+| product.e2e-spec.ts | 6              |
+| cart.e2e-spec.ts    | 4              |
+| order.e2e-spec.ts   | 4              |
+| user.e2e-spec.ts    | 3              |
 
 ## Negotiation Record
 

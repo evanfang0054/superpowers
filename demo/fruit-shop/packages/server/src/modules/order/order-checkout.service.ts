@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import {
@@ -107,10 +104,10 @@ export class OrderCheckoutService {
 
       for (const item of cartItems) {
         if (!item.product) continue;
-        await queryRunner.manager.query(
-          'UPDATE products SET stock = stock - ? WHERE id = ?',
-          [item.quantity, item.productId],
-        );
+        await queryRunner.manager.query('UPDATE products SET stock = stock - ? WHERE id = ?', [
+          item.quantity,
+          item.productId,
+        ]);
       }
 
       let discountAmount = 0;
@@ -118,7 +115,10 @@ export class OrderCheckoutService {
       let couponTemplateId: number | null = null;
       if (dto.couponId) {
         const ucRows: {
-          id: number; user_id: number; coupon_id: number; used_at: Date | null;
+          id: number;
+          user_id: number;
+          coupon_id: number;
+          used_at: Date | null;
         }[] = await queryRunner.manager.query(
           'SELECT id, user_id, coupon_id, used_at FROM user_coupons WHERE id = ? FOR UPDATE',
           [dto.couponId],
@@ -143,12 +143,15 @@ export class OrderCheckoutService {
           });
         }
         const template = await this.couponService.getTemplate(uc.coupon_id);
-        discountAmount = this.couponService.calculateDiscount(template, orderItems.map((i) => ({
-          productId: i.productId!,
-          quantity: i.quantity!,
-          price: Number(i.price),
-          categoryId: item_product_category.get(i.productId!)!,
-        })));
+        discountAmount = this.couponService.calculateDiscount(
+          template,
+          orderItems.map((i) => ({
+            productId: i.productId!,
+            quantity: i.quantity!,
+            price: Number(i.price),
+            categoryId: item_product_category.get(i.productId!)!,
+          })),
+        );
         if (totalAmount - discountAmount < 0) {
           throw new BadRequestException({
             code: ErrorCode.COUPON_NOT_APPLICABLE,
@@ -201,7 +204,15 @@ export class OrderCheckoutService {
       await queryRunner.commitTransaction();
 
       this.logger.info(
-        { orderId: savedOrder.id, orderNo, userId, totalAmount: finalTotalAmount, itemCount: orderItems.length, couponId: couponTemplateId, discountAmount },
+        {
+          orderId: savedOrder.id,
+          orderNo,
+          userId,
+          totalAmount: finalTotalAmount,
+          itemCount: orderItems.length,
+          couponId: couponTemplateId,
+          discountAmount,
+        },
         '订单创建成功',
       );
 

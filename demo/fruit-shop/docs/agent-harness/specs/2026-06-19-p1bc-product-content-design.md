@@ -80,8 +80,8 @@ web (React)
 
 ```typescript
 export interface ProductSpec {
-  name: string;       // 规格维度名，如「规格」「产地」
-  values: string[];   // 可选值，如 ['500g/盒', '1kg/袋']
+  name: string; // 规格维度名，如「规格」「产地」
+  values: string[]; // 可选值，如 ['500g/盒', '1kg/袋']
 }
 
 // Product 接口追加三个字段：
@@ -126,9 +126,9 @@ const [selectedSpecs, setSelectedSpecs] = useState<Record<string, string>>({});
 const specs = product.specs ?? [];
 
 // 渲染处（原第 175-180 行）：
-{specs.length > 0 && (
-  <SpecSelector specs={specs} onChange={setSelectedSpecs} />
-)}
+{
+  specs.length > 0 && <SpecSelector specs={specs} onChange={setSelectedSpecs} />;
+}
 ```
 
 将 `selectedSpecs` 传给 BuyBar：
@@ -166,16 +166,17 @@ const specLabel = Object.values(selectedSpecs).join('/') || '默认';
 `ProductFormData` 接口与 `emptyForm` 追加：
 
 ```typescript
-sweetness: string;          // 必填，input text
-weight: string;             // 必填，input text
-color: string;              // 必填，input text（接受 hex 如 #FF6B35）
-tags: string;               // 逗号分隔字符串，提交时 split
-specs: string;              // JSON 字符串，提交时 JSON.parse
-isRecommended: boolean;     // checkbox
-featuredSortOrder: number;  // number input
+sweetness: string; // 必填，input text
+weight: string; // 必填，input text
+color: string; // 必填，input text（接受 hex 如 #FF6B35）
+tags: string; // 逗号分隔字符串，提交时 split
+specs: string; // JSON 字符串，提交时 JSON.parse
+isRecommended: boolean; // checkbox
+featuredSortOrder: number; // number input
 ```
 
 `emptyForm` 默认值：
+
 ```typescript
 sweetness: '', weight: '', color: '#FF6B35',
 tags: '', specs: '',
@@ -183,6 +184,7 @@ isRecommended: false, featuredSortOrder: 0,
 ```
 
 **JSX 新增控件**（沿用现有 gray-200 border + rounded-2xl 样式）：
+
 - sweetness/weight/color：input text（color 可选 input[type=color] 但保持 text 兼容 hex）
 - tags：input text，placeholder `甜,新鲜,限时`
 - specs：textarea，placeholder `[{"name":"规格","values":["500g/盒","1kg/袋"]}]`
@@ -190,6 +192,7 @@ isRecommended: false, featuredSortOrder: 0,
 - featuredSortOrder：input[type=number]
 
 **`openEditModal` 回填**：
+
 ```typescript
 tags: product.tags?.join(',') ?? '',
 specs: product.specs ? JSON.stringify(product.specs, null, 2) : '',
@@ -198,13 +201,17 @@ featuredSortOrder: product.featuredSortOrder ?? 0,
 ```
 
 **提交 payload 转换**：
+
 ```typescript
 const payload = {
   ...其他字段,
   sweetness: form.sweetness,
   weight: form.weight,
   color: form.color,
-  tags: form.tags.split(',').map(s => s.trim()).filter(Boolean),
+  tags: form.tags
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean),
   isRecommended: form.isRecommended,
   featuredSortOrder: Number(form.featuredSortOrder),
 };
@@ -214,7 +221,7 @@ try {
   payload.specs = form.specs.trim() ? JSON.parse(form.specs) : null;
 } catch {
   showToast('规格 JSON 格式错误', 'error');
-  return;  // 不提交
+  return; // 不提交
 }
 ```
 
@@ -236,7 +243,7 @@ export interface Banner {
   linkType: BannerLinkType;
   linkValue: string | null;
   sortOrder: number;
-  status: number;  // 0=OFF, 1=ON
+  status: number; // 0=OFF, 1=ON
   createdAt: string;
   updatedAt: string;
 }
@@ -277,6 +284,7 @@ export class BannerEntity {
 ### 6.2 后端 Module 结构
 
 **`packages/server/src/modules/banner/`**（新建）：
+
 - `banner.module.ts` — `TypeOrmModule.forFeature([BannerEntity])`
 - `banner.controller.ts` — `@Controller('banners')`
 - `banner.service.ts` — `findActive`（Public 用）/ `findAll`（Admin 用）/ `create` / `update` / `remove`（含 Redis 缓存 300s，参考 ProductService 模式）
@@ -284,15 +292,16 @@ export class BannerEntity {
 
 ### 6.3 接口
 
-| 方法 | 路径 | 守卫 | 说明 |
-|---|---|---|---|
-| GET | `/api/banners` | `@Public` | 返回 `status=ON` 的 Banner，按 `sortOrder ASC`，300s Redis 缓存 |
-| GET | `/api/banners/all` | JWT + ADMIN | 返回全部 Banner（含 OFF），管理用 |
-| POST | `/api/banners` | JWT + ADMIN | 新建 |
-| PUT | `/api/banners/:id` | JWT + ADMIN | 更新 |
-| DELETE | `/api/banners/:id` | JWT + ADMIN | 删除 |
+| 方法   | 路径               | 守卫        | 说明                                                            |
+| ------ | ------------------ | ----------- | --------------------------------------------------------------- |
+| GET    | `/api/banners`     | `@Public`   | 返回 `status=ON` 的 Banner，按 `sortOrder ASC`，300s Redis 缓存 |
+| GET    | `/api/banners/all` | JWT + ADMIN | 返回全部 Banner（含 OFF），管理用                               |
+| POST   | `/api/banners`     | JWT + ADMIN | 新建                                                            |
+| PUT    | `/api/banners/:id` | JWT + ADMIN | 更新                                                            |
+| DELETE | `/api/banners/:id` | JWT + ADMIN | 删除                                                            |
 
 **DTO 校验**（`CreateBannerDto`）：
+
 - `title`：`@IsString @MinLength(1) @MaxLength(100)` 必填
 - `subtitle?`：`@IsOptional @MaxLength(200)`
 - `image?`：`@IsOptional @MaxLength(500)`
@@ -344,11 +353,13 @@ export const bannerApi = {
 - 沿用 DESIGN.md gradient + 装饰圆样式
 
 **`packages/web/src/pages/AdminBanners.tsx`**（新建，仿 AdminProducts）：
+
 - 表格列：title / status（ON/OFF 标签）/ sortOrder / linkType / 操作（编辑/删除）
 - 新建/编辑 modal：title / subtitle / image URL / ctaText / linkType(select) / linkValue / sortOrder / status(select ON/OFF)
 - 沿用 AdminProducts gray-200 border + rounded-2xl + focus:ring-brand-primary/30 样式
 
 **`packages/web/src/router/index.tsx`** 新增：
+
 ```tsx
 const AdminBanners = lazy(() => import('@/pages/AdminBanners'));
 // 路由表（在 /admin/products 之后）：
@@ -422,6 +433,7 @@ Admin 表单的 `isRecommended` checkbox + `featuredSortOrder` number input 已�
 **`packages/web/src/pages/Cart.tsx`** 改造：
 
 Header 追加「清空」按钮：
+
 ```tsx
 <header>
   <h1>购物车</h1>
@@ -438,12 +450,13 @@ Header 追加「清空」按钮：
 ```
 
 Modal 二次确认（复用现有 deleteTarget modal 模式，新增 `clearTarget` state）：
+
 ```tsx
 const [clearTarget, setClearTarget] = useState(false);
 
 const confirmClear = async () => {
   try {
-    await clearCart();  // cart.store 已有，调 cartApi.clear()
+    await clearCart(); // cart.store 已有，调 cartApi.clear()
     showToast('购物车已清空', 'success');
   } catch {
     showToast('清空失败', 'error');
@@ -453,23 +466,25 @@ const confirmClear = async () => {
 };
 
 // JSX（与现有 delete modal 同级）：
-{clearTarget && (
-  <Modal>
-    <p>确定清空购物车？此操作不可撤销</p>
-    <button onClick={confirmClear}>确定清空</button>
-    <button onClick={() => setClearTarget(false)}>取消</button>
-  </Modal>
-)}
+{
+  clearTarget && (
+    <Modal>
+      <p>确定清空购物车？此操作不可撤销</p>
+      <button onClick={confirmClear}>确定清空</button>
+      <button onClick={() => setClearTarget(false)}>取消</button>
+    </Modal>
+  );
+}
 ```
 
 ## 8. shared 变更汇总
 
-| 变更 | 文件 |
-|---|---|
-| Product 接口追加 specs/isRecommended/featuredSortOrder | `packages/shared/src/types/product.ts` |
-| 新增 ProductSpec 类型 | `packages/shared/src/types/product.ts` |
+| 变更                                                                      | 文件                                          |
+| ------------------------------------------------------------------------- | --------------------------------------------- |
+| Product 接口追加 specs/isRecommended/featuredSortOrder                    | `packages/shared/src/types/product.ts`        |
+| 新增 ProductSpec 类型                                                     | `packages/shared/src/types/product.ts`        |
 | 新增 banner 类型（Banner/CreateBannerDTO/UpdateBannerDTO/BannerLinkType） | `packages/shared/src/types/banner.ts`（新建） |
-| index.ts re-export banner 类型 | `packages/shared/src/index.ts` |
+| index.ts re-export banner 类型                                            | `packages/shared/src/index.ts`                |
 
 每次改 `shared` 必须重 build：`pnpm --filter shared build`。
 
@@ -477,61 +492,64 @@ const confirmClear = async () => {
 
 ### P1-B 场景
 
-| 场景 | 触发 | 预期 |
-|---|---|---|
-| Admin 创建商品填全字段 | 表单填 sweetness/weight/color/tags/specs | POST 成功，DB 有完整字段 |
-| 详情页 SpecSelector 渲染 | 进入有 specs 的商品详情 | SpecSelector 显示规格 chips，可选中 |
-| BuyBar 加购带 specLabel | 选规格后加购 | Cart 中 specLabel 为选中值拼接（如「500g/盒」） |
-| 详情页无 specs 商品 | 商品 specs 为 null | SpecSelector 不渲染，BuyBar specLabel 为「默认」 |
-| Admin specs JSON 错误 | textarea 填非法 JSON 提交 | toast 错误，不提交 |
+| 场景                     | 触发                                     | 预期                                             |
+| ------------------------ | ---------------------------------------- | ------------------------------------------------ |
+| Admin 创建商品填全字段   | 表单填 sweetness/weight/color/tags/specs | POST 成功，DB 有完整字段                         |
+| 详情页 SpecSelector 渲染 | 进入有 specs 的商品详情                  | SpecSelector 显示规格 chips，可选中              |
+| BuyBar 加购带 specLabel  | 选规格后加购                             | Cart 中 specLabel 为选中值拼接（如「500g/盒」）  |
+| 详情页无 specs 商品      | 商品 specs 为 null                       | SpecSelector 不渲染，BuyBar specLabel 为「默认」 |
+| Admin specs JSON 错误    | textarea 填非法 JSON 提交                | toast 错误，不提交                               |
 
 ### P1-C-1 场景
 
-| 场景 | 触发 | 预期 |
-|---|---|---|
-| Admin 创建 Banner | /admin/banners 填表保存 | POST 成功，列表显示 |
-| 首页 Banner 渲染 | 首页加载 | PromoBanner 显示第一条 ON 的 Banner 数据 |
-| CTA 跳转 product | 点 linkType=product 的 CTA | navigate('/product/:id') |
-| CTA 跳转 external | 点 linkType=external 的 CTA | window.open 新 tab |
-| Banner 缓存 | 重复加载首页 | 300s 内不重复查 DB |
-| Admin 下架 | 状态改 OFF | 首页不再显示该 Banner |
-| 无 ON 的 Banner | 全部 OFF | PromoBanner 不渲染 |
+| 场景              | 触发                        | 预期                                     |
+| ----------------- | --------------------------- | ---------------------------------------- |
+| Admin 创建 Banner | /admin/banners 填表保存     | POST 成功，列表显示                      |
+| 首页 Banner 渲染  | 首页加载                    | PromoBanner 显示第一条 ON 的 Banner 数据 |
+| CTA 跳转 product  | 点 linkType=product 的 CTA  | navigate('/product/:id')                 |
+| CTA 跳转 external | 点 linkType=external 的 CTA | window.open 新 tab                       |
+| Banner 缓存       | 重复加载首页                | 300s 内不重复查 DB                       |
+| Admin 下架        | 状态改 OFF                  | 首页不再显示该 Banner                    |
+| 无 ON 的 Banner   | 全部 OFF                    | PromoBanner 不渲染                       |
 
 ### P1-C-2 场景
 
-| 场景 | 触发 | 预期 |
-|---|---|---|
+| 场景           | 触发                                        | 预期                                        |
+| -------------- | ------------------------------------------- | ------------------------------------------- |
 | 推荐位优先展示 | Admin 勾选 2 商品 isRecommended + sortOrder | 详情页推荐位前 2 条是勾选商品，按 sortOrder |
-| 推荐位补足 | 推荐商品 < limit | 用 createdAt DESC 补足到 limit |
-| 清空购物车 | Cart 页点「清空」→ modal 确认 | items 清空，toast 成功，`DELETE /cart` 200 |
-| 空购物车无按钮 | items.length === 0 | 「清空」按钮不显示 |
-| 清空失败 | 后端异常 | toast 失败，items 保持 |
+| 推荐位补足     | 推荐商品 < limit                            | 用 createdAt DESC 补足到 limit              |
+| 清空购物车     | Cart 页点「清空」→ modal 确认               | items 清空，toast 成功，`DELETE /cart` 200  |
+| 空购物车无按钮 | items.length === 0                          | 「清空」按钮不显示                          |
+| 清空失败       | 后端异常                                    | toast 失败，items 保持                      |
 
 ## 10. 风险与权衡
 
-| 风险 | 影响 | 缓解 |
-|---|---|---|
-| specs 用 simple-json 存结构化数组 | DB 层无法按规格字段查询 | MVP 可接受；P2 若需按规格筛选再迁移关联表 |
-| Admin specs JSON textarea | 运营易写错 JSON | 提交时 JSON.parse 校验 + toast 错误，不提交坏数据 |
-| 推荐位两段查询 | 2 次 SQL（featured + fillers） | 单次响应 < 200ms 可接受；Redis 60s 缓存兜底 |
-| Banner linkType=external 跳转 | 用户离开站点 | 用 `window.open(url, '_blank', 'noopener')` 防 tabnabbing |
-| 清空购物车误点 | 二次确认 modal 已防护 | 复用现有 modal 模式，UX 一致 |
-| Admin 表单字段变多 | 表单变长 | 分组（基础/规格/运营），保持视觉层次 |
-| ProductEntity 加 3 列 + BannerEntity 新表 | synchronize 自动建表/加列 | 开发环境 OK；生产需 migration（项目现状 synchronize=true） |
-| 推荐位缓存 key 不变但算法变 | 旧缓存命中后仍是旧排序 | 部署后手动清 Redis 或等 60s TTL；MVP 接受 |
+| 风险                                      | 影响                           | 缓解                                                       |
+| ----------------------------------------- | ------------------------------ | ---------------------------------------------------------- |
+| specs 用 simple-json 存结构化数组         | DB 层无法按规格字段查询        | MVP 可接受；P2 若需按规格筛选再迁移关联表                  |
+| Admin specs JSON textarea                 | 运营易写错 JSON                | 提交时 JSON.parse 校验 + toast 错误，不提交坏数据          |
+| 推荐位两段查询                            | 2 次 SQL（featured + fillers） | 单次响应 < 200ms 可接受；Redis 60s 缓存兜底                |
+| Banner linkType=external 跳转             | 用户离开站点                   | 用 `window.open(url, '_blank', 'noopener')` 防 tabnabbing  |
+| 清空购物车误点                            | 二次确认 modal 已防护          | 复用现有 modal 模式，UX 一致                               |
+| Admin 表单字段变多                        | 表单变长                       | 分组（基础/规格/运营），保持视觉层次                       |
+| ProductEntity 加 3 列 + BannerEntity 新表 | synchronize 自动建表/加列      | 开发环境 OK；生产需 migration（项目现状 synchronize=true） |
+| 推荐位缓存 key 不变但算法变               | 旧缓存命中后仍是旧排序         | 部署后手动清 Redis 或等 60s TTL；MVP 接受                  |
 
 ## 11. 测试策略
 
 **后端 e2e**（沿用现有 jest + supertest）：
+
 - `test/banner.e2e-spec.ts`（新建）：Public/Admin 守卫、CRUD、缓存
 - `test/product.recommendations.e2e-spec.ts` 扩展：isRecommended 优先、补足逻辑
 - `test/product.e2e-spec.ts` 扩展：Create/Update 含 specs/isRecommended/featuredSortOrder
 
 **前端**（无测试框架）：
+
 - TypeScript 构建通过
 - docker compose 浏览器手动验证场景
 
 **全量回归**：
+
 - `pnpm --filter shared build`
 - `pnpm --filter server test` + `test:e2e`
 - `pnpm --filter web build`

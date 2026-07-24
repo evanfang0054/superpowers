@@ -1,17 +1,8 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { PinoLogger } from 'nestjs-pino';
-import {
-  RefundEntity,
-  OrderEntity,
-  OrderItemEntity,
-  ProductEntity,
-} from '../../entities';
+import { RefundEntity, OrderEntity, OrderItemEntity, ProductEntity } from '../../entities';
 import { RefundReviewDto } from '../order/dto/refund-review.dto';
 import { ErrorCode, ErrorMessage, OrderStatus, RefundStatus } from 'shared';
 
@@ -56,9 +47,7 @@ export class RefundService {
         [refundId],
       );
       if (refundRows.length === 0) {
-        throw new NotFoundException(
-          ErrorMessage[ErrorCode.REFUND_NOT_FOUND],
-        );
+        throw new NotFoundException(ErrorMessage[ErrorCode.REFUND_NOT_FOUND]);
       }
       const refundRow = refundRows[0];
       if (refundRow.status !== RefundStatus.PENDING) {
@@ -70,10 +59,7 @@ export class RefundService {
       const orderId = refundRow.order_id;
 
       // 2. 锁 order 行
-      await queryRunner.manager.query(
-        'SELECT id FROM orders WHERE id = ? FOR UPDATE',
-        [orderId],
-      );
+      await queryRunner.manager.query('SELECT id FROM orders WHERE id = ? FOR UPDATE', [orderId]);
 
       // 3. 锁相关商品 + 回补库存
       const items = await queryRunner.manager.find(OrderItemEntity, {
@@ -81,24 +67,22 @@ export class RefundService {
       });
       const productIds = items.map((i) => i.productId);
       if (productIds.length > 0) {
-        await queryRunner.manager.query(
-          'SELECT id FROM products WHERE id IN (?) FOR UPDATE',
-          [productIds],
-        );
+        await queryRunner.manager.query('SELECT id FROM products WHERE id IN (?) FOR UPDATE', [
+          productIds,
+        ]);
         for (const item of items) {
-          await queryRunner.manager.query(
-            'UPDATE products SET stock = stock + ? WHERE id = ?',
-            [item.quantity, item.productId],
-          );
+          await queryRunner.manager.query('UPDATE products SET stock = stock + ? WHERE id = ?', [
+            item.quantity,
+            item.productId,
+          ]);
         }
       }
 
       // 4. 解绑优惠券（若有）
-      const orderRows: { coupon_id: number | null }[] =
-        await queryRunner.manager.query(
-          'SELECT coupon_id FROM orders WHERE id = ?',
-          [orderId],
-        );
+      const orderRows: { coupon_id: number | null }[] = await queryRunner.manager.query(
+        'SELECT coupon_id FROM orders WHERE id = ?',
+        [orderId],
+      );
       const couponId = orderRows[0]?.coupon_id;
       if (couponId) {
         await queryRunner.manager.query(
@@ -108,20 +92,17 @@ export class RefundService {
       }
 
       // 5. 更新状态
-      await queryRunner.manager.query(
-        'UPDATE orders SET status = ? WHERE id = ?',
-        [OrderStatus.REFUNDED, orderId],
-      );
-      await queryRunner.manager.query(
-        'UPDATE refunds SET status = ? WHERE id = ?',
-        [RefundStatus.APPROVED, refundId],
-      );
+      await queryRunner.manager.query('UPDATE orders SET status = ? WHERE id = ?', [
+        OrderStatus.REFUNDED,
+        orderId,
+      ]);
+      await queryRunner.manager.query('UPDATE refunds SET status = ? WHERE id = ?', [
+        RefundStatus.APPROVED,
+        refundId,
+      ]);
 
       await queryRunner.commitTransaction();
-      this.logger.info(
-        { refundId, orderId },
-        '退款通过，库存回补 + 券解绑',
-      );
+      this.logger.info({ refundId, orderId }, '退款通过，库存回补 + 券解绑');
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
@@ -146,9 +127,7 @@ export class RefundService {
         [refundId],
       );
       if (refundRows.length === 0) {
-        throw new NotFoundException(
-          ErrorMessage[ErrorCode.REFUND_NOT_FOUND],
-        );
+        throw new NotFoundException(ErrorMessage[ErrorCode.REFUND_NOT_FOUND]);
       }
       const refundRow = refundRows[0];
       if (refundRow.status !== RefundStatus.PENDING) {
@@ -159,10 +138,10 @@ export class RefundService {
       }
 
       // 恢复 prevStatus
-      await queryRunner.manager.query(
-        'UPDATE orders SET status = ? WHERE id = ?',
-        [refundRow.prev_status, refundRow.order_id],
-      );
+      await queryRunner.manager.query('UPDATE orders SET status = ? WHERE id = ?', [
+        refundRow.prev_status,
+        refundRow.order_id,
+      ]);
       await queryRunner.manager.query(
         'UPDATE refunds SET status = ?, admin_note = ? WHERE id = ?',
         [RefundStatus.REJECTED, dto.adminNote ?? null, refundId],

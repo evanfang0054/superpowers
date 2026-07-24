@@ -196,7 +196,10 @@ export default function AdminProducts() {
         sweetness: form.sweetness,
         weight: form.weight,
         color: form.color,
-        tags: form.tags.split(',').map((s) => s.trim()).filter(Boolean),
+        tags: form.tags
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean),
         specs: parsedSpecs,
         isRecommended: form.isRecommended,
         featuredSortOrder: Number(form.featuredSortOrder),
@@ -244,7 +247,14 @@ export default function AdminProducts() {
               onClick={() => navigate('/')}
               className="w-9 h-9 flex items-center justify-center rounded-full bg-brand-btn-bg hover:bg-brand-border transition-colors"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <path d="M19 12H5M12 19l-7-7 7-7" />
               </svg>
             </button>
@@ -313,7 +323,9 @@ export default function AdminProducts() {
                               />
                             </div>
                             <div>
-                              <p className="font-medium text-brand-dark line-clamp-1">{product.name}</p>
+                              <p className="font-medium text-brand-dark line-clamp-1">
+                                {product.name}
+                              </p>
                               {product.origin && (
                                 <p className="text-xs text-brand-muted">{product.origin}</p>
                               )}
@@ -387,7 +399,14 @@ export default function AdminProducts() {
                 onClick={() => setShowModal(false)}
                 className="text-brand-muted hover:text-brand-muted"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
               </button>
@@ -556,7 +575,9 @@ export default function AdminProducts() {
                 <label className="block text-sm font-medium text-brand-dark mb-1">状态</label>
                 <select
                   value={form.status}
-                  onChange={(e) => setForm({ ...form, status: Number(e.target.value) as ProductStatus })}
+                  onChange={(e) =>
+                    setForm({ ...form, status: Number(e.target.value) as ProductStatus })
+                  }
                   className="w-full px-3 py-2.5 rounded-2xl border border-brand-border text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary"
                 >
                   <option value={ProductStatus.ON}>上架</option>
@@ -581,7 +602,9 @@ export default function AdminProducts() {
                   <input
                     type="number"
                     value={form.featuredSortOrder}
-                    onChange={(e) => setForm({ ...form, featuredSortOrder: Number(e.target.value) })}
+                    onChange={(e) =>
+                      setForm({ ...form, featuredSortOrder: Number(e.target.value) })
+                    }
                     placeholder="小的在前"
                     className="w-full px-3 py-2.5 rounded-2xl border border-brand-border text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary"
                   />

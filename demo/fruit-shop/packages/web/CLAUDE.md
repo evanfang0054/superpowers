@@ -33,11 +33,11 @@ shared 包无需预先构建 — web 通过 Vite alias 直接读 `../shared/src`
 
 ### 状态管理 (`src/store/`)
 
-| Store | 持久化 | 关键点 |
-|---|---|---|
-| `auth.store.ts` | localStorage `fruit-shop-auth` | token + refreshToken + user |
-| `cart.store.ts` | 无 | 每次 mutation 后调 `fetchCart()` 重同步服务端 |
-| `order.store.ts` | 无 | `fetchOrders` 支持追加（无限滚动）或替换 |
+| Store            | 持久化                         | 关键点                                        |
+| ---------------- | ------------------------------ | --------------------------------------------- |
+| `auth.store.ts`  | localStorage `fruit-shop-auth` | token + refreshToken + user                   |
+| `cart.store.ts`  | 无                             | 每次 mutation 后调 `fetchCart()` 重同步服务端 |
+| `order.store.ts` | 无                             | `fetchOrders` 支持追加（无限滚动）或替换      |
 
 ### 路由 (`src/router/index.tsx`)
 

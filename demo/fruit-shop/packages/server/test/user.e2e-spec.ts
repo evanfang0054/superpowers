@@ -8,11 +8,7 @@ describe('User (e2e)', () => {
   beforeAll(async () => {
     await helper.setup();
     await helper.cleanDatabase();
-    const tokens = await helper.registerAndLogin(
-      '13800000010',
-      'test123456',
-      'TestUser',
-    );
+    const tokens = await helper.registerAndLogin('13800000010', 'test123456', 'TestUser');
     accessToken = tokens.accessToken;
   });
 

@@ -14,12 +14,7 @@ export type { ApiResponse, PaginatedResponse, PaginationQuery } from './types/ap
 
 export type { ProductSpec } from './types/product';
 
-export type {
-  Banner,
-  BannerLinkType,
-  CreateBannerDTO,
-  UpdateBannerDTO,
-} from './types/banner';
+export type { Banner, BannerLinkType, CreateBannerDTO, UpdateBannerDTO } from './types/banner';
 
 export type { Address, CreateAddressDTO, UpdateAddressDTO } from './types/address';
 

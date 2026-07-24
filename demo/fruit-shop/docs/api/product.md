@@ -7,12 +7,12 @@
 - 守卫：无（隐式公开，受 Throttler 限制）
 - 查询参数：
 
-| 参数 | 类型 | 说明 |
-|---|---|---|
-| page | number | 默认 1 |
-| limit | number | 默认 10 |
-| categoryId | number | 按分类筛选 |
-| keyword | string | 按商品名 LIKE 模糊匹配 |
+| 参数       | 类型   | 说明                   |
+| ---------- | ------ | ---------------------- |
+| page       | number | 默认 1                 |
+| limit      | number | 默认 10                |
+| categoryId | number | 按分类筛选             |
+| keyword    | string | 按商品名 LIKE 模糊匹配 |
 
 - 仅返回 `status = ON` 的商品
 - 响应 `data`：`{ list: Product[], total, page, limit }`
@@ -32,10 +32,10 @@
 - 守卫：`@Public`
 - 查询参数：
 
-| 参数 | 类型 | 默认 | 说明 |
-|---|---|---|---|
-| limit | number | 10 | 最大 20 |
-| excludeId | number | - | 排除指定商品 id（用于详情页"你可能还喜欢"）|
+| 参数      | 类型   | 默认 | 说明                                        |
+| --------- | ------ | ---- | ------------------------------------------- |
+| limit     | number | 10   | 最大 20                                     |
+| excludeId | number | -    | 排除指定商品 id（用于详情页"你可能还喜欢"） |
 
 - 筛选条件：`status = ON AND stock > 0`，按 `createdAt DESC`
 - 响应 `data`：`{ list: Product[] }`（不带分页）

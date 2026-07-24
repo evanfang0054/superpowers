@@ -56,70 +56,164 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <SuspenseWrapper><Home /></SuspenseWrapper>,
+    element: (
+      <SuspenseWrapper>
+        <Home />
+      </SuspenseWrapper>
+    ),
   },
   {
     path: '/product/:id',
-    element: <SuspenseWrapper><ProductDetail /></SuspenseWrapper>,
+    element: (
+      <SuspenseWrapper>
+        <ProductDetail />
+      </SuspenseWrapper>
+    ),
   },
   {
     path: '/cart',
-    element: <SuspenseWrapper><ProtectedRoute><Cart /></ProtectedRoute></SuspenseWrapper>,
+    element: (
+      <SuspenseWrapper>
+        <ProtectedRoute>
+          <Cart />
+        </ProtectedRoute>
+      </SuspenseWrapper>
+    ),
   },
   {
     path: '/checkout',
-    element: <SuspenseWrapper><ProtectedRoute><Checkout /></ProtectedRoute></SuspenseWrapper>,
+    element: (
+      <SuspenseWrapper>
+        <ProtectedRoute>
+          <Checkout />
+        </ProtectedRoute>
+      </SuspenseWrapper>
+    ),
   },
   {
     path: '/orders',
-    element: <SuspenseWrapper><ProtectedRoute><OrderList /></ProtectedRoute></SuspenseWrapper>,
+    element: (
+      <SuspenseWrapper>
+        <ProtectedRoute>
+          <OrderList />
+        </ProtectedRoute>
+      </SuspenseWrapper>
+    ),
   },
   {
     path: '/order/:id',
-    element: <SuspenseWrapper><ProtectedRoute><OrderDetail /></ProtectedRoute></SuspenseWrapper>,
+    element: (
+      <SuspenseWrapper>
+        <ProtectedRoute>
+          <OrderDetail />
+        </ProtectedRoute>
+      </SuspenseWrapper>
+    ),
   },
   {
     path: '/profile',
-    element: <SuspenseWrapper><ProtectedRoute><Profile /></ProtectedRoute></SuspenseWrapper>,
+    element: (
+      <SuspenseWrapper>
+        <ProtectedRoute>
+          <Profile />
+        </ProtectedRoute>
+      </SuspenseWrapper>
+    ),
   },
   {
     path: '/addresses',
-    element: <SuspenseWrapper><ProtectedRoute><Addresses /></ProtectedRoute></SuspenseWrapper>,
+    element: (
+      <SuspenseWrapper>
+        <ProtectedRoute>
+          <Addresses />
+        </ProtectedRoute>
+      </SuspenseWrapper>
+    ),
   },
   {
     path: '/favorites',
-    element: <SuspenseWrapper><ProtectedRoute><Favorites /></ProtectedRoute></SuspenseWrapper>,
+    element: (
+      <SuspenseWrapper>
+        <ProtectedRoute>
+          <Favorites />
+        </ProtectedRoute>
+      </SuspenseWrapper>
+    ),
   },
   {
     path: '/coupons/mine',
-    element: <SuspenseWrapper><ProtectedRoute><MyCoupons /></ProtectedRoute></SuspenseWrapper>,
+    element: (
+      <SuspenseWrapper>
+        <ProtectedRoute>
+          <MyCoupons />
+        </ProtectedRoute>
+      </SuspenseWrapper>
+    ),
   },
   {
     path: '/login',
-    element: <SuspenseWrapper><Login /></SuspenseWrapper>,
+    element: (
+      <SuspenseWrapper>
+        <Login />
+      </SuspenseWrapper>
+    ),
   },
   {
     path: '/register',
-    element: <SuspenseWrapper><Register /></SuspenseWrapper>,
+    element: (
+      <SuspenseWrapper>
+        <Register />
+      </SuspenseWrapper>
+    ),
   },
   {
     path: '/admin/products',
-    element: <SuspenseWrapper><AdminRoute><AdminProducts /></AdminRoute></SuspenseWrapper>,
+    element: (
+      <SuspenseWrapper>
+        <AdminRoute>
+          <AdminProducts />
+        </AdminRoute>
+      </SuspenseWrapper>
+    ),
   },
   {
     path: '/admin/banners',
-    element: <SuspenseWrapper><AdminRoute><AdminBanners /></AdminRoute></SuspenseWrapper>,
+    element: (
+      <SuspenseWrapper>
+        <AdminRoute>
+          <AdminBanners />
+        </AdminRoute>
+      </SuspenseWrapper>
+    ),
   },
   {
     path: '/admin/refunds',
-    element: <SuspenseWrapper><AdminRoute><AdminRefunds /></AdminRoute></SuspenseWrapper>,
+    element: (
+      <SuspenseWrapper>
+        <AdminRoute>
+          <AdminRefunds />
+        </AdminRoute>
+      </SuspenseWrapper>
+    ),
   },
   {
     path: '/admin/coupons',
-    element: <SuspenseWrapper><AdminRoute><AdminCoupons /></AdminRoute></SuspenseWrapper>,
+    element: (
+      <SuspenseWrapper>
+        <AdminRoute>
+          <AdminCoupons />
+        </AdminRoute>
+      </SuspenseWrapper>
+    ),
   },
   {
     path: '/admin/categories',
-    element: <SuspenseWrapper><AdminRoute><AdminCategories /></AdminRoute></SuspenseWrapper>,
+    element: (
+      <SuspenseWrapper>
+        <AdminRoute>
+          <AdminCategories />
+        </AdminRoute>
+      </SuspenseWrapper>
+    ),
   },
 ]);

@@ -6,6 +6,7 @@
 ## 背景
 
 fruit-shop 后端目前缺少以下基础设施：
+
 - API 文档（Swagger）—— 前后端对接需手动查代码
 - 测试覆盖（Jest + Supertest）—— 当前零测试
 - 速率限制（Throttler）—— 公开端点无防刷保护
@@ -102,6 +103,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 ### 限流命中响应
 
 HTTP 429，body（不使用 shared/ErrorCode，因为 429 是基础设施错误而非业务错误）：
+
 ```json
 { "code": 429, "message": "Too Many Requests" }
 ```
@@ -132,6 +134,7 @@ HTTP 429，body（不使用 shared/ErrorCode，因为 429 是基础设施错误�
 ### 新增模块
 
 `packages/server/src/modules/health/`
+
 - `health.module.ts`
 - `health.controller.ts`
 
@@ -276,17 +279,20 @@ packages/server/
 ### 测试数据库
 
 通过 `.env.test` 配置：
+
 ```
 DB_DATABASE=fruit_shop_test
 REDIS_DB=1
 ```
 
 集成测试前（beforeAll）：
+
 1. 创建测试 app
 2. TypeORM `synchronize: true` 自动建表
 3. seed 必要的基础数据（测试用户、测试商品）
 
 集成测试后（afterAll）：
+
 1. 清理测试数据
 2. 关闭 app 连接
 
@@ -303,25 +309,27 @@ REDIS_DB=1
 
 ### 覆盖范围
 
-| 模块 | Unit | Integration | 端点 |
-|------|------|-------------|------|
-| auth | ✓ | ✓ | POST register, login, refresh, logout (4) |
-| user | ✓ | ✓ | GET profile, PUT profile (2) |
-| product | ✓ | ✓ | GET list, GET :id, POST create(ADMIN), PUT :id(ADMIN), DELETE :id(ADMIN) (5) |
-| cart | ✓ | ✓ | GET list, POST add, PUT :id, DELETE :id (4) |
-| order | ✓ | ✓ | POST create, GET list, GET :id, PUT :id/cancel (4) |
-| health | — | ✓ | GET /health (1) |
+| 模块    | Unit | Integration | 端点                                                                         |
+| ------- | ---- | ----------- | ---------------------------------------------------------------------------- |
+| auth    | ✓    | ✓           | POST register, login, refresh, logout (4)                                    |
+| user    | ✓    | ✓           | GET profile, PUT profile (2)                                                 |
+| product | ✓    | ✓           | GET list, GET :id, POST create(ADMIN), PUT :id(ADMIN), DELETE :id(ADMIN) (5) |
+| cart    | ✓    | ✓           | GET list, POST add, PUT :id, DELETE :id (4)                                  |
+| order   | ✓    | ✓           | POST create, GET list, GET :id, PUT :id/cancel (4)                           |
+| health  | —    | ✓           | GET /health (1)                                                              |
 
 ---
 
 ## 环境变量新增
 
 `packages/server/.env.example` 新增：
+
 ```
 SWAGGER_ENABLED=true
 ```
 
 `.env.test`（新增，用于集成测试）：
+
 ```
 DB_DATABASE=fruit_shop_test
 REDIS_DB=1

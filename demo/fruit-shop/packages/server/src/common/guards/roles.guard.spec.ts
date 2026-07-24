@@ -14,7 +14,11 @@ describe('RolesGuard', () => {
   });
 
   const ctx = (user: any) =>
-    ({ getHandler: () => ({}), getClass: () => ({}), switchToHttp: () => ({ getRequest: () => ({ user }) }) } as any);
+    ({
+      getHandler: () => ({}),
+      getClass: () => ({}),
+      switchToHttp: () => ({ getRequest: () => ({ user }) }),
+    }) as any;
 
   it('should return true when no @Roles', () => {
     reflector.getAllAndOverride.mockReturnValue(undefined);

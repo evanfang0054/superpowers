@@ -52,9 +52,7 @@ export default function ProductDetail() {
       .getRecommendations(5)
       .then((res) => {
         const items = res.data.data || [];
-        setRecommendations(
-          items.filter((p: Product) => p.id !== Number(id)).slice(0, 4),
-        );
+        setRecommendations(items.filter((p: Product) => p.id !== Number(id)).slice(0, 4));
       })
       .catch(() => {});
   }, [id]);
@@ -82,10 +80,7 @@ export default function ProductDetail() {
 
       {/* 导航栏 */}
       <div className="flex items-center justify-between px-4 py-3 bg-brand-bg/90 backdrop-blur-[10px] sticky top-0 z-50">
-        <div
-          onClick={() => navigate(-1)}
-          className="cursor-pointer flex items-center gap-1"
-        >
+        <div onClick={() => navigate(-1)} className="cursor-pointer flex items-center gap-1">
           <svg
             width="24"
             height="24"

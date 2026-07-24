@@ -1,6 +1,4 @@
-import {
-  HttpException, HttpStatus, ServiceUnavailableException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, ServiceUnavailableException } from '@nestjs/common';
 import { ThrottlerException } from '@nestjs/throttler';
 import { HttpExceptionFilter } from './http-exception.filter';
 
@@ -23,14 +21,20 @@ describe('HttpExceptionFilter', () => {
   });
 
   it('should pass through business code', () => {
-    filter.catch(new HttpException({ code: 40001, message: 'phone exists' }, HttpStatus.CONFLICT), host);
+    filter.catch(
+      new HttpException({ code: 40001, message: 'phone exists' }, HttpStatus.CONFLICT),
+      host,
+    );
     expect(response.json).toHaveBeenCalledWith({ code: 40001, message: 'phone exists' });
     expect(response.status).toHaveBeenCalledWith(HttpStatus.OK);
   });
 
   it('should join class-validator array messages', () => {
     filter.catch(
-      new HttpException({ message: ['phone invalid', 'password short'], error: 'Bad Request', statusCode: 400 }, HttpStatus.BAD_REQUEST),
+      new HttpException(
+        { message: ['phone invalid', 'password short'], error: 'Bad Request', statusCode: 400 },
+        HttpStatus.BAD_REQUEST,
+      ),
       host,
     );
     const args = response.json.mock.calls[0][0];

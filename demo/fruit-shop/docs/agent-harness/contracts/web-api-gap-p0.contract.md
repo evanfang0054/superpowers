@@ -3,11 +3,13 @@
 ## Definition of Done
 
 ### 接口契约对齐（前端不再 405）
+
 - [ ] `packages/web/src/api/cart.ts` 的 `updateQuantity` 改为 `PUT /cart/:id`，Cart 页面加减数量后 UI 数值与后端一致（重新 `GET /cart` 能拿到更新后的 quantity）
 - [ ] `packages/web/src/pages/AdminProducts.tsx` 编辑商品改为 `PUT /products/:id`，编辑后表单关闭且 `GET /products` 列表显示新值
 - [ ] `packages/web/src/api/user.ts` 路径改为 `/user/profile`（单数），为 P1 个人中心做准备（P0 内不要求 UI 触发，但接口需对齐）
 
 ### 新增接口
+
 - [ ] `GET /api/products/recommendations?limit=10&excludeId=<id>` 返回 `status=ON && stock>0 && id!=excludeId` 的商品，按 `createdAt DESC` 排序；在 `@Get(':id')` 之前声明（不会被 ParseIntPipe 吞掉）；Redis 60s 缓存生效
 - [ ] `DELETE /api/cart` 清空当前用户购物车；调用后 `GET /api/cart` 返回空数组
 - [ ] `POST /api/orders` 在事务内对每个购物车项校验 `quantity <= product.stock`；不足时整笔回滚并返回业务码 `40901`，data 字段含缺货明细 `{ productId, productName, requested, available }`
@@ -16,11 +18,13 @@
 - [ ] `POST /api/cart` 加购前校验 `product.stock > 0`，售罄返回业务码 `40902`
 
 ### 类型与构建
+
 - [ ] `packages/shared/src/constants.ts` 新增 `STOCK_INSUFFICIENT=40901`、`PRODUCT_OUT_OF_STOCK=40902`
 - [ ] `pnpm --filter shared build` 成功，server 启动后能 import 到新 ErrorCode（验证：登录成功后人为制造库存不足下单，返回体 code === 40901）
 - [ ] web 通过 Vite alias 直读 shared 源码，无需额外构建；浏览器 Network 面板能看到 `PUT /cart/:id` 请求
 
 ### 文档
+
 - [ ] `docs/api/README.md` 写完统一约定（base url / 鉴权 / 响应格式 / 错误码表 / 分页 / 时间 / 限流 / 脱敏）
 - [ ] `docs/api/auth.md`、`user.md`、`product.md`（含 recommendations）、`category.md`、`cart.md`（含 clear）、`order.md`（含库存校验说明）覆盖所有 P0 涉及接口；每个接口含 method/path/守卫/请求体/响应体/错误码
 
@@ -37,6 +41,7 @@
 ## Acceptance Criteria
 
 ### Computational（可执行验证）
+
 - **场景 A（购物车加减）**：docker compose 环境，登录后加入购物车 → Cart 页点「+」→ 后端 PUT 成功 → 重新 GET /cart 数量 +1；点「-」同理 -1
 - **场景 B（Admin 编辑）**：登录 admin 账号 → AdminProducts 编辑某商品 price → 表单提交 PUT 成功 → 列表显示新 price
 - **场景 C（推荐位）**：进入任意商品详情页 → Network 面板看到 `GET /products/recommendations` 200 → RecommendFruits 组件渲染至少 1 张商品卡（前提：DB 有 ≥2 个 status=ON 且 stock>0 的商品）
@@ -47,6 +52,7 @@
 - **shared build**: `pnpm --filter shared build` 成功且 `packages/shared/dist/constants.js` 含新 ErrorCode
 
 ### Inferential（review 验证）
+
 - spec reviewer review `packages/server/src/modules/order/order.service.ts` 的事务实现，确认扣减/回补在同一事务内、使用了行锁
 - spec reviewer review `packages/server/src/modules/product/product.controller.ts`，确认 `@Get('recommendations')` 在 `@Get(':id')` 之前声明
 - spec reviewer review `docs/api/*.md`，确认与代码实现一致（method/path/字段）

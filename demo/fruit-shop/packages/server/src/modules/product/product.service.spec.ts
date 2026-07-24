@@ -62,7 +62,8 @@ describe('ProductService', () => {
       expect(redis.set).toHaveBeenCalledWith(
         expect.stringMatching(/^products:/),
         expect.any(String),
-        'EX', 60,
+        'EX',
+        60,
       );
     });
 

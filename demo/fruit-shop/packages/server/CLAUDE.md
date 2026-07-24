@@ -35,6 +35,7 @@ docker compose up -d                  # 从 monorepo 根目录执行
 ### 入口与全局中间件
 
 `src/main.ts` — 全局 API 前缀 `/api`，CORS 开启。pino 作为全局 logger（`app.useLogger(app.get(Logger))`，开启 `bufferLogs`）。注册顺序：
+
 - 全局 `ValidationPipe`：whitelist + forbidNonWhitelisted + transform（隐式类型转换）
 - 全局 `TransformInterceptor`：成功响应包装为 `{ code: 0, data, message: "success" }`
 - 全局 `HttpExceptionFilter`：**所有错误也返回 HTTP 200**，业务码在 body 的 `code` 字段
@@ -46,14 +47,14 @@ docker compose up -d                  # 从 monorepo 根目录执行
 
 6 个 feature module（`src/modules/`），每个遵循 `controller → service → dto`：
 
-| 模块 | 路径 | 职责 |
-|------|------|------|
-| `auth` | `modules/auth/` | 注册/登录/刷新 Token/登出，JWT 双 token 机制 |
-| `user` | `modules/user/` | 用户信息查询/更新 |
-| `product` | `modules/product/` | 商品 CRUD + 分类管理（仅 ADMIN） |
-| `cart` | `modules/cart/` | 购物车增删改查 |
-| `order` | `modules/order/` | 下单（事务）、订单查询/取消 |
-| `health` | `modules/health/` | `/api/health` 健康检查（@Public） |
+| 模块      | 路径               | 职责                                         |
+| --------- | ------------------ | -------------------------------------------- |
+| `auth`    | `modules/auth/`    | 注册/登录/刷新 Token/登出，JWT 双 token 机制 |
+| `user`    | `modules/user/`    | 用户信息查询/更新                            |
+| `product` | `modules/product/` | 商品 CRUD + 分类管理（仅 ADMIN）             |
+| `cart`    | `modules/cart/`    | 购物车增删改查                               |
+| `order`   | `modules/order/`   | 下单（事务）、订单查询/取消                  |
+| `health`  | `modules/health/`  | `/api/health` 健康检查（@Public）            |
 
 ### 认证机制
 
@@ -97,6 +98,7 @@ docker compose up -d                  # 从 monorepo 根目录执行
 ## 环境变量
 
 参考 `.env.example`：
+
 - DB：`DB_HOST / DB_PORT / DB_USERNAME / DB_PASSWORD / DB_DATABASE / DB_LOGGING`
 - Redis：`REDIS_HOST / REDIS_PORT / REDIS_DB`（测试用 1）
 - JWT：`JWT_SECRET / JWT_ACCESS_EXPIRES_IN`（默认 900s）/ `JWT_REFRESH_EXPIRES_IN`（默认 604800s）

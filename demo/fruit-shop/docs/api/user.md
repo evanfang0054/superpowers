@@ -6,7 +6,15 @@
 - 响应 `data`：当前用户实体（不含 password）
 
 ```json
-{ "id": 1, "phone": "138****0001", "nickname": "...", "avatar": "...", "role": "user", "createdAt": "...", "updatedAt": "..." }
+{
+  "id": 1,
+  "phone": "138****0001",
+  "nickname": "...",
+  "avatar": "...",
+  "role": "user",
+  "createdAt": "...",
+  "updatedAt": "..."
+}
 ```
 
 ## PUT /api/user/profile

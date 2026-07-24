@@ -34,10 +34,7 @@ export class FavoriteService {
 
     const entity = this.favoriteRepo.create({ userId, productId });
     const saved = await this.favoriteRepo.save(entity);
-    this.logger.info(
-      { userId, productId, favoriteId: saved.id },
-      '收藏成功',
-    );
+    this.logger.info({ userId, productId, favoriteId: saved.id }, '收藏成功');
     return { id: saved.id, userId, productId, createdAt: saved.createdAt };
   }
 
@@ -56,10 +53,7 @@ export class FavoriteService {
     }
 
     await this.favoriteRepo.remove(existing);
-    this.logger.info(
-      { userId, productId },
-      '取消收藏成功',
-    );
+    this.logger.info({ userId, productId }, '取消收藏成功');
     return { id: existing.id, userId, productId };
   }
 

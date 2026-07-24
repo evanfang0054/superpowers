@@ -3,7 +3,7 @@ export interface Review {
   productId: number;
   userId: number;
   orderId: number;
-  rating: number;  // 1-5
+  rating: number; // 1-5
   content: string;
   images: string[] | null;
   createdAt: string;

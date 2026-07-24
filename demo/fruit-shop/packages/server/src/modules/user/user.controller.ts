@@ -15,10 +15,7 @@ export class UserController {
   }
 
   @Put('profile')
-  updateProfile(
-    @CurrentUser('id') userId: number,
-    @Body() dto: UpdateProfileDto,
-  ) {
+  updateProfile(@CurrentUser('id') userId: number, @Body() dto: UpdateProfileDto) {
     return this.userService.updateProfile(userId, dto);
   }
 }

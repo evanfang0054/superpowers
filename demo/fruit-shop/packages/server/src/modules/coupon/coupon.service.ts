@@ -1,24 +1,10 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { PinoLogger } from 'nestjs-pino';
-import {
-  CouponTemplateEntity,
-  UserCouponEntity,
-} from '../../entities';
-import {
-  CouponType,
-  ErrorCode,
-  ErrorMessage,
-} from 'shared';
-import {
-  CreateCouponTemplateDto,
-  UpdateCouponTemplateDto,
-} from './dto/create-coupon-template.dto';
+import { CouponTemplateEntity, UserCouponEntity } from '../../entities';
+import { CouponType, ErrorCode, ErrorMessage } from 'shared';
+import { CreateCouponTemplateDto, UpdateCouponTemplateDto } from './dto/create-coupon-template.dto';
 import { CouponPreviewDto } from './dto/coupon-preview.dto';
 
 @Injectable()
@@ -184,10 +170,7 @@ export class CouponService {
     const applicableItems = template.categoryId
       ? items.filter((i) => i.categoryId === template.categoryId)
       : items;
-    const subtotal = applicableItems.reduce(
-      (sum, i) => sum + Number(i.price) * i.quantity,
-      0,
-    );
+    const subtotal = applicableItems.reduce((sum, i) => sum + Number(i.price) * i.quantity, 0);
 
     // 计算门槛时按应用范围的小计计算
     if (subtotal < minAmount) {
@@ -239,14 +222,8 @@ export class CouponService {
     }
 
     const discountAmount = this.calculateDiscount(template, dto.items);
-    const totalBefore = dto.items.reduce(
-      (s, i) => s + Number(i.price) * i.quantity,
-      0,
-    );
-    const totalAfterDiscount = Math.max(
-      0,
-      Math.round((totalBefore - discountAmount) * 100) / 100,
-    );
+    const totalBefore = dto.items.reduce((s, i) => s + Number(i.price) * i.quantity, 0);
+    const totalAfterDiscount = Math.max(0, Math.round((totalBefore - discountAmount) * 100) / 100);
 
     return {
       discountAmount,

@@ -15,11 +15,13 @@
 ## File Structure
 
 **shared**
+
 - Modify: `packages/shared/src/types/product.ts` — ProductSpec + Product 追加 specs/isRecommended/featuredSortOrder
 - Create: `packages/shared/src/types/banner.ts`
 - Modify: `packages/shared/src/index.ts` — re-export banner
 
 **server**
+
 - Modify: `packages/server/src/entities/product.entity.ts` — 3 新列
 - Create: `packages/server/src/entities/banner.entity.ts`
 - Modify: `packages/server/src/modules/product/dto/create-product.dto.ts` + `update-product.dto.ts`
@@ -30,6 +32,7 @@
 - Modify: `packages/server/test/product.recommendations.e2e-spec.ts`
 
 **web**
+
 - Modify: `packages/web/src/pages/ProductDetail.tsx` — 修 specs 死代码 + selectedSpecs
 - Modify: `packages/web/src/components/BuyBar.tsx` — 接 selectedSpecs prop
 - Modify: `packages/web/src/pages/AdminProducts.tsx` — 补字段
@@ -44,6 +47,7 @@
 ## Task 1: shared 新增 ProductSpec + Banner 类型
 
 **Files:**
+
 - Modify: `packages/shared/src/types/product.ts`
 - Create: `packages/shared/src/types/banner.ts`
 - Modify: `packages/shared/src/index.ts`
@@ -124,15 +128,9 @@ export type UpdateBannerDTO = Partial<CreateBannerDTO>;
 在 `packages/shared/src/index.ts` 的 `export type { ApiResponse, PaginatedResponse, PaginationQuery } from './types/api';` 之后追加：
 
 ```typescript
-
 export type { ProductSpec } from './types/product';
 
-export type {
-  Banner,
-  BannerLinkType,
-  CreateBannerDTO,
-  UpdateBannerDTO,
-} from './types/banner';
+export type { Banner, BannerLinkType, CreateBannerDTO, UpdateBannerDTO } from './types/banner';
 ```
 
 - [ ] **Step 4: 构建 shared**
@@ -157,6 +155,7 @@ git commit -m "feat(shared): 新增 ProductSpec 与 Banner 类型定义"
 ## Task 2: server ProductEntity 追加 specs/isRecommended/featuredSortOrder
 
 **Files:**
+
 - Modify: `packages/server/src/entities/product.entity.ts`
 
 - [ ] **Step 1: 在 ProductEntity 追加 3 列**
@@ -205,6 +204,7 @@ git commit -m "feat(server): ProductEntity 追加 specs/isRecommended/featuredSo
 ## Task 3: server Product DTO 追加 specs/isRecommended/featuredSortOrder
 
 **Files:**
+
 - Modify: `packages/server/src/modules/product/dto/create-product.dto.ts`
 - Modify: `packages/server/src/modules/product/dto/update-product.dto.ts`
 
@@ -281,6 +281,7 @@ git commit -m "feat(server): Product DTO 追加 specs/isRecommended/featuredSort
 ## Task 4: server BannerEntity + Module + DTO + Controller + Service
 
 **Files:**
+
 - Create: `packages/server/src/entities/banner.entity.ts`
 - Create: `packages/server/src/modules/banner/banner.module.ts`
 - Create: `packages/server/src/modules/banner/banner.controller.ts`
@@ -353,14 +354,7 @@ export { BannerEntity } from './banner.entity';
 创建 `packages/server/src/modules/banner/dto/create-banner.dto.ts`：
 
 ```typescript
-import {
-  IsString,
-  IsOptional,
-  IsInt,
-  IsIn,
-  Min,
-  MaxLength,
-} from 'class-validator';
+import { IsString, IsOptional, IsInt, IsIn, Min, MaxLength } from 'class-validator';
 
 export class CreateBannerDto {
   @IsString()
@@ -614,6 +608,7 @@ git commit -m "feat(server): 新增 Banner 模块（entity/module/controller/ser
 ## Task 5: server Banner e2e 测试
 
 **Files:**
+
 - Create: `packages/server/test/banner.e2e-spec.ts`
 
 - [ ] **Step 1: 创建 banner.e2e-spec.ts**
@@ -772,6 +767,7 @@ git commit -m "test(banner): 新增 Banner e2e（Public/Admin 守卫、CRUD、�
 ## Task 6: server 推荐位迭代（两段查询）
 
 **Files:**
+
 - Modify: `packages/server/src/modules/product/product.service.ts`
 - Modify: `packages/server/test/product.recommendations.e2e-spec.ts`
 
@@ -837,38 +833,43 @@ git commit -m "test(banner): 新增 Banner e2e（Public/Admin 守卫、CRUD、�
 读 `packages/server/test/product.recommendations.e2e-spec.ts`，在现有用例之后追加两个用例（参考其 beforeAll 结构）：
 
 ```typescript
-  it('isRecommended 商品应优先出现在推荐位', async () => {
-    // 创建 2 个推荐商品 + 1 个非推荐商品
-    const featured1 = await helper.createProductAsAdmin(adminToken, {
-      name: '推荐-A', isRecommended: true, featuredSortOrder: 1,
-    });
-    const featured2 = await helper.createProductAsAdmin(adminToken, {
-      name: '推荐-B', isRecommended: true, featuredSortOrder: 0,
-    });
-    const normal = await helper.createProductAsAdmin(adminToken, {
-      name: '普通-C', isRecommended: false,
-    });
-
-    const res = await request(helper.httpServer)
-      .get('/api/products/recommendations')
-      .query({ limit: 10 })
-      .expect(200);
-    const ids = res.body.data.list.map((p: any) => p.id);
-
-    // 推荐 B（sortOrder 0）应排在 A（sortOrder 1）之前
-    expect(ids.indexOf(featured2)).toBeLessThan(ids.indexOf(featured1));
-    // 推荐商品应在普通商品之前
-    expect(ids.indexOf(featured2)).toBeLessThan(ids.indexOf(normal));
+it('isRecommended 商品应优先出现在推荐位', async () => {
+  // 创建 2 个推荐商品 + 1 个非推荐商品
+  const featured1 = await helper.createProductAsAdmin(adminToken, {
+    name: '推荐-A',
+    isRecommended: true,
+    featuredSortOrder: 1,
+  });
+  const featured2 = await helper.createProductAsAdmin(adminToken, {
+    name: '推荐-B',
+    isRecommended: true,
+    featuredSortOrder: 0,
+  });
+  const normal = await helper.createProductAsAdmin(adminToken, {
+    name: '普通-C',
+    isRecommended: false,
   });
 
-  it('推荐商品不足时应用 createdAt DESC 补足', async () => {
-    const res = await request(helper.httpServer)
-      .get('/api/products/recommendations')
-      .query({ limit: 10 })
-      .expect(200);
-    expect(res.body.data.list.length).toBeLessThanOrEqual(10);
-    // 若列表含非推荐商品，它们必在推荐商品之后（顺序由测试 1 保证）
-  });
+  const res = await request(helper.httpServer)
+    .get('/api/products/recommendations')
+    .query({ limit: 10 })
+    .expect(200);
+  const ids = res.body.data.list.map((p: any) => p.id);
+
+  // 推荐 B（sortOrder 0）应排在 A（sortOrder 1）之前
+  expect(ids.indexOf(featured2)).toBeLessThan(ids.indexOf(featured1));
+  // 推荐商品应在普通商品之前
+  expect(ids.indexOf(featured2)).toBeLessThan(ids.indexOf(normal));
+});
+
+it('推荐商品不足时应用 createdAt DESC 补足', async () => {
+  const res = await request(helper.httpServer)
+    .get('/api/products/recommendations')
+    .query({ limit: 10 })
+    .expect(200);
+  expect(res.body.data.list.length).toBeLessThanOrEqual(10);
+  // 若列表含非推荐商品，它们必在推荐商品之后（顺序由测试 1 保证）
+});
 ```
 
 注意：`helper.createProductAsAdmin` 的 overrides 参数已支持任意字段透传（含 `isRecommended`、`featuredSortOrder`）—— 检查 `test/helpers/test-helper.ts` 的 `createProductAsAdmin` 实现，确认 overrides 会覆盖默认 body。如不覆盖需先扩展 helper。
@@ -895,6 +896,7 @@ git commit -m "feat(product): 推荐位迭代——isRecommended 优先 + create
 ## Task 7: web ProductDetail 修 specs 死代码 + selectedSpecs
 
 **Files:**
+
 - Modify: `packages/web/src/pages/ProductDetail.tsx`
 
 - [ ] **Step 1: 删除 specs 强制断言，改用 product.specs**
@@ -902,13 +904,13 @@ git commit -m "feat(product): 推荐位迭代——isRecommended 优先 + create
 在 `packages/web/src/pages/ProductDetail.tsx` 中，顶部 `useState` 区追加（在 `const [isLoading, setIsLoading] = useState(true);` 之后）：
 
 ```tsx
-  const [selectedSpecs, setSelectedSpecs] = useState<Record<string, string>>({});
+const [selectedSpecs, setSelectedSpecs] = useState<Record<string, string>>({});
 ```
 
 删除第 69-86 行的「解析规格」整段代码（`const specs: Array<...> = []; if ((product as ...).specs) { try { ... } catch {} }`），替换为：
 
 ```tsx
-  const specs = product.specs ?? [];
+const specs = product.specs ?? [];
 ```
 
 - [ ] **Step 2: 修改 SpecSelector 的 onChange 与 BuyBar 调用**
@@ -916,13 +918,13 @@ git commit -m "feat(product): 推荐位迭代——isRecommended 优先 + create
 将第 178 行 `<SpecSelector specs={specs} onChange={() => {}} />` 改为：
 
 ```tsx
-          <SpecSelector specs={specs} onChange={setSelectedSpecs} />
+<SpecSelector specs={specs} onChange={setSelectedSpecs} />
 ```
 
 将第 195 行 `<BuyBar product={product} />` 改为：
 
 ```tsx
-      <BuyBar product={product} selectedSpecs={selectedSpecs} />
+<BuyBar product={product} selectedSpecs={selectedSpecs} />
 ```
 
 - [ ] **Step 3: 运行 web build**
@@ -937,6 +939,7 @@ Expected: 成功（依赖 Task 8 BuyBar 接 selectedSpecs prop 才能通过类�
 ## Task 8: web BuyBar 接 selectedSpecs prop
 
 **Files:**
+
 - Modify: `packages/web/src/components/BuyBar.tsx`
 
 - [ ] **Step 1: 修改 BuyBarProps 与 specLabel 计算**
@@ -959,29 +962,29 @@ export function BuyBar({ product, selectedSpecs }: BuyBarProps) {
 在 `const [qty, setQty] = useState(1);` 之后追加 specLabel 计算：
 
 ```tsx
-  const specLabel = Object.values(selectedSpecs).join('/') || '默认';
+const specLabel = Object.values(selectedSpecs).join('/') || '默认';
 ```
 
 将 `handleAddToCart` 与 `handleBuyNow` 中的 `specLabel: '默认'` 替换为 `specLabel`：
 
 ```tsx
-  const handleAddToCart = async () => {
-    try {
-      await addItem({ productId: product.id, specLabel, quantity: qty });
-      showToast(`已加入购物车 ×${qty}`, 'success');
-    } catch {
-      showToast('添加失败，请重试', 'error');
-    }
-  };
+const handleAddToCart = async () => {
+  try {
+    await addItem({ productId: product.id, specLabel, quantity: qty });
+    showToast(`已加入购物车 ×${qty}`, 'success');
+  } catch {
+    showToast('添加失败，请重试', 'error');
+  }
+};
 
-  const handleBuyNow = async () => {
-    try {
-      await addItem({ productId: product.id, specLabel, quantity: qty });
-      navigate('/cart');
-    } catch {
-      showToast('操作失败，请重试', 'error');
-    }
-  };
+const handleBuyNow = async () => {
+  try {
+    await addItem({ productId: product.id, specLabel, quantity: qty });
+    navigate('/cart');
+  } catch {
+    showToast('操作失败，请重试', 'error');
+  }
+};
 ```
 
 - [ ] **Step 2: 运行 web build（与 Task 7 一起）**
@@ -1001,11 +1004,13 @@ git commit -m "feat(web): ProductDetail 修 specs 死代码 + BuyBar 接 selecte
 ## Task 9: web AdminProducts 表单补字段
 
 **Files:**
+
 - Modify: `packages/web/src/pages/AdminProducts.tsx`
 
 - [ ] **Step 1: 读现有 AdminProducts.tsx，定位 ProductFormData / emptyForm / openEditModal / payload**
 
 先读 `packages/web/src/pages/AdminProducts.tsx` 完整文件，理解：
+
 - `ProductFormData` 接口定义（约第 21-32 行）
 - `emptyForm` 默认值（约第 34-45 行）
 - 表单 JSX 结构
@@ -1017,13 +1022,13 @@ git commit -m "feat(web): ProductDetail 修 specs 死代码 + BuyBar 接 selecte
 在 `ProductFormData` 接口追加：
 
 ```typescript
-  sweetness: string;
-  weight: string;
-  color: string;
-  tags: string;            // 逗号分隔
-  specs: string;           // JSON 字符串
-  isRecommended: boolean;
-  featuredSortOrder: number;
+sweetness: string;
+weight: string;
+color: string;
+tags: string; // 逗号分隔
+specs: string; // JSON 字符串
+isRecommended: boolean;
+featuredSortOrder: number;
 ```
 
 - [ ] **Step 3: emptyForm 追加默认值**
@@ -1057,48 +1062,60 @@ git commit -m "feat(web): ProductDetail 修 specs 死代码 + BuyBar 接 selecte
 在表单 JSX 中（按现有字段分组位置）追加。沿用现有 input 样式（`border border-gray-200 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-brand-primary/30`）：
 
 ```tsx
-{/* 甜度 */}
+{
+  /* 甜度 */
+}
 <input
   value={form.sweetness}
   onChange={(e) => setForm({ ...form, sweetness: e.target.value })}
   placeholder="甜度（如 甜、酸甜）"
   className="w-full border border-gray-200 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-brand-primary/30"
-/>
+/>;
 
-{/* 规格 weight */}
+{
+  /* 规格 weight */
+}
 <input
   value={form.weight}
   onChange={(e) => setForm({ ...form, weight: e.target.value })}
   placeholder="规格（如 500g、1kg）"
   className="w-full border border-gray-200 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-brand-primary/30"
-/>
+/>;
 
-{/* 颜色 */}
+{
+  /* 颜色 */
+}
 <input
   value={form.color}
   onChange={(e) => setForm({ ...form, color: e.target.value })}
   placeholder="色板 hex（如 #FF6B35）"
   className="w-full border border-gray-200 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-brand-primary/30"
-/>
+/>;
 
-{/* 标签 tags */}
+{
+  /* 标签 tags */
+}
 <input
   value={form.tags}
   onChange={(e) => setForm({ ...form, tags: e.target.value })}
   placeholder="标签（逗号分隔，如 甜,新鲜,限时）"
   className="w-full border border-gray-200 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-brand-primary/30"
-/>
+/>;
 
-{/* 规格 JSON specs */}
+{
+  /* 规格 JSON specs */
+}
 <textarea
   value={form.specs}
   onChange={(e) => setForm({ ...form, specs: e.target.value })}
   placeholder='规格 JSON，如 [{"name":"规格","values":["500g/盒","1kg/袋"]}]'
   rows={3}
   className="w-full border border-gray-200 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-brand-primary/30 font-mono text-xs"
-/>
+/>;
 
-{/* 推荐位 */}
+{
+  /* 推荐位 */
+}
 <label className="flex items-center gap-2">
   <input
     type="checkbox"
@@ -1106,16 +1123,18 @@ git commit -m "feat(web): ProductDetail 修 specs 死代码 + BuyBar 接 selecte
     onChange={(e) => setForm({ ...form, isRecommended: e.target.checked })}
   />
   <span>设为推荐商品</span>
-</label>
+</label>;
 
-{/* 推荐排序 */}
+{
+  /* 推荐排序 */
+}
 <input
   type="number"
   value={form.featuredSortOrder}
   onChange={(e) => setForm({ ...form, featuredSortOrder: Number(e.target.value) })}
   placeholder="推荐排序（小的在前）"
   className="w-full border border-gray-200 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-brand-primary/30"
-/>
+/>;
 ```
 
 控件放置位置：sweetness/weight/color/tags/specs 放在 description 附近（现有基础字段区），isRecommended/featuredSortOrder 放在 status 附近（运营字段区）。
@@ -1125,28 +1144,31 @@ git commit -m "feat(web): ProductDetail 修 specs 死代码 + BuyBar 接 selecte
 修改提交逻辑（约第 152-163 行 payload 构造处），追加字段并处理 specs：
 
 ```tsx
-  // specs JSON 解析（失败不提交）
-  let parsedSpecs: any[] | null = null;
-  if (form.specs.trim()) {
-    try {
-      parsedSpecs = JSON.parse(form.specs);
-      if (!Array.isArray(parsedSpecs)) throw new Error('not array');
-    } catch {
-      showToast('规格 JSON 格式错误', 'error');
-      return;
-    }
+// specs JSON 解析（失败不提交）
+let parsedSpecs: any[] | null = null;
+if (form.specs.trim()) {
+  try {
+    parsedSpecs = JSON.parse(form.specs);
+    if (!Array.isArray(parsedSpecs)) throw new Error('not array');
+  } catch {
+    showToast('规格 JSON 格式错误', 'error');
+    return;
   }
+}
 
-  const payload = {
-    // ...现有字段
-    sweetness: form.sweetness,
-    weight: form.weight,
-    color: form.color,
-    tags: form.tags.split(',').map((s) => s.trim()).filter(Boolean),
-    specs: parsedSpecs,
-    isRecommended: form.isRecommended,
-    featuredSortOrder: Number(form.featuredSortOrder),
-  };
+const payload = {
+  // ...现有字段
+  sweetness: form.sweetness,
+  weight: form.weight,
+  color: form.color,
+  tags: form.tags
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean),
+  specs: parsedSpecs,
+  isRecommended: form.isRecommended,
+  featuredSortOrder: Number(form.featuredSortOrder),
+};
 ```
 
 注意：现有 payload 是 `apiClient.post` 或 `apiClient.put` 直接传 form 对象，需改为构造新 payload 对象后传入。保留原有字段映射。
@@ -1168,6 +1190,7 @@ git commit -m "feat(web): AdminProducts 表单补 sweetness/weight/color/tags/sp
 ## Task 10: web Banner API + PromoBanner 接 API
 
 **Files:**
+
 - Create: `packages/web/src/api/banner.ts`
 - Modify: `packages/web/src/components/PromoBanner.tsx`
 
@@ -1177,12 +1200,7 @@ git commit -m "feat(web): AdminProducts 表单补 sweetness/weight/color/tags/sp
 
 ```typescript
 import { apiClient } from './client';
-import type {
-  ApiResponse,
-  Banner,
-  CreateBannerDTO,
-  UpdateBannerDTO,
-} from 'shared';
+import type { ApiResponse, Banner, CreateBannerDTO, UpdateBannerDTO } from 'shared';
 
 export const bannerApi = {
   getActive() {
@@ -1264,9 +1282,7 @@ export function PromoBanner() {
       <div className="relative p-5 flex items-center justify-between">
         <div className="flex-1">
           <div className="text-white font-bold text-lg">{banner.title}</div>
-          {banner.subtitle && (
-            <div className="text-white/90 text-sm mt-1">{banner.subtitle}</div>
-          )}
+          {banner.subtitle && <div className="text-white/90 text-sm mt-1">{banner.subtitle}</div>}
         </div>
         {banner.ctaText && (
           <button
@@ -1301,6 +1317,7 @@ git commit -m "feat(web): PromoBanner 改为从 /api/banners 拉取，CTA 按 li
 ## Task 11: web AdminBanners 页 + 路由
 
 **Files:**
+
 - Create: `packages/web/src/pages/AdminBanners.tsx`
 - Modify: `packages/web/src/router/index.tsx`
 
@@ -1422,7 +1439,8 @@ export default function AdminBanners() {
     }
   };
 
-  const inputCls = 'w-full border border-gray-200 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-brand-primary/30';
+  const inputCls =
+    'w-full border border-gray-200 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-brand-primary/30';
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -1456,9 +1474,11 @@ export default function AdminBanners() {
               <tr key={b.id} className="border-t border-gray-100">
                 <td className="p-3 font-medium">{b.title}</td>
                 <td className="p-3">
-                  <span className={`px-2 py-0.5 rounded text-xs font-bold ${
-                    b.status === 1 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-                  }`}>
+                  <span
+                    className={`px-2 py-0.5 rounded text-xs font-bold ${
+                      b.status === 1 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                    }`}
+                  >
                     {b.status === 1 ? '上架' : '下架'}
                   </span>
                 </td>
@@ -1468,11 +1488,15 @@ export default function AdminBanners() {
                   <button
                     onClick={() => openEdit(b)}
                     className="text-brand-primary text-sm font-bold"
-                  >编辑</button>
+                  >
+                    编辑
+                  </button>
                   <button
                     onClick={() => handleDelete(b.id)}
                     className="text-red-500 text-sm font-bold"
-                  >删除</button>
+                  >
+                    删除
+                  </button>
                 </td>
               </tr>
             ))}
@@ -1483,9 +1507,7 @@ export default function AdminBanners() {
       {modalOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4">
-              {editingId ? '编辑 Banner' : '新建 Banner'}
-            </h2>
+            <h2 className="text-xl font-bold mb-4">{editingId ? '编辑 Banner' : '新建 Banner'}</h2>
             <div className="space-y-3">
               <input
                 value={form.title}
@@ -1513,7 +1535,9 @@ export default function AdminBanners() {
               />
               <select
                 value={form.linkType}
-                onChange={(e) => setForm({ ...form, linkType: e.target.value as BannerFormData['linkType'] })}
+                onChange={(e) =>
+                  setForm({ ...form, linkType: e.target.value as BannerFormData['linkType'] })
+                }
                 className={inputCls}
               >
                 <option value="none">不跳转</option>
@@ -1547,11 +1571,15 @@ export default function AdminBanners() {
               <button
                 onClick={handleSubmit}
                 className="flex-1 py-2.5 rounded-2xl bg-brand-primary text-white font-bold"
-              >保存</button>
+              >
+                保存
+              </button>
               <button
                 onClick={() => setModalOpen(false)}
                 className="flex-1 py-2.5 rounded-2xl border border-gray-200 font-bold"
-              >取消</button>
+              >
+                取消
+              </button>
             </div>
           </div>
         </div>
@@ -1597,11 +1625,13 @@ git commit -m "feat(web): 新增 AdminBanners 管理页 + /admin/banners 路由"
 ## Task 12: web Cart 清空按钮 + modal
 
 **Files:**
+
 - Modify: `packages/web/src/pages/Cart.tsx`
 
 - [ ] **Step 1: 读 Cart.tsx 定位 header / deleteTarget modal / clearCart 调用**
 
 先读 `packages/web/src/pages/Cart.tsx`，理解：
+
 - header 结构（约第 104-109 行）
 - 现有 deleteTarget modal（用于单条删除二次确认）
 - store 中 clearCart 方法已存在
@@ -1611,7 +1641,7 @@ git commit -m "feat(web): 新增 AdminBanners 管理页 + /admin/banners 路由"
 在 useState 区追加：
 
 ```tsx
-  const [clearTarget, setClearTarget] = useState(false);
+const [clearTarget, setClearTarget] = useState(false);
 ```
 
 - [ ] **Step 3: header 追加清空按钮**
@@ -1619,14 +1649,16 @@ git commit -m "feat(web): 新增 AdminBanners 管理页 + /admin/banners 路由"
 在 header 的 `{items.length}件商品` 之后追加：
 
 ```tsx
-{items.length > 0 && (
-  <button
-    onClick={() => setClearTarget(true)}
-    className="ml-auto text-brand-coral text-sm font-bold"
-  >
-    清空
-  </button>
-)}
+{
+  items.length > 0 && (
+    <button
+      onClick={() => setClearTarget(true)}
+      className="ml-auto text-brand-coral text-sm font-bold"
+    >
+      清空
+    </button>
+  );
+}
 ```
 
 注意：若 header 已有 `ml-auto` 类的元素（如全选/结算按钮），需调整布局使「清空」靠右。按现有结构，将「清空」放在 header 最右侧。
@@ -1636,44 +1668,44 @@ git commit -m "feat(web): 新增 AdminBanners 管理页 + /admin/banners 路由"
 在组件内（与 deleteTarget modal 同级）追加：
 
 ```tsx
-  const confirmClear = async () => {
-    try {
-      await clearCart();
-      showToast('购物车已清空', 'success');
-    } catch {
-      showToast('清空失败', 'error');
-    } finally {
-      setClearTarget(false);
-    }
-  };
+const confirmClear = async () => {
+  try {
+    await clearCart();
+    showToast('购物车已清空', 'success');
+  } catch {
+    showToast('清空失败', 'error');
+  } finally {
+    setClearTarget(false);
+  }
+};
 ```
 
 JSX modal（放在现有 deleteTarget modal 附近）：
 
 ```tsx
-{clearTarget && (
-  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-    <div className="bg-white rounded-3xl p-6 w-full max-w-xs">
-      <p className="text-center text-brand-dark font-bold mb-4">
-        确定清空购物车？此操作不可撤销
-      </p>
-      <div className="flex gap-2">
-        <button
-          onClick={confirmClear}
-          className="flex-1 py-2.5 rounded-2xl bg-brand-coral text-white font-bold"
-        >
-          确定清空
-        </button>
-        <button
-          onClick={() => setClearTarget(false)}
-          className="flex-1 py-2.5 rounded-2xl border border-brand-border font-bold"
-        >
-          取消
-        </button>
+{
+  clearTarget && (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-3xl p-6 w-full max-w-xs">
+        <p className="text-center text-brand-dark font-bold mb-4">确定清空购物车？此操作不可撤销</p>
+        <div className="flex gap-2">
+          <button
+            onClick={confirmClear}
+            className="flex-1 py-2.5 rounded-2xl bg-brand-coral text-white font-bold"
+          >
+            确定清空
+          </button>
+          <button
+            onClick={() => setClearTarget(false)}
+            className="flex-1 py-2.5 rounded-2xl border border-brand-border font-bold"
+          >
+            取消
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-)}
+  );
+}
 ```
 
 注意：从 store 解构 `clearCart`：
@@ -1737,21 +1769,21 @@ Run: `docker compose up -d --build`
 
 ## 验收映射（Contract → Task）
 
-| Contract 验收项 | 对应 Task |
-|---|---|
-| shared ProductSpec/Banner 类型 | Task 1 |
-| ProductEntity 3 新列 | Task 2 |
-| Product DTO 3 新字段 | Task 3 |
-| BannerEntity + Module + DTO + Controller + Service | Task 4 |
-| Banner e2e | Task 5 |
-| 推荐位两段查询 + e2e | Task 6 |
-| ProductDetail 修 specs 死代码 + selectedSpecs | Task 7 |
-| BuyBar 接 selectedSpecs | Task 8 |
-| AdminProducts 表单补字段 | Task 9 |
-| Banner API + PromoBanner 接 API | Task 10 |
-| AdminBanners 页 + 路由 | Task 11 |
-| Cart 清空按钮 + modal | Task 12 |
-| 全量回归 + 手动验证 | Task 13 |
+| Contract 验收项                                    | 对应 Task |
+| -------------------------------------------------- | --------- |
+| shared ProductSpec/Banner 类型                     | Task 1    |
+| ProductEntity 3 新列                               | Task 2    |
+| Product DTO 3 新字段                               | Task 3    |
+| BannerEntity + Module + DTO + Controller + Service | Task 4    |
+| Banner e2e                                         | Task 5    |
+| 推荐位两段查询 + e2e                               | Task 6    |
+| ProductDetail 修 specs 死代码 + selectedSpecs      | Task 7    |
+| BuyBar 接 selectedSpecs                            | Task 8    |
+| AdminProducts 表单补字段                           | Task 9    |
+| Banner API + PromoBanner 接 API                    | Task 10   |
+| AdminBanners 页 + 路由                             | Task 11   |
+| Cart 清空按钮 + modal                              | Task 12   |
+| 全量回归 + 手动验证                                | Task 13   |
 
 ---
 

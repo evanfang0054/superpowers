@@ -1,17 +1,9 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-  Inject,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { Redis } from 'ioredis';
 import { ProductEntity, CategoryEntity, OrderItemEntity } from '../../entities';
-import {
-  QueryProductDto,
-  ProductSortBy,
-} from './dto/query-product.dto';
+import { QueryProductDto, ProductSortBy } from './dto/query-product.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -223,9 +215,7 @@ export class ProductService {
     // 2. 不足用非推荐商品按 createdAt DESC 补足
     if (list.length < limit) {
       const excludeIds = list.map((p) => p.id);
-      const fillQb = baseQb
-        .clone()
-        .andWhere('p.is_recommended = :isRec', { isRec: false });
+      const fillQb = baseQb.clone().andWhere('p.is_recommended = :isRec', { isRec: false });
       if (excludeIds.length > 0) {
         fillQb.andWhere('p.id NOT IN (:...excludeIds)', { excludeIds });
       }

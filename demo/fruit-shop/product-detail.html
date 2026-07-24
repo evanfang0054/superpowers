@@ -1,402 +1,580 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>鲜果集 - 商品详情</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>鲜果集 - 商品详情</title>
 
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
-  <!-- React + Babel pinned -->
-  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+    <!-- React + Babel pinned -->
+    <script
+      src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+      integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+      integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+      integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+      crossorigin="anonymous"
+    ></script>
 
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Fredoka:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
-  <style type="text/tailwindcss">
-    @theme {
-      --color-brand-bg: #FFF8F0;
-      --color-brand-primary: #FF6B35;
-      --color-brand-secondary: #F7C948;
-      --color-brand-accent: #E84393;
-      --color-brand-green: #00B894;
-      --color-brand-dark: #2D3436;
-      --color-brand-muted: #636E72;
-      --color-brand-card: #FFFFFF;
-      --color-brand-peach: #FFEAA7;
-      --color-brand-coral: #FF7675;
-      --color-brand-border: #f0ece6;
-      --color-brand-btn-bg: #f5f1eb;
-      --font-display: 'Fredoka', 'Noto Sans SC', sans-serif;
-    }
-  </style>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-brand-bg: #fff8f0;
+        --color-brand-primary: #ff6b35;
+        --color-brand-secondary: #f7c948;
+        --color-brand-accent: #e84393;
+        --color-brand-green: #00b894;
+        --color-brand-dark: #2d3436;
+        --color-brand-muted: #636e72;
+        --color-brand-card: #ffffff;
+        --color-brand-peach: #ffeaa7;
+        --color-brand-coral: #ff7675;
+        --color-brand-border: #f0ece6;
+        --color-brand-btn-bg: #f5f1eb;
+        --font-display: 'Fredoka', 'Noto Sans SC', sans-serif;
+      }
+    </style>
 
-  <style>
-    body { font-family: 'Noto Sans SC', -apple-system, sans-serif; }
+    <style>
+      body {
+        font-family:
+          'Noto Sans SC',
+          -apple-system,
+          sans-serif;
+      }
 
-    /* 弹性跳入动画 */
-    @keyframes bounceIn {
-      0% { transform: scale(0.3); opacity: 0; }
-      50% { transform: scale(1.08); }
-      70% { transform: scale(0.95); }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    .bounce-in { animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+      /* 弹性跳入动画 */
+      @keyframes bounceIn {
+        0% {
+          transform: scale(0.3);
+          opacity: 0;
+        }
+        50% {
+          transform: scale(1.08);
+        }
+        70% {
+          transform: scale(0.95);
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      .bounce-in {
+        animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      }
 
-    /* 浮动动画 */
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-8px); }
-    }
-    .float { animation: float 3s ease-in-out infinite; }
+      /* 浮动动画 */
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+      .float {
+        animation: float 3s ease-in-out infinite;
+      }
 
-    /* 脉冲光晕 */
-    @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.4); }
-      50% { box-shadow: 0 0 0 12px rgba(255, 107, 53, 0); }
-    }
-    .pulse-glow { animation: pulseGlow 2s infinite; }
+      /* 脉冲光晕 */
+      @keyframes pulseGlow {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.4);
+        }
+        50% {
+          box-shadow: 0 0 0 12px rgba(255, 107, 53, 0);
+        }
+      }
+      .pulse-glow {
+        animation: pulseGlow 2s infinite;
+      }
 
-    /* 装饰圆点旋转 */
-    @keyframes spin-slow {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    .spin-slow { animation: spin-slow 20s linear infinite; }
+      /* 装饰圆点旋转 */
+      @keyframes spin-slow {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .spin-slow {
+        animation: spin-slow 20s linear infinite;
+      }
 
-    /* 数量按钮交互 */
-    .qty-btn { transition: transform 0.15s, background 0.15s; }
-    .qty-btn:active { transform: scale(0.9); }
-  </style>
-</head>
-<body class="h-full w-full m-0 p-0 bg-brand-bg">
-  <div id="root" class="min-h-screen"></div>
+      /* 数量按钮交互 */
+      .qty-btn {
+        transition:
+          transform 0.15s,
+          background 0.15s;
+      }
+      .qty-btn:active {
+        transform: scale(0.9);
+      }
+    </style>
+  </head>
+  <body class="h-full w-full m-0 p-0 bg-brand-bg">
+    <div id="root" class="min-h-screen"></div>
 
-  <script type="text/babel">
-    const { useState } = React;
+    <script type="text/babel">
+      const { useState } = React;
 
-    // ==================== 水果数据 ====================
-    const fruits = [
-      {
-        id: 1, name: '阳光芒果', origin: '海南三亚',
-        price: 29.9, originalPrice: 49.9, unit: '斤',
-        sweetness: '★★★★★', weight: '350-450g/个',
-        desc: '树上自然熟，金灿灿的果肉入口即化，甜度高达22°Brix。每一口都是热带阳光的味道。',
-        tags: ['当季爆款', '树上熟', '包邮'],
-        image: 'https://images.unsplash.com/photo-1757281096599-b9165ba74008?fm=jpg&q=80&w=800&auto=format&fit=crop',
-        color: '#FFD32A',
-      },
-      {
-        id: 2, name: '丹东草莓', origin: '辽宁丹东',
-        price: 39.9, originalPrice: 59.9, unit: '盒/300g',
-        sweetness: '★★★★☆', weight: '15-25g/颗',
-        desc: '红颜品种，颗颗饱满多汁，草莓味浓郁。',
-        tags: ['新品', '产地直发'],
-        image: 'https://images.unsplash.com/photo-1708100769120-015acf75bcc1?fm=jpg&q=80&w=800&auto=format&fit=crop',
-        color: '#FF6B6B',
-      },
-      {
-        id: 3, name: '智利车厘子', origin: '智利',
-        price: 79.9, originalPrice: 119.9, unit: '斤',
-        sweetness: '★★★★★', weight: '10-12g/颗',
-        desc: 'JJ级大果，深红如宝石，脆甜多汁。',
-        tags: ['进口', 'JJ级'],
-        image: 'https://images.unsplash.com/photo-1559619479-25dfed32ee96?fm=jpg&q=80&w=800&auto=format&fit=crop',
-        color: '#A3183B',
-      },
-      {
-        id: 4, name: '云南蓝莓', origin: '云南红河',
-        price: 24.9, originalPrice: 39.9, unit: '盒/125g',
-        sweetness: '★★★★☆', weight: '12-18mm',
-        desc: '高原阳光种植，花青素含量高，酸甜可口。',
-        tags: ['高原种植', '花青素'],
-        image: 'https://images.unsplash.com/photo-1510154011132-f48b8eabd172?fm=jpg&q=80&w=800&auto=format&fit=crop',
-        color: '#5F27CD',
-      },
-    ];
+      // ==================== 水果数据 ====================
+      const fruits = [
+        {
+          id: 1,
+          name: '阳光芒果',
+          origin: '海南三亚',
+          price: 29.9,
+          originalPrice: 49.9,
+          unit: '斤',
+          sweetness: '★★★★★',
+          weight: '350-450g/个',
+          desc: '树上自然熟，金灿灿的果肉入口即化，甜度高达22°Brix。每一口都是热带阳光的味道。',
+          tags: ['当季爆款', '树上熟', '包邮'],
+          image:
+            'https://images.unsplash.com/photo-1757281096599-b9165ba74008?fm=jpg&q=80&w=800&auto=format&fit=crop',
+          color: '#FFD32A',
+        },
+        {
+          id: 2,
+          name: '丹东草莓',
+          origin: '辽宁丹东',
+          price: 39.9,
+          originalPrice: 59.9,
+          unit: '盒/300g',
+          sweetness: '★★★★☆',
+          weight: '15-25g/颗',
+          desc: '红颜品种，颗颗饱满多汁，草莓味浓郁。',
+          tags: ['新品', '产地直发'],
+          image:
+            'https://images.unsplash.com/photo-1708100769120-015acf75bcc1?fm=jpg&q=80&w=800&auto=format&fit=crop',
+          color: '#FF6B6B',
+        },
+        {
+          id: 3,
+          name: '智利车厘子',
+          origin: '智利',
+          price: 79.9,
+          originalPrice: 119.9,
+          unit: '斤',
+          sweetness: '★★★★★',
+          weight: '10-12g/颗',
+          desc: 'JJ级大果，深红如宝石，脆甜多汁。',
+          tags: ['进口', 'JJ级'],
+          image:
+            'https://images.unsplash.com/photo-1559619479-25dfed32ee96?fm=jpg&q=80&w=800&auto=format&fit=crop',
+          color: '#A3183B',
+        },
+        {
+          id: 4,
+          name: '云南蓝莓',
+          origin: '云南红河',
+          price: 24.9,
+          originalPrice: 39.9,
+          unit: '盒/125g',
+          sweetness: '★★★★☆',
+          weight: '12-18mm',
+          desc: '高原阳光种植，花青素含量高，酸甜可口。',
+          tags: ['高原种植', '花青素'],
+          image:
+            'https://images.unsplash.com/photo-1510154011132-f48b8eabd172?fm=jpg&q=80&w=800&auto=format&fit=crop',
+          color: '#5F27CD',
+        },
+      ];
 
-    // ==================== 组件 ====================
+      // ==================== 组件 ====================
 
-    // 装饰圆点背景
-    function DecorDots() {
-      return (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute -top-[60px] -right-[40px] w-40 h-40 rounded-full bg-brand-peach/30" />
-          <div className="absolute top-[200px] -left-5 w-20 h-20 rounded-full bg-brand-secondary/25" />
-          <div className="spin-slow absolute bottom-[300px] -right-[15px] w-[60px] h-[60px]">
-            <div className="absolute top-0 left-[25px] w-2.5 h-2.5 rounded-full bg-brand-coral/40" />
-            <div className="absolute bottom-0 left-2.5 w-2 h-2 rounded-full bg-brand-green/40" />
-            <div className="absolute bottom-[5px] right-[5px] w-1.5 h-1.5 rounded-full bg-brand-accent/40" />
-          </div>
-        </div>
-      );
-    }
-
-    // 顶部导航
-    function NavBar({ onBack }) {
-      return (
-        <div className="flex items-center justify-between px-4 py-3 bg-brand-bg/90 backdrop-blur-[10px] sticky top-0 z-50">
-          <div onClick={onBack} className="cursor-pointer flex items-center gap-1">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2D3436" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
-          </div>
-          <span className="font-bold text-[17px] text-brand-dark">鲜果集</span>
-          <div className="flex gap-3">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D3436" strokeWidth="2" strokeLinecap="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16,6 12,2 8,6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-            <div className="relative">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D3436" strokeWidth="2" strokeLinecap="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
-              <div className="absolute -top-1 -right-1.5 w-4 h-4 rounded-full bg-brand-accent text-white text-[10px] font-bold flex items-center justify-center">3</div>
+      // 装饰圆点背景
+      function DecorDots() {
+        return (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute -top-[60px] -right-[40px] w-40 h-40 rounded-full bg-brand-peach/30" />
+            <div className="absolute top-[200px] -left-5 w-20 h-20 rounded-full bg-brand-secondary/25" />
+            <div className="spin-slow absolute bottom-[300px] -right-[15px] w-[60px] h-[60px]">
+              <div className="absolute top-0 left-[25px] w-2.5 h-2.5 rounded-full bg-brand-coral/40" />
+              <div className="absolute bottom-0 left-2.5 w-2 h-2 rounded-full bg-brand-green/40" />
+              <div className="absolute bottom-[5px] right-[5px] w-1.5 h-1.5 rounded-full bg-brand-accent/40" />
             </div>
           </div>
-        </div>
-      );
-    }
+        );
+      }
 
-    // 商品大图
-    function ProductHero({ image, name, color }) {
-      const [loaded, setLoaded] = useState(false);
-      return (
-        <div className="relative overflow-hidden rounded-b-[32px]">
-          <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${color}22 0%, #FFF8F0 100%)` }} />
-          <div className={`flex justify-center px-6 pt-5 pb-4 ${loaded ? 'bounce-in' : ''}`}>
-            <img
-              src={image}
-              alt={name}
-              onLoad={() => setLoaded(true)}
-              className="w-full h-[280px] object-cover rounded-3xl"
-              style={{ boxShadow: `0 8px 32px ${color}33` }}
-            />
-          </div>
-          <div className="flex justify-center gap-1.5 pb-3">
-            <div className="w-5 h-1 rounded-sm bg-brand-primary" />
-            <div className="w-2 h-1 rounded-sm bg-gray-300" />
-            <div className="w-2 h-1 rounded-sm bg-gray-300" />
-          </div>
-        </div>
-      );
-    }
-
-    // 价格区域
-    function PriceSection({ price, originalPrice, unit, tags }) {
-      return (
-        <div className="px-5 pb-4">
-          <div className="flex items-baseline gap-2">
-            <span className="text-sm font-bold text-brand-primary">¥</span>
-            <span className="text-[36px] font-black text-brand-primary font-display leading-none">{price}</span>
-            <span className="text-[13px] text-brand-muted">/ {unit}</span>
-            {originalPrice && (
-              <span className="text-[13px] text-gray-300 line-through ml-1">¥{originalPrice}</span>
-            )}
-          </div>
-          <div className="flex gap-2 mt-2.5 flex-wrap">
-            {tags.map((tag, i) => (
-              <span key={i} className="py-1 px-3 rounded-[20px] text-[11px] font-semibold"
-                style={{
-                  background: i === 0 ? '#FF6B3518' : '#F7C94830',
-                  color: i === 0 ? '#FF6B35' : '#2D3436',
-                  border: i === 0 ? '1.5px solid #FF6B3544' : '1.5px solid #F7C94855',
-                }}
-              >{tag}</span>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    // 商品名称
-    function ProductName({ name, origin }) {
-      return (
-        <div className="px-5 pt-2 pb-1">
-          <h1 className="text-[22px] font-black text-brand-dark leading-tight m-0">{name}</h1>
-          <div className="flex items-center gap-1 mt-1.5">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00B894" strokeWidth="2.5" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <span className="text-[13px] text-brand-muted font-medium">产地直发 · {origin}</span>
-          </div>
-        </div>
-      );
-    }
-
-    // 规格选择
-    function SpecSelector({ specs, selected, onSelect }) {
-      return (
-        <div className="px-5 pb-4">
-          <div className="text-sm font-bold text-brand-dark mb-2.5">选择规格</div>
-          <div className="flex gap-2.5 flex-wrap">
-            {specs.map((spec, i) => (
-              <div key={i} onClick={() => onSelect(i)}
-                className="qty-btn py-2.5 px-[18px] rounded-2xl cursor-pointer"
-                style={{
-                  border: selected === i ? '2.5px solid #FF6B35' : '2px solid #eee',
-                  background: selected === i ? '#FF6B3510' : '#FFFFFF',
-                  transition: 'all 0.2s',
-                }}
+      // 顶部导航
+      function NavBar({ onBack }) {
+        return (
+          <div className="flex items-center justify-between px-4 py-3 bg-brand-bg/90 backdrop-blur-[10px] sticky top-0 z-50">
+            <div onClick={onBack} className="cursor-pointer flex items-center gap-1">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#2D3436"
+                strokeWidth="2.5"
+                strokeLinecap="round"
               >
-                <div className={`text-sm font-semibold ${selected === i ? 'text-brand-primary' : 'text-brand-dark'}`}>{spec.label}</div>
-                <div className="text-xs text-brand-muted mt-0.5">¥{spec.price}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    // 甜度/品质信息
-    function QualityInfo({ sweetness, weight }) {
-      const items = [
-        { icon: '🍬', label: '甜度', value: sweetness },
-        { icon: '⚖️', label: '规格', value: weight },
-        { icon: '🚚', label: '配送', value: '顺丰冷链' },
-        { icon: '🛡️', label: '保障', value: '坏果包赔' },
-      ];
-      return (
-        <div className="px-5 pb-4">
-          <div className="grid grid-cols-2 gap-2.5">
-            {items.map((item, i) => (
-              <div key={i} className="py-3 px-3.5 rounded-2xl bg-brand-card border-[1.5px] border-brand-border flex items-center gap-2.5">
-                <span className="text-xl">{item.icon}</span>
-                <div>
-                  <div className="text-[11px] text-brand-muted font-medium">{item.label}</div>
-                  <div className="text-[13px] font-bold text-brand-dark mt-px">{item.value}</div>
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </div>
+            <span className="font-bold text-[17px] text-brand-dark">鲜果集</span>
+            <div className="flex gap-3">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#2D3436"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
+                <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
+                <polyline points="16,6 12,2 8,6" />
+                <line x1="12" y1="2" x2="12" y2="15" />
+              </svg>
+              <div className="relative">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#2D3436"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                >
+                  <circle cx="9" cy="21" r="1" />
+                  <circle cx="20" cy="21" r="1" />
+                  <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
+                </svg>
+                <div className="absolute -top-1 -right-1.5 w-4 h-4 rounded-full bg-brand-accent text-white text-[10px] font-bold flex items-center justify-center">
+                  3
                 </div>
               </div>
-            ))}
+            </div>
           </div>
-        </div>
-      );
-    }
+        );
+      }
 
-    // 商品描述
-    function Description({ text }) {
-      return (
-        <div className="px-5 pb-4">
-          <div className="py-4 px-[18px] rounded-[20px] border-[1.5px]"
-            style={{
-              background: 'linear-gradient(135deg, #FFEAA744 0%, #F7C94822 100%)',
-              borderColor: '#FFEAA766',
-            }}
-          >
-            <div className="text-sm font-bold text-brand-dark mb-1.5">「水果故事」</div>
-            <p className="text-[13.5px] text-brand-muted leading-relaxed m-0">{text}</p>
+      // 商品大图
+      function ProductHero({ image, name, color }) {
+        const [loaded, setLoaded] = useState(false);
+        return (
+          <div className="relative overflow-hidden rounded-b-[32px]">
+            <div
+              className="absolute inset-0"
+              style={{ background: `linear-gradient(135deg, ${color}22 0%, #FFF8F0 100%)` }}
+            />
+            <div className={`flex justify-center px-6 pt-5 pb-4 ${loaded ? 'bounce-in' : ''}`}>
+              <img
+                src={image}
+                alt={name}
+                onLoad={() => setLoaded(true)}
+                className="w-full h-[280px] object-cover rounded-3xl"
+                style={{ boxShadow: `0 8px 32px ${color}33` }}
+              />
+            </div>
+            <div className="flex justify-center gap-1.5 pb-3">
+              <div className="w-5 h-1 rounded-sm bg-brand-primary" />
+              <div className="w-2 h-1 rounded-sm bg-gray-300" />
+              <div className="w-2 h-1 rounded-sm bg-gray-300" />
+            </div>
           </div>
-        </div>
-      );
-    }
+        );
+      }
 
-    // 推荐水果
-    function RecommendFruits({ items }) {
-      return (
-        <div className="px-5 pb-6">
-          <div className="text-[15px] font-bold text-brand-dark mb-3">你可能还喜欢</div>
-          <div className="flex gap-3 overflow-x-auto pb-1">
-            {items.map((fruit) => (
-              <div key={fruit.id}
-                className="min-w-[140px] rounded-[20px] bg-brand-card border-[1.5px] border-brand-border overflow-hidden cursor-pointer shrink-0"
+      // 价格区域
+      function PriceSection({ price, originalPrice, unit, tags }) {
+        return (
+          <div className="px-5 pb-4">
+            <div className="flex items-baseline gap-2">
+              <span className="text-sm font-bold text-brand-primary">¥</span>
+              <span className="text-[36px] font-black text-brand-primary font-display leading-none">
+                {price}
+              </span>
+              <span className="text-[13px] text-brand-muted">/ {unit}</span>
+              {originalPrice && (
+                <span className="text-[13px] text-gray-300 line-through ml-1">
+                  ¥{originalPrice}
+                </span>
+              )}
+            </div>
+            <div className="flex gap-2 mt-2.5 flex-wrap">
+              {tags.map((tag, i) => (
+                <span
+                  key={i}
+                  className="py-1 px-3 rounded-[20px] text-[11px] font-semibold"
+                  style={{
+                    background: i === 0 ? '#FF6B3518' : '#F7C94830',
+                    color: i === 0 ? '#FF6B35' : '#2D3436',
+                    border: i === 0 ? '1.5px solid #FF6B3544' : '1.5px solid #F7C94855',
+                  }}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      // 商品名称
+      function ProductName({ name, origin }) {
+        return (
+          <div className="px-5 pt-2 pb-1">
+            <h1 className="text-[22px] font-black text-brand-dark leading-tight m-0">{name}</h1>
+            <div className="flex items-center gap-1 mt-1.5">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#00B894"
+                strokeWidth="2.5"
+                strokeLinecap="round"
               >
-                <img src={fruit.image} alt={fruit.name}
-                  className="w-full h-[100px] object-cover" />
-                <div className="py-2.5 px-3">
-                  <div className="text-[13px] font-bold text-brand-dark">{fruit.name}</div>
-                  <div className="flex items-baseline gap-1 mt-1">
-                    <span className="text-[11px] text-brand-primary font-bold">¥</span>
-                    <span className="text-lg font-extrabold text-brand-primary font-display">{fruit.price}</span>
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              <span className="text-[13px] text-brand-muted font-medium">产地直发 · {origin}</span>
+            </div>
+          </div>
+        );
+      }
+
+      // 规格选择
+      function SpecSelector({ specs, selected, onSelect }) {
+        return (
+          <div className="px-5 pb-4">
+            <div className="text-sm font-bold text-brand-dark mb-2.5">选择规格</div>
+            <div className="flex gap-2.5 flex-wrap">
+              {specs.map((spec, i) => (
+                <div
+                  key={i}
+                  onClick={() => onSelect(i)}
+                  className="qty-btn py-2.5 px-[18px] rounded-2xl cursor-pointer"
+                  style={{
+                    border: selected === i ? '2.5px solid #FF6B35' : '2px solid #eee',
+                    background: selected === i ? '#FF6B3510' : '#FFFFFF',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <div
+                    className={`text-sm font-semibold ${selected === i ? 'text-brand-primary' : 'text-brand-dark'}`}
+                  >
+                    {spec.label}
+                  </div>
+                  <div className="text-xs text-brand-muted mt-0.5">¥{spec.price}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      // 甜度/品质信息
+      function QualityInfo({ sweetness, weight }) {
+        const items = [
+          { icon: '🍬', label: '甜度', value: sweetness },
+          { icon: '⚖️', label: '规格', value: weight },
+          { icon: '🚚', label: '配送', value: '顺丰冷链' },
+          { icon: '🛡️', label: '保障', value: '坏果包赔' },
+        ];
+        return (
+          <div className="px-5 pb-4">
+            <div className="grid grid-cols-2 gap-2.5">
+              {items.map((item, i) => (
+                <div
+                  key={i}
+                  className="py-3 px-3.5 rounded-2xl bg-brand-card border-[1.5px] border-brand-border flex items-center gap-2.5"
+                >
+                  <span className="text-xl">{item.icon}</span>
+                  <div>
+                    <div className="text-[11px] text-brand-muted font-medium">{item.label}</div>
+                    <div className="text-[13px] font-bold text-brand-dark mt-px">{item.value}</div>
                   </div>
                 </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      // 商品描述
+      function Description({ text }) {
+        return (
+          <div className="px-5 pb-4">
+            <div
+              className="py-4 px-[18px] rounded-[20px] border-[1.5px]"
+              style={{
+                background: 'linear-gradient(135deg, #FFEAA744 0%, #F7C94822 100%)',
+                borderColor: '#FFEAA766',
+              }}
+            >
+              <div className="text-sm font-bold text-brand-dark mb-1.5">「水果故事」</div>
+              <p className="text-[13.5px] text-brand-muted leading-relaxed m-0">{text}</p>
+            </div>
+          </div>
+        );
+      }
+
+      // 推荐水果
+      function RecommendFruits({ items }) {
+        return (
+          <div className="px-5 pb-6">
+            <div className="text-[15px] font-bold text-brand-dark mb-3">你可能还喜欢</div>
+            <div className="flex gap-3 overflow-x-auto pb-1">
+              {items.map((fruit) => (
+                <div
+                  key={fruit.id}
+                  className="min-w-[140px] rounded-[20px] bg-brand-card border-[1.5px] border-brand-border overflow-hidden cursor-pointer shrink-0"
+                >
+                  <img
+                    src={fruit.image}
+                    alt={fruit.name}
+                    className="w-full h-[100px] object-cover"
+                  />
+                  <div className="py-2.5 px-3">
+                    <div className="text-[13px] font-bold text-brand-dark">{fruit.name}</div>
+                    <div className="flex items-baseline gap-1 mt-1">
+                      <span className="text-[11px] text-brand-primary font-bold">¥</span>
+                      <span className="text-lg font-extrabold text-brand-primary font-display">
+                        {fruit.price}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      // 底部购买栏
+      function BuyBar({ price, qty, onQtyChange, onAddCart, onBuyNow }) {
+        return (
+          <div className="fixed bottom-0 inset-x-0 flex items-center gap-3 px-4 py-3 bg-white/95 backdrop-blur-[12px] border-t-[1.5px] border-brand-border z-40">
+            {/* 数量 */}
+            <div className="flex items-center gap-2">
+              <div
+                className="qty-btn w-[30px] h-[30px] rounded-[10px] flex items-center justify-center bg-brand-btn-bg cursor-pointer text-base font-bold text-brand-dark"
+                onClick={() => onQtyChange(Math.max(1, qty - 1))}
+              >
+                −
               </div>
-            ))}
+              <span className="text-base font-extrabold min-w-6 text-center font-display">
+                {qty}
+              </span>
+              <div
+                className="qty-btn w-[30px] h-[30px] rounded-[10px] flex items-center justify-center bg-brand-btn-bg cursor-pointer text-base font-bold text-brand-dark"
+                onClick={() => onQtyChange(qty + 1)}
+              >
+                +
+              </div>
+            </div>
+            {/* 加购 */}
+            <div
+              onClick={onAddCart}
+              className="flex-1 py-3 rounded-2xl text-center bg-brand-secondary text-brand-dark font-bold text-[15px] cursor-pointer transition-transform duration-150"
+            >
+              加入购物车
+            </div>
+            {/* 立即购买 */}
+            <div
+              onClick={onBuyNow}
+              className="pulse-glow flex-1 py-3 rounded-2xl text-center text-white font-bold text-[15px] cursor-pointer transition-transform duration-150"
+              style={{ background: 'linear-gradient(135deg, #FF6B35, #FF7675)' }}
+            >
+              立即购买
+            </div>
           </div>
-        </div>
-      );
-    }
+        );
+      }
 
-    // 底部购买栏
-    function BuyBar({ price, qty, onQtyChange, onAddCart, onBuyNow }) {
-      return (
-        <div className="fixed bottom-0 inset-x-0 flex items-center gap-3 px-4 py-3 bg-white/95 backdrop-blur-[12px] border-t-[1.5px] border-brand-border z-40">
-          {/* 数量 */}
-          <div className="flex items-center gap-2">
-            <div className="qty-btn w-[30px] h-[30px] rounded-[10px] flex items-center justify-center bg-brand-btn-bg cursor-pointer text-base font-bold text-brand-dark"
-              onClick={() => onQtyChange(Math.max(1, qty - 1))}>−</div>
-            <span className="text-base font-extrabold min-w-6 text-center font-display">{qty}</span>
-            <div className="qty-btn w-[30px] h-[30px] rounded-[10px] flex items-center justify-center bg-brand-btn-bg cursor-pointer text-base font-bold text-brand-dark"
-              onClick={() => onQtyChange(qty + 1)}>+</div>
+      // Toast 提示
+      function Toast({ message, visible }) {
+        if (!visible) return null;
+        return (
+          <div className="absolute top-[70px] left-1/2 -translate-x-1/2 py-2.5 px-6 rounded-3xl bg-black/75 text-white text-sm font-semibold z-[100] animate-[bounceIn_0.3s_ease]">
+            {message}
           </div>
-          {/* 加购 */}
-          <div onClick={onAddCart}
-            className="flex-1 py-3 rounded-2xl text-center bg-brand-secondary text-brand-dark font-bold text-[15px] cursor-pointer transition-transform duration-150"
-          >加入购物车</div>
-          {/* 立即购买 */}
-          <div onClick={onBuyNow}
-            className="pulse-glow flex-1 py-3 rounded-2xl text-center text-white font-bold text-[15px] cursor-pointer transition-transform duration-150"
-            style={{ background: 'linear-gradient(135deg, #FF6B35, #FF7675)' }}
-          >立即购买</div>
-        </div>
-      );
-    }
+        );
+      }
 
-    // Toast 提示
-    function Toast({ message, visible }) {
-      if (!visible) return null;
-      return (
-        <div className="absolute top-[70px] left-1/2 -translate-x-1/2 py-2.5 px-6 rounded-3xl bg-black/75 text-white text-sm font-semibold z-[100] animate-[bounceIn_0.3s_ease]">
-          {message}
-        </div>
-      );
-    }
+      // ==================== 主页面 ====================
+      function ProductDetail() {
+        const product = fruits[0];
+        const recommendItems = fruits.slice(1);
 
-    // ==================== 主页面 ====================
-    function ProductDetail() {
-      const product = fruits[0];
-      const recommendItems = fruits.slice(1);
+        const specs = [
+          { label: '1斤尝鲜装', price: '29.9' },
+          { label: '3斤家庭装', price: '79.9' },
+          { label: '5斤分享装', price: '119.9' },
+        ];
 
-      const specs = [
-        { label: '1斤尝鲜装', price: '29.9' },
-        { label: '3斤家庭装', price: '79.9' },
-        { label: '5斤分享装', price: '119.9' },
-      ];
+        const [selectedSpec, setSelectedSpec] = useState(0);
+        const [qty, setQty] = useState(1);
+        const [toast, setToast] = useState({ visible: false, message: '' });
 
-      const [selectedSpec, setSelectedSpec] = useState(0);
-      const [qty, setQty] = useState(1);
-      const [toast, setToast] = useState({ visible: false, message: '' });
+        const showToast = (msg) => {
+          setToast({ visible: true, message: msg });
+          setTimeout(() => setToast({ visible: false, message: '' }), 1800);
+        };
 
-      const showToast = (msg) => {
-        setToast({ visible: true, message: msg });
-        setTimeout(() => setToast({ visible: false, message: '' }), 1800);
-      };
+        return (
+          <div className="relative bg-brand-bg min-h-full">
+            <DecorDots />
+            <NavBar onBack={() => showToast('返回首页')} />
 
-      return (
-        <div className="relative bg-brand-bg min-h-full">
-          <DecorDots />
-          <NavBar onBack={() => showToast('返回首页')} />
+            <ProductHero image={product.image} name={product.name} color={product.color} />
+            <ProductName name={product.name} origin={product.origin} />
+            <PriceSection
+              price={product.price}
+              originalPrice={product.originalPrice}
+              unit={product.unit}
+              tags={product.tags}
+            />
+            <SpecSelector specs={specs} selected={selectedSpec} onSelect={setSelectedSpec} />
+            <QualityInfo sweetness={product.sweetness} weight={product.weight} />
+            <Description text={product.desc} />
+            <RecommendFruits items={recommendItems} />
 
-          <ProductHero image={product.image} name={product.name} color={product.color} />
-          <ProductName name={product.name} origin={product.origin} />
-          <PriceSection price={product.price} originalPrice={product.originalPrice} unit={product.unit} tags={product.tags} />
-          <SpecSelector specs={specs} selected={selectedSpec} onSelect={setSelectedSpec} />
-          <QualityInfo sweetness={product.sweetness} weight={product.weight} />
-          <Description text={product.desc} />
-          <RecommendFruits items={recommendItems} />
+            <div className="h-[70px]" />
 
-          <div className="h-[70px]" />
+            <BuyBar
+              price={specs[selectedSpec].price}
+              qty={qty}
+              onQtyChange={setQty}
+              onAddCart={() => showToast(`已加入购物车 ×${qty}`)}
+              onBuyNow={() => showToast('正在跳转结算...')}
+            />
 
-          <BuyBar
-            price={specs[selectedSpec].price}
-            qty={qty} onQtyChange={setQty}
-            onAddCart={() => showToast(`已加入购物车 ×${qty}`)}
-            onBuyNow={() => showToast('正在跳转结算...')}
-          />
+            <Toast message={toast.message} visible={toast.visible} />
+          </div>
+        );
+      }
 
-          <Toast message={toast.message} visible={toast.visible} />
-        </div>
-      );
-    }
-
-    // ==================== 渲染 ====================
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<ProductDetail />);
-  </script>
-</body>
+      // ==================== 渲染 ====================
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<ProductDetail />);
+    </script>
+  </body>
 </html>

@@ -1,10 +1,5 @@
 import { apiClient } from './client';
-import type {
-  ApiResponse,
-  Banner,
-  CreateBannerDTO,
-  UpdateBannerDTO,
-} from 'shared';
+import type { ApiResponse, Banner, CreateBannerDTO, UpdateBannerDTO } from 'shared';
 
 export const bannerApi = {
   getActive() {

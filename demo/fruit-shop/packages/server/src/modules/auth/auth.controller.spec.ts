@@ -71,7 +71,9 @@ describe('AuthController', () => {
       authService.logout.mockResolvedValue(null as any);
 
       // logout 方法需要 @Req() 和 @CurrentUser()，直接调用测试
-      expect(await controller.logout(user, { headers: { authorization: 'Bearer test-token' } } as any)).toBeNull();
+      expect(
+        await controller.logout(user, { headers: { authorization: 'Bearer test-token' } } as any),
+      ).toBeNull();
       expect(authService.logout).toHaveBeenCalledWith(1, 'test-jti', 'test-token');
     });
   });

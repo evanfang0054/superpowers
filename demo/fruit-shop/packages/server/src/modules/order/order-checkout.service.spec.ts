@@ -63,9 +63,9 @@ describe('OrderCheckoutService', () => {
     it('should throw CART_EMPTY when cart has no items', async () => {
       cartRepo.find.mockResolvedValue([]);
 
-      await expect(
-        service.create(1, { address: 'a', phone: 'p' } as any),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.create(1, { address: 'a', phone: 'p' } as any)).rejects.toThrow(
+        BadRequestException,
+      );
 
       // Short-circuits before touching the transaction
       expect(dataSource.createQueryRunner).not.toHaveBeenCalled();
@@ -81,13 +81,11 @@ describe('OrderCheckoutService', () => {
         },
       ]);
       // FOR UPDATE returns stock=2 which is insufficient for quantity=10
-      queryRunner.manager.query.mockResolvedValueOnce([
-        { id: 1, stock: 2, name: 'Apple' },
-      ]);
+      queryRunner.manager.query.mockResolvedValueOnce([{ id: 1, stock: 2, name: 'Apple' }]);
 
-      await expect(
-        service.create(1, { address: 'a', phone: 'p' } as any),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.create(1, { address: 'a', phone: 'p' } as any)).rejects.toThrow(
+        BadRequestException,
+      );
 
       expect(queryRunner.rollbackTransaction).toHaveBeenCalled();
       expect(queryRunner.release).toHaveBeenCalled();

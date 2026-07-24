@@ -26,18 +26,12 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
-  create(
-    @CurrentUser('id') userId: number,
-    @Body() dto: CreateOrderDto,
-  ) {
+  create(@CurrentUser('id') userId: number, @Body() dto: CreateOrderDto) {
     return this.orderService.create(userId, dto);
   }
 
   @Get()
-  findAll(
-    @CurrentUser('id') userId: number,
-    @Query() query: QueryOrderDto,
-  ) {
+  findAll(@CurrentUser('id') userId: number, @Query() query: QueryOrderDto) {
     return this.orderService.findAll(userId, query);
   }
 
@@ -45,42 +39,27 @@ export class OrderController {
   @Post('admin/:id/ship')
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
-  adminShip(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: ShipDto,
-  ) {
+  adminShip(@Param('id', ParseIntPipe) id: number, @Body() dto: ShipDto) {
     return this.orderService.ship(id, dto);
   }
 
   @Get(':id')
-  findOne(
-    @CurrentUser('id') userId: number,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  findOne(@CurrentUser('id') userId: number, @Param('id', ParseIntPipe) id: number) {
     return this.orderService.findOne(userId, id);
   }
 
   @Put(':id/cancel')
-  cancel(
-    @CurrentUser('id') userId: number,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  cancel(@CurrentUser('id') userId: number, @Param('id', ParseIntPipe) id: number) {
     return this.orderService.cancel(userId, id);
   }
 
   @Put(':id/pay')
-  pay(
-    @CurrentUser('id') userId: number,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  pay(@CurrentUser('id') userId: number, @Param('id', ParseIntPipe) id: number) {
     return this.orderService.pay(userId, id);
   }
 
   @Put(':id/confirm')
-  confirm(
-    @CurrentUser('id') userId: number,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  confirm(@CurrentUser('id') userId: number, @Param('id', ParseIntPipe) id: number) {
     return this.orderService.confirm(userId, id);
   }
 
@@ -94,9 +73,7 @@ export class OrderController {
   }
 
   @Get(':id/shipping')
-  findShipping(
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  findShipping(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.findShipping(id);
   }
 }

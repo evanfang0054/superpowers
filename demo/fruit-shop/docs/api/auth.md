@@ -15,7 +15,11 @@
 - 响应 `data`：
 
 ```json
-{ "accessToken": "...", "refreshToken": "...", "user": { "id": 1, "phone": "...", "nickname": "...", "avatar": null, "role": "user" } }
+{
+  "accessToken": "...",
+  "refreshToken": "...",
+  "user": { "id": 1, "phone": "...", "nickname": "...", "avatar": null, "role": "user" }
+}
 ```
 
 - 错误码：`40102 PHONE_EXISTS` 手机号已注册

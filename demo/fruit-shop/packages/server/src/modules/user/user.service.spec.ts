@@ -46,7 +46,9 @@ describe('UserService', () => {
     it('should throw NotFoundException when user not found', async () => {
       userRepo.findOne.mockResolvedValue(null);
 
-      await expect(service.updateProfile(999, { nickname: 'x' })).rejects.toThrow(NotFoundException);
+      await expect(service.updateProfile(999, { nickname: 'x' })).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

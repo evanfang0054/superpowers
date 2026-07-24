@@ -104,12 +104,19 @@ web（React）
 ### 5.1 数据模型
 
 **OrderStatus 扩展**（shared/types/order.ts）：
+
 ```typescript
-PENDING = 0, PAID = 1, SHIPPED = 2, COMPLETED = 3,
-CANCELLED = 4, REFUNDING = 5, REFUNDED = 6
+((PENDING = 0),
+  (PAID = 1),
+  (SHIPPED = 2),
+  (COMPLETED = 3),
+  (CANCELLED = 4),
+  (REFUNDING = 5),
+  (REFUNDED = 6));
 ```
 
 **OrderEntity 追加字段**：
+
 ```typescript
 @Column({ name: 'coupon_id', nullable: true }) couponId: number | null;
 @Column({ name: 'discount_amount', type: 'decimal', precision: 10, scale: 2, default: 0 }) discountAmount: number;
@@ -118,6 +125,7 @@ CANCELLED = 4, REFUNDING = 5, REFUNDED = 6
 ```
 
 **ShippingEntity**（新建 `entities/shipping.entity.ts`）：
+
 ```typescript
 @Entity('shippings')
 export class ShippingEntity {
@@ -126,12 +134,13 @@ export class ShippingEntity {
   @Column({ length: 100 }) company: string;
   @Column({ name: 'tracking_no', length: 100 }) trackingNo: string;
   @Column({ name: 'shipped_at', type: 'timestamp' }) shippedAt: Date;
-  @Column({ type: 'smallint', default: 0 }) status: number;  // 0=运输中 1=已签收
+  @Column({ type: 'smallint', default: 0 }) status: number; // 0=运输中 1=已签收
   @CreateDateColumn() createdAt: Date;
 }
 ```
 
 **RefundEntity**（新建 `entities/refund.entity.ts`）：
+
 ```typescript
 @Entity('refunds')
 export class RefundEntity {
@@ -139,8 +148,8 @@ export class RefundEntity {
   @Column({ name: 'order_id' }) orderId: number;
   @Column({ name: 'user_id' }) userId: number;
   @Column({ length: 500 }) reason: string;
-  @Column({ name: 'prev_status', type: 'smallint' }) prevStatus: number;  // 申请退款前的状态（PAID 或 SHIPPED）
-  @Column({ type: 'smallint', default: 0 }) status: number;  // 0=待审批 1=通过 2=拒绝
+  @Column({ name: 'prev_status', type: 'smallint' }) prevStatus: number; // 申请退款前的状态（PAID 或 SHIPPED）
+  @Column({ type: 'smallint', default: 0 }) status: number; // 0=待审批 1=通过 2=拒绝
   @Column({ name: 'admin_note', length: 500, nullable: true }) adminNote: string | null;
   @CreateDateColumn() createdAt: Date;
   @UpdateDateColumn() updatedAt: Date;
@@ -150,6 +159,7 @@ export class RefundEntity {
 ### 5.2 状态机
 
 合法流转：
+
 - `pay`（用户）：仅 `PENDING → PAID`
 - `ship`（Admin）：仅 `PAID → SHIPPED`，同时创建 ShippingEntity
 - `confirm`（用户）：仅 `SHIPPED → COMPLETED`
@@ -160,16 +170,16 @@ export class RefundEntity {
 
 ### 5.3 接口
 
-| 方法 | 路径 | 守卫 | 说明 |
-|---|---|---|---|
-| PUT | `/api/orders/:id/pay` | JWT | 模拟支付，PENDING→PAID |
-| POST | `/api/admin/orders/:id/ship` | JWT+ADMIN | 发货，body `{company, trackingNo}` |
-| PUT | `/api/orders/:id/confirm` | JWT | 确认收货 |
-| POST | `/api/orders/:id/refund` | JWT | 申请退款，body `{reason}` |
-| GET | `/api/orders/:id/shipping` | JWT | 查物流 |
-| GET | `/api/admin/refunds` | JWT+ADMIN | 退款列表（分页） |
-| POST | `/api/admin/refunds/:id/approve` | JWT+ADMIN | 通过退款（回补库存 + 解绑券） |
-| POST | `/api/admin/refunds/:id/reject` | JWT+ADMIN | 拒绝退款，body `{adminNote}` |
+| 方法 | 路径                             | 守卫      | 说明                               |
+| ---- | -------------------------------- | --------- | ---------------------------------- |
+| PUT  | `/api/orders/:id/pay`            | JWT       | 模拟支付，PENDING→PAID             |
+| POST | `/api/admin/orders/:id/ship`     | JWT+ADMIN | 发货，body `{company, trackingNo}` |
+| PUT  | `/api/orders/:id/confirm`        | JWT       | 确认收货                           |
+| POST | `/api/orders/:id/refund`         | JWT       | 申请退款，body `{reason}`          |
+| GET  | `/api/orders/:id/shipping`       | JWT       | 查物流                             |
+| GET  | `/api/admin/refunds`             | JWT+ADMIN | 退款列表（分页）                   |
+| POST | `/api/admin/refunds/:id/approve` | JWT+ADMIN | 通过退款（回补库存 + 解绑券）      |
+| POST | `/api/admin/refunds/:id/reject`  | JWT+ADMIN | 拒绝退款，body `{adminNote}`       |
 
 ### 5.4 前端
 
@@ -181,6 +191,7 @@ export class RefundEntity {
 ### 6.1 地址簿（P2-1）
 
 **AddressEntity**（新建）：
+
 ```typescript
 @Entity('addresses')
 export class AddressEntity {
@@ -199,17 +210,19 @@ export class AddressEntity {
 ```
 
 **接口**：
-| 方法 | 路径 | 守卫 | 说明 |
-|---|---|---|---|
-| GET | `/api/addresses` | JWT | 全部地址，默认排第一 |
-| POST | `/api/addresses` | JWT | 新建（若 isDefault，事务内其他置 false） |
-| PUT | `/api/addresses/:id` | JWT | 修改 |
-| DELETE | `/api/addresses/:id` | JWT | 删除（默认地址不可删，抛 ADDRESS_IS_DEFAULT） |
-| PUT | `/api/addresses/:id/default` | JWT | 设为默认（事务内其他置 false） |
+
+| 方法   | 路径                         | 守卫 | 说明                                          |
+| ------ | ---------------------------- | ---- | --------------------------------------------- |
+| GET    | `/api/addresses`             | JWT  | 全部地址，默认排第一                          |
+| POST   | `/api/addresses`             | JWT  | 新建（若 isDefault，事务内其他置 false）      |
+| PUT    | `/api/addresses/:id`         | JWT  | 修改                                          |
+| DELETE | `/api/addresses/:id`         | JWT  | 删除（默认地址不可删，抛 ADDRESS_IS_DEFAULT） |
+| PUT    | `/api/addresses/:id/default` | JWT  | 设为默认（事务内其他置 false）                |
 
 **CreateOrderDto 扩展**：增加 `addressId?: number`。下单时若有 addressId，读 AddressEntity 快照写入 Order.address/phone。
 
 **前端**：
+
 - 新建 `/addresses` 路由 + `pages/Addresses.tsx`（列表 + CRUD modal + 设默认）
 - `Profile.tsx` 追加菜单项「我的地址」
 - `Checkout.tsx` 地址区域改为「从地址簿选择 + 显示默认 + 跳转 /addresses 管理」，保留手输 fallback
@@ -217,15 +230,16 @@ export class AddressEntity {
 ### 6.2 评价（P2-2）
 
 **ReviewEntity**（新建）：
+
 ```typescript
 @Entity('reviews')
-@Unique(['orderId', 'productId'])  // 一件一评
+@Unique(['orderId', 'productId']) // 一件一评
 export class ReviewEntity {
   @PrimaryGeneratedColumn() id: number;
   @Column({ name: 'product_id' }) productId: number;
   @Column({ name: 'user_id' }) userId: number;
   @Column({ name: 'order_id' }) orderId: number;
-  @Column({ type: 'tinyint' }) rating: number;  // 1-5
+  @Column({ type: 'tinyint' }) rating: number; // 1-5
   @Column({ type: 'text' }) content: string;
   @Column({ type: 'simple-json', nullable: true }) images: string[] | null;
   @CreateDateColumn() createdAt: Date;
@@ -234,15 +248,17 @@ export class ReviewEntity {
 ```
 
 **接口**：
-| 方法 | 路径 | 守卫 | 说明 |
-|---|---|---|---|
-| GET | `/api/products/:id/reviews?page=&limit=` | @Public | 商品评价列表（分页），含 user 昵称/头像 |
-| POST | `/api/orders/:id/reviews` | JWT | 批量评价订单商品，body `{ reviews: [{productId, rating, content, images?}] }` |
-| GET | `/api/reviews/mine` | JWT | 我的评价 |
+
+| 方法 | 路径                                     | 守卫    | 说明                                                                          |
+| ---- | ---------------------------------------- | ------- | ----------------------------------------------------------------------------- |
+| GET  | `/api/products/:id/reviews?page=&limit=` | @Public | 商品评价列表（分页），含 user 昵称/头像                                       |
+| POST | `/api/orders/:id/reviews`                | JWT     | 批量评价订单商品，body `{ reviews: [{productId, rating, content, images?}] }` |
+| GET  | `/api/reviews/mine`                      | JWT     | 我的评价                                                                      |
 
 **评价资格**：订单 status === COMPLETED + 归属当前用户 + `(orderId, productId)` 未评过。
 
 **前端**：
+
 - 新建 `components/ReviewSection.tsx`（商品详情页评价区，分页 + 平均分）
 - `ProductDetail.tsx` 在 Description 与 RecommendFruits 之间插入 `<ReviewSection productId={product.id} />`
 - `OrderDetail.tsx` COMPLETED 订单显示「去评价」按钮 → 弹 modal 批量评价
@@ -250,6 +266,7 @@ export class ReviewEntity {
 ### 6.3 收藏（P2-3）
 
 **FavoriteEntity**（新建）：
+
 ```typescript
 @Entity('favorites')
 @Unique(['userId', 'productId'])
@@ -262,14 +279,16 @@ export class FavoriteEntity {
 ```
 
 **接口**：
-| 方法 | 路径 | 守卫 | 说明 |
-|---|---|---|---|
-| POST | `/api/products/:id/favorite` | JWT | 收藏（已收藏抛 FAVORITE_EXISTS） |
-| DELETE | `/api/products/:id/favorite` | JWT | 取消（未收藏抛 FAVORITE_NOT_FOUND） |
-| GET | `/api/favorites?page=&limit=` | JWT | 我的收藏分页 |
-| GET | `/api/products/:id/favorite-status` | JWT | 查是否已收藏 |
+
+| 方法   | 路径                                | 守卫 | 说明                                |
+| ------ | ----------------------------------- | ---- | ----------------------------------- |
+| POST   | `/api/products/:id/favorite`        | JWT  | 收藏（已收藏抛 FAVORITE_EXISTS）    |
+| DELETE | `/api/products/:id/favorite`        | JWT  | 取消（未收藏抛 FAVORITE_NOT_FOUND） |
+| GET    | `/api/favorites?page=&limit=`       | JWT  | 我的收藏分页                        |
+| GET    | `/api/products/:id/favorite-status` | JWT  | 查是否已收藏                        |
 
 **前端**：
+
 - 新建 `components/FavoriteToggle.tsx`（心形图标，已收藏实心）
 - `ProductDetail.tsx` 导航栏插入 `<FavoriteToggle productId={id} />`
 - 新建 `pages/Favorites.tsx`（分页列表）
@@ -280,15 +299,19 @@ export class FavoriteEntity {
 ### 7.1 数据模型
 
 **CouponTemplateEntity**（Admin 配置，新建）：
+
 ```typescript
 @Entity('coupon_templates')
 export class CouponTemplateEntity {
   @PrimaryGeneratedColumn() id: number;
   @Column({ length: 100 }) name: string;
-  @Column({ type: 'smallint' }) type: number;  // 0=满减 1=折扣 2=无门槛
-  @Column({ name: 'min_amount', type: 'decimal', precision: 10, scale: 2, default: 0 }) minAmount: number;
-  @Column({ name: 'discount_amount', type: 'decimal', precision: 10, scale: 2, default: 0 }) discountAmount: number;
-  @Column({ name: 'discount_rate', type: 'decimal', precision: 3, scale: 2, nullable: true }) discountRate: number | null;
+  @Column({ type: 'smallint' }) type: number; // 0=满减 1=折扣 2=无门槛
+  @Column({ name: 'min_amount', type: 'decimal', precision: 10, scale: 2, default: 0 })
+  minAmount: number;
+  @Column({ name: 'discount_amount', type: 'decimal', precision: 10, scale: 2, default: 0 })
+  discountAmount: number;
+  @Column({ name: 'discount_rate', type: 'decimal', precision: 3, scale: 2, nullable: true })
+  discountRate: number | null;
   @Column({ name: 'category_id', nullable: true }) categoryId: number | null;
   @Column({ name: 'total_count', type: 'int', default: 0 }) totalCount: number;
   @Column({ name: 'claimed_count', type: 'int', default: 0 }) claimedCount: number;
@@ -301,6 +324,7 @@ export class CouponTemplateEntity {
 ```
 
 **UserCouponEntity**（用户领取实例，新建）：
+
 ```typescript
 @Entity('user_coupons')
 export class UserCouponEntity {
@@ -315,23 +339,23 @@ export class UserCouponEntity {
 
 ### 7.2 类型与计算
 
-| type | 名称 | 规则 |
-|---|---|---|
-| 0 | 满减 | subtotal >= minAmount → 减 discountAmount |
-| 1 | 折扣 | subtotal >= minAmount → subtotal * discountRate |
-| 2 | 无门槛 | 直接减 discountAmount |
+| type | 名称   | 规则                                            |
+| ---- | ------ | ----------------------------------------------- |
+| 0    | 满减   | subtotal >= minAmount → 减 discountAmount       |
+| 1    | 折扣   | subtotal >= minAmount → subtotal * discountRate |
+| 2    | 无门槛 | 直接减 discountAmount                           |
 
 适用范围：categoryId 为 null 时全场可用；否则限定该分类商品小计参与计算。
 
 ### 7.3 接口
 
-| 方法 | 路径 | 守卫 | 说明 |
-|---|---|---|---|
-| GET | `/api/coupons/available` | JWT | 可领取模板（status=1 + 有效期内 + 未领完） |
-| GET | `/api/coupons/mine` | JWT | 我的未使用券（含 template 详情） |
-| POST | `/api/coupons/:id/claim` | JWT | 领取（事务内 totalCount 校验 + claimedCount++） |
-| POST | `/api/coupons/preview` | JWT | body `{couponId, items}` → 返回 `{discountAmount, totalAfterDiscount}` |
-| CRUD | `/api/admin/coupons` | JWT+ADMIN | 模板增删改查 |
+| 方法 | 路径                     | 守卫      | 说明                                                                   |
+| ---- | ------------------------ | --------- | ---------------------------------------------------------------------- |
+| GET  | `/api/coupons/available` | JWT       | 可领取模板（status=1 + 有效期内 + 未领完）                             |
+| GET  | `/api/coupons/mine`      | JWT       | 我的未使用券（含 template 详情）                                       |
+| POST | `/api/coupons/:id/claim` | JWT       | 领取（事务内 totalCount 校验 + claimedCount++）                        |
+| POST | `/api/coupons/preview`   | JWT       | body `{couponId, items}` → 返回 `{discountAmount, totalAfterDiscount}` |
+| CRUD | `/api/admin/coupons`     | JWT+ADMIN | 模板增删改查                                                           |
 
 ### 7.4 下单抵扣流程
 
@@ -359,6 +383,7 @@ export class UserCouponEntity {
 ### 8.1 多维筛选与排序（P2-9）
 
 **QueryProductDto 扩展**：
+
 ```typescript
 minPrice?: number;
 maxPrice?: number;
@@ -367,6 +392,7 @@ sortBy?: 'created_desc' | 'price_asc' | 'price_desc' | 'sales_desc';
 ```
 
 **findAll 改造**：
+
 - 条件：categoryId/keyword + minPrice/maxPrice/origin（andWhere）
 - 排序分支：sales_desc 用 OrderItem 子查询聚合 + COALESCE；price_asc/desc 直接 orderBy；默认 created_desc
 - cacheKey 含全部筛选维度
@@ -376,6 +402,7 @@ sortBy?: 'created_desc' | 'price_asc' | 'price_desc' | 'sales_desc';
 ### 8.2 搜索联想（P2-10）
 
 **接口**：`GET /api/products/suggest?keyword=&limit=10`（@Public）
+
 - `SELECT name FROM products WHERE status=ON AND name LIKE '%keyword%' LIMIT 10`
 - Redis 60s 缓存
 - 响应 `{ list: string[] }`
@@ -389,32 +416,36 @@ sortBy?: 'created_desc' | 'price_asc' | 'price_desc' | 'sales_desc';
 **依赖**：`multer` + `@types/multer`
 
 **main.ts**：
+
 ```typescript
 app.useStaticAssets(join(__dirname, '..', 'uploads'), { prefix: '/uploads/' });
 ```
 
 **UploadModule**：
+
 ```typescript
 @Controller('upload')
 @UseGuards(JwtAuthGuard)
 export class UploadController {
   @Post('image')
-  @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      destination: join(process.cwd(), 'uploads'),
-      filename: (req, file, cb) => {
-        const ext = extname(file.originalname);
-        cb(null, `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`);
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: join(process.cwd(), 'uploads'),
+        filename: (req, file, cb) => {
+          const ext = extname(file.originalname);
+          cb(null, `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`);
+        },
+      }),
+      limits: { fileSize: 2 * 1024 * 1024 },
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.startsWith('image/')) {
+          return cb(new BadRequestException({ code: 41102, message: '仅支持图片文件' }), false);
+        }
+        cb(null, true);
       },
     }),
-    limits: { fileSize: 2 * 1024 * 1024 },
-    fileFilter: (req, file, cb) => {
-      if (!file.mimetype.startsWith('image/')) {
-        return cb(new BadRequestException({ code: 41102, message: '仅支持图片文件' }), false);
-      }
-      cb(null, true);
-    },
-  }))
+  )
   uploadImage(@UploadedFile() file: Express.Multer.File) {
     if (!file) throw new BadRequestException({ code: 41103, message: '上传失败' });
     return { url: `/uploads/${file.filename}` };
@@ -431,13 +462,15 @@ export class UploadController {
 ### 9.2 分类 Admin CRUD（P2-11）
 
 **接口扩展**（CategoryController）：
-| 方法 | 路径 | 守卫 | 说明 |
-|---|---|---|---|
-| POST | `/api/categories` | JWT+ADMIN | 新建 |
-| PUT | `/api/categories/:id` | JWT+ADMIN | 修改 |
+
+| 方法   | 路径                  | 守卫      | 说明                   |
+| ------ | --------------------- | --------- | ---------------------- |
+| POST   | `/api/categories`     | JWT+ADMIN | 新建                   |
+| PUT    | `/api/categories/:id` | JWT+ADMIN | 修改                   |
 | DELETE | `/api/categories/:id` | JWT+ADMIN | 删除（有关联商品拒绝） |
 
 **删除校验**：
+
 ```typescript
 async removeCategory(id) {
   const count = await this.productRepo.count({ where: { categoryId: id, status: ProductStatus.ON } });
@@ -453,18 +486,18 @@ async removeCategory(id) {
 
 ## 10. shared 变更汇总
 
-| 变更 | 文件 |
-|---|---|
-| Order 接口追加 couponId/discountAmount/paidAt/shippedAt | `types/order.ts` |
-| OrderStatus 枚举追加 REFUNDING=5/REFUNDED=6 | `types/order.ts` |
-| 新增 Address/CreateAddressDTO/UpdateAddressDTO | `types/address.ts`（新建） |
-| 新增 Review/CreateReviewDTO | `types/review.ts`（新建） |
-| 新增 Favorite | `types/favorite.ts`（新建） |
-| 新增 CouponTemplate/UserCoupon/CreateCouponDTO/CouponType | `types/coupon.ts`（新建） |
-| 新增 Shipping | `types/shipping.ts`（新建） |
-| 新增 Refund/RefundStatus | `types/refund.ts`（新建） |
-| 新增 6 段业务码（退款/评价/收藏/地址/优惠券/上传/分类） | `constants.ts` |
-| index.ts re-export 全部新类型 | `index.ts` |
+| 变更                                                      | 文件                        |
+| --------------------------------------------------------- | --------------------------- |
+| Order 接口追加 couponId/discountAmount/paidAt/shippedAt   | `types/order.ts`            |
+| OrderStatus 枚举追加 REFUNDING=5/REFUNDED=6               | `types/order.ts`            |
+| 新增 Address/CreateAddressDTO/UpdateAddressDTO            | `types/address.ts`（新建）  |
+| 新增 Review/CreateReviewDTO                               | `types/review.ts`（新建）   |
+| 新增 Favorite                                             | `types/favorite.ts`（新建） |
+| 新增 CouponTemplate/UserCoupon/CreateCouponDTO/CouponType | `types/coupon.ts`（新建）   |
+| 新增 Shipping                                             | `types/shipping.ts`（新建） |
+| 新增 Refund/RefundStatus                                  | `types/refund.ts`（新建）   |
+| 新增 6 段业务码（退款/评价/收藏/地址/优惠券/上传/分类）   | `constants.ts`              |
+| index.ts re-export 全部新类型                             | `index.ts`                  |
 
 每次改 `shared` 必须重 build：`pnpm --filter shared build`。
 
@@ -483,78 +516,84 @@ async removeCategory(id) {
 ## 11. 验收场景
 
 ### P2-A 订单闭环
-| 场景 | 预期 |
-|---|---|
-| 模拟支付 | PENDING → PAID，paidAt 写入 |
+
+| 场景       | 预期                                |
+| ---------- | ----------------------------------- |
+| 模拟支付   | PENDING → PAID，paidAt 写入         |
 | Admin 发货 | PAID → SHIPPED，ShippingEntity 创建 |
-| 确认收货 | SHIPPED → COMPLETED |
-| 申请退款 | PAID/SHIPPED → REFUNDING |
-| 通过退款 | REFUNDING → REFUNDED，库存回补 |
-| 拒绝退款 | REFUNDING → 恢复 prevStatus |
-| 非法流转 | 抛 ORDER_STATUS_ERROR（40402） |
+| 确认收货   | SHIPPED → COMPLETED                 |
+| 申请退款   | PAID/SHIPPED → REFUNDING            |
+| 通过退款   | REFUNDING → REFUNDED，库存回补      |
+| 拒绝退款   | REFUNDING → 恢复 prevStatus         |
+| 非法流转   | 抛 ORDER_STATUS_ERROR（40402）      |
 
 ### P2-B 用户互动
-| 场景 | 预期 |
-|---|---|
-| 地址 CRUD | 新建/编辑/删除/设默认 |
-| Checkout 选地址 | Order.address 写快照 |
-| 默认地址不可删 | 返回 ADDRESS_IS_DEFAULT |
-| COMPLETED 订单评价 | 批量评价成功 |
-| 重复评价 | 返回 REVIEW_EXISTS |
-| 商品评价列表 | 分页展示含用户昵称 |
-| 收藏 toggle | 心形切换 |
-| 重复收藏 | 返回 FAVORITE_EXISTS |
-| 收藏列表 | 分页展示 |
-| Profile 入口 | 「我的地址」「我的收藏」可见 |
+
+| 场景               | 预期                         |
+| ------------------ | ---------------------------- |
+| 地址 CRUD          | 新建/编辑/删除/设默认        |
+| Checkout 选地址    | Order.address 写快照         |
+| 默认地址不可删     | 返回 ADDRESS_IS_DEFAULT      |
+| COMPLETED 订单评价 | 批量评价成功                 |
+| 重复评价           | 返回 REVIEW_EXISTS           |
+| 商品评价列表       | 分页展示含用户昵称           |
+| 收藏 toggle        | 心形切换                     |
+| 重复收藏           | 返回 FAVORITE_EXISTS         |
+| 收藏列表           | 分页展示                     |
+| Profile 入口       | 「我的地址」「我的收藏」可见 |
 
 ### P2-C 优惠券
-| 场景 | 预期 |
-|---|---|
+
+| 场景             | 预期                             |
+| ---------------- | -------------------------------- |
 | Admin 创建满减券 | type=0, minAmount/discountAmount |
-| 用户领取 | UserCoupon 创建，claimedCount++ |
-| 领取超限 | 返回 COUPON_SOLD_OUT |
-| 下单使用 | totalAmount 扣减，券核销 |
-| 重复使用 | 返回 COUPON_USED |
-| 不满足门槛 | 返回 COUPON_MIN_NOT_MET |
-| 取消订单 | 库存回补 + 券解绑 |
-| 退款通过 | 库存回补 + 券解绑 |
+| 用户领取         | UserCoupon 创建，claimedCount++  |
+| 领取超限         | 返回 COUPON_SOLD_OUT             |
+| 下单使用         | totalAmount 扣减，券核销         |
+| 重复使用         | 返回 COUPON_USED                 |
+| 不满足门槛       | 返回 COUPON_MIN_NOT_MET          |
+| 取消订单         | 库存回补 + 券解绑                |
+| 退款通过         | 库存回补 + 券解绑                |
 
 ### P2-D 搜索增强
-| 场景 | 预期 |
-|---|---|
-| 价格区间筛选 | minPrice/maxPrice 生效 |
-| 产地筛选 | origin LIKE 匹配 |
-| 销量排序 | sales_desc 聚合降序 |
-| 搜索联想 | 输入「苹」下拉显示匹配商品名 |
+
+| 场景         | 预期                         |
+| ------------ | ---------------------------- |
+| 价格区间筛选 | minPrice/maxPrice 生效       |
+| 产地筛选     | origin LIKE 匹配             |
+| 销量排序     | sales_desc 聚合降序          |
+| 搜索联想     | 输入「苹」下拉显示匹配商品名 |
 
 ### P2-E 基础设施
-| 场景 | 预期 |
-|---|---|
-| 图片上传 ≤2MB | 成功返回 /uploads/xxx.jpg |
-| 超大文件 | 返回 41101 |
-| 非图片 MIME | 返回 41102 |
-| Admin 表单用上传 | image 字段改上传组件 |
-| 分类 CRUD | 新建/修改/删除 |
-| 删除有关联商品分类 | 返回 41201 |
+
+| 场景               | 预期                      |
+| ------------------ | ------------------------- |
+| 图片上传 ≤2MB      | 成功返回 /uploads/xxx.jpg |
+| 超大文件           | 返回 41101                |
+| 非图片 MIME        | 返回 41102                |
+| Admin 表单用上传   | image 字段改上传组件      |
+| 分类 CRUD          | 新建/修改/删除            |
+| 删除有关联商品分类 | 返回 41201                |
 
 ## 12. 风险与权衡
 
-| 风险 | 影响 | 缓解 |
-|---|---|---|
-| 一次性做 11 项 | PR 巨大、回归风险高 | 每 3-4 项插入全量回归 checkpoint |
-| 销量子查询性能 | 大数据量下慢 | Redis 缓存 bestsellers 5 分钟 |
-| 优惠券并发核销 | 高并发可能重复使用 | SELECT FOR UPDATE user_coupons 行锁 |
-| 上传文件安全 | 恶意文件风险 | MIME 白名单 + 2MB 限制 + 文件名随机化 |
-| RefundEntity prevStatus 推断 | 拒绝退款恢复错状态 | RefundEntity 显式存 prevStatus 字段 |
-| 地址簿默认值唯一 | 并发设置可能破坏 | 设默认走事务，先全置 false 再设一条 true |
-| 状态机扩展破坏 cancel | cancel 仅 PENDING 可用 | cancel 校验不变；REFUNDING 不可 cancel |
-| 多维筛选 cacheKey 漂移 | 旧缓存命中错结果 | cacheKey 含全部筛选维度 |
-| Docker uploads 卷 | 容器重建丢文件 | Dockerfile VOLUME + compose 挂载 |
-| 优惠券与订单事务交叉 | create/cancel/approveRefund 都要处理券 | 三处统一在事务内核销/解绑 |
+| 风险                         | 影响                                   | 缓解                                     |
+| ---------------------------- | -------------------------------------- | ---------------------------------------- |
+| 一次性做 11 项               | PR 巨大、回归风险高                    | 每 3-4 项插入全量回归 checkpoint         |
+| 销量子查询性能               | 大数据量下慢                           | Redis 缓存 bestsellers 5 分钟            |
+| 优惠券并发核销               | 高并发可能重复使用                     | SELECT FOR UPDATE user_coupons 行锁      |
+| 上传文件安全                 | 恶意文件风险                           | MIME 白名单 + 2MB 限制 + 文件名随机化    |
+| RefundEntity prevStatus 推断 | 拒绝退款恢复错状态                     | RefundEntity 显式存 prevStatus 字段      |
+| 地址簿默认值唯一             | 并发设置可能破坏                       | 设默认走事务，先全置 false 再设一条 true |
+| 状态机扩展破坏 cancel        | cancel 仅 PENDING 可用                 | cancel 校验不变；REFUNDING 不可 cancel   |
+| 多维筛选 cacheKey 漂移       | 旧缓存命中错结果                       | cacheKey 含全部筛选维度                  |
+| Docker uploads 卷            | 容器重建丢文件                         | Dockerfile VOLUME + compose 挂载         |
+| 优惠券与订单事务交叉         | create/cancel/approveRefund 都要处理券 | 三处统一在事务内核销/解绑                |
 
 ## 13. 测试策略
 
 **后端 e2e**（沿用 jest + supertest）：
+
 - `test/order.flow.e2e-spec.ts`：完整流转 pay→ship→confirm→refund（依赖 P2-A）
 - `test/address.e2e-spec.ts`：CRUD + 设默认 + 默认不可删
 - `test/review.e2e-spec.ts`：评价资格、重复评、列表
@@ -565,6 +604,7 @@ async removeCategory(id) {
 - `test/product.search.e2e-spec.ts`：多维筛选 + 销量排序 + suggest
 
 **前端**（无测试框架）：
+
 - TypeScript 构建通过
 - docker compose 浏览器手动验证
 

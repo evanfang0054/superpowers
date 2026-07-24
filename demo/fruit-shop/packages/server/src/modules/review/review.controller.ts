@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Param,
-  Body,
-  Query,
-  UseGuards,
-  ParseIntPipe,
-} from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Query, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -27,10 +18,7 @@ export class ReviewController {
   // 商品评价列表（公开）
   @Public()
   @Get('products/:id/reviews')
-  findByProduct(
-    @Param('id', ParseIntPipe) id: number,
-    @Query() query: QueryReviewDto,
-  ) {
+  findByProduct(@Param('id', ParseIntPipe) id: number, @Query() query: QueryReviewDto) {
     return this.reviewService.findByProduct(id, query);
   }
 
@@ -46,10 +34,7 @@ export class ReviewController {
 
   // 我的评价（JWT）
   @Get('reviews/mine')
-  findMine(
-    @CurrentUser('id') userId: number,
-    @Query() query: QueryReviewDto,
-  ) {
+  findMine(@CurrentUser('id') userId: number, @Query() query: QueryReviewDto) {
     return this.reviewService.findMine(userId, query);
   }
 }

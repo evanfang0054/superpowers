@@ -1,15 +1,13 @@
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
-export const databaseConfig = (
-  configService: ConfigService,
-): TypeOrmModuleOptions => {
+export const databaseConfig = (configService: ConfigService): TypeOrmModuleOptions => {
   const dbSync = configService.get<string>('DB_SYNC', 'true');
 
   if (process.env.NODE_ENV === 'production' && dbSync !== 'false') {
     console.warn(
       '[WARNING] DB_SYNC is not explicitly disabled in production. ' +
-      'Set DB_SYNC=false to prevent automatic schema changes.',
+        'Set DB_SYNC=false to prevent automatic schema changes.',
     );
   }
 

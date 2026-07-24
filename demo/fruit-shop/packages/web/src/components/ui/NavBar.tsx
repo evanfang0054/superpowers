@@ -10,13 +10,7 @@ interface NavBarProps {
   sticky?: boolean;
 }
 
-export function NavBar({
-  title,
-  left,
-  right,
-  showBack = true,
-  sticky = true,
-}: NavBarProps) {
+export function NavBar({ title, left, right, showBack = true, sticky = true }: NavBarProps) {
   const navigate = useNavigate();
   const positionClass = sticky ? 'sticky top-0 z-50' : '';
 
@@ -47,9 +41,7 @@ export function NavBar({
     <header
       className={`bg-brand-bg/90 backdrop-blur-[10px] border-b border-brand-border h-12 flex items-center px-4 ${positionClass}`}
     >
-      <div className="flex items-center gap-2 min-w-0">
-        {left ?? defaultLeft}
-      </div>
+      <div className="flex items-center gap-2 min-w-0">{left ?? defaultLeft}</div>
       {title && (
         <div className="flex-1 text-center font-bold text-[17px] text-brand-dark truncate px-2">
           {title}

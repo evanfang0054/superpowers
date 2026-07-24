@@ -24,19 +24,12 @@ const DEFAULT_ICON = (
   </svg>
 );
 
-export function EmptyState({
-  icon,
-  title,
-  description,
-  action,
-}: EmptyStateProps) {
+export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-32">
       <div className="text-brand-muted/60">{icon ?? DEFAULT_ICON}</div>
       <p className="text-brand-muted text-sm mt-4">{title}</p>
-      {description && (
-        <p className="text-brand-muted/70 text-xs mt-1">{description}</p>
-      )}
+      {description && <p className="text-brand-muted/70 text-xs mt-1">{description}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>
   );

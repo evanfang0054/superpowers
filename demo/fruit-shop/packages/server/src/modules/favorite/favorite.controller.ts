@@ -24,37 +24,25 @@ export class FavoriteController {
 
   // 收藏商品
   @Post('products/:id/favorite')
-  add(
-    @CurrentUser('id') userId: number,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  add(@CurrentUser('id') userId: number, @Param('id', ParseIntPipe) id: number) {
     return this.favoriteService.add(userId, id);
   }
 
   // 取消收藏
   @Delete('products/:id/favorite')
-  remove(
-    @CurrentUser('id') userId: number,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  remove(@CurrentUser('id') userId: number, @Param('id', ParseIntPipe) id: number) {
     return this.favoriteService.remove(userId, id);
   }
 
   // 我的收藏列表（分页 + 商品详情）
   @Get('favorites')
-  findAll(
-    @CurrentUser('id') userId: number,
-    @Query() query: QueryFavoriteDto,
-  ) {
+  findAll(@CurrentUser('id') userId: number, @Query() query: QueryFavoriteDto) {
     return this.favoriteService.findAll(userId, query);
   }
 
   // 查询某商品是否已收藏
   @Get('products/:id/favorite-status')
-  getStatus(
-    @CurrentUser('id') userId: number,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  getStatus(@CurrentUser('id') userId: number, @Param('id', ParseIntPipe) id: number) {
     return this.favoriteService.getStatus(userId, id);
   }
 }

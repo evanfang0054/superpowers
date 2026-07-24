@@ -187,7 +187,9 @@ describe('Order Flow (e2e)', () => {
       .send({ address: '北京市', phone: '13800000030' });
     const tempOrderId = createRes.body.data.id;
 
-    await request(helper.httpServer).put(`/api/orders/${tempOrderId}/pay`).set('Authorization', `Bearer ${userToken}`);
+    await request(helper.httpServer)
+      .put(`/api/orders/${tempOrderId}/pay`)
+      .set('Authorization', `Bearer ${userToken}`);
     await request(helper.httpServer)
       .post(`/api/orders/${tempOrderId}/refund`)
       .set('Authorization', `Bearer ${userToken}`)

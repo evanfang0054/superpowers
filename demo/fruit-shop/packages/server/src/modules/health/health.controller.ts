@@ -24,10 +24,7 @@ export class HealthController {
   @HealthCheck()
   @SetMetadata(SKIP_TRANSFORM_KEY, true)
   check() {
-    return this.health.check([
-      () => this.db.pingCheck('database'),
-      () => this.redisCheck(),
-    ]);
+    return this.health.check([() => this.db.pingCheck('database'), () => this.redisCheck()]);
   }
 
   private async redisCheck(): Promise<HealthIndicatorResult> {

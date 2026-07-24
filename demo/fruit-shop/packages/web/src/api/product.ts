@@ -1,11 +1,5 @@
 import { apiClient } from './client';
-import type {
-  ApiResponse,
-  PaginatedResponse,
-  Product,
-  Category,
-  PaginationQuery,
-} from 'shared';
+import type { ApiResponse, PaginatedResponse, Product, Category, PaginationQuery } from 'shared';
 
 export interface ProductQuery extends PaginationQuery {
   categoryId?: number;

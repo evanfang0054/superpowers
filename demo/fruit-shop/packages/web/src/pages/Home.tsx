@@ -23,27 +23,24 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  const fetchProducts = useCallback(
-    async (p: number, kw?: string, catId?: number) => {
-      setIsLoading(true);
-      try {
-        const params: ProductQuery = { page: p, limit: 12 };
-        if (kw) params.keyword = kw;
-        if (catId) params.categoryId = catId;
+  const fetchProducts = useCallback(async (p: number, kw?: string, catId?: number) => {
+    setIsLoading(true);
+    try {
+      const params: ProductQuery = { page: p, limit: 12 };
+      if (kw) params.keyword = kw;
+      if (catId) params.categoryId = catId;
 
-        const response = await productApi.getList(params);
-        const items = response.data.data?.list || [];
+      const response = await productApi.getList(params);
+      const items = response.data.data?.list || [];
 
-        setProducts((prev) => (p === 1 ? items : [...prev, ...items]));
-        setHasMore(items.length >= 12);
-      } catch {
-        // 静默
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [],
-  );
+      setProducts((prev) => (p === 1 ? items : [...prev, ...items]));
+      setHasMore(items.length >= 12);
+    } catch {
+      // 静默
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     productApi

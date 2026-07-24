@@ -1,9 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { RedisModuleOptions } from '@nestjs-modules/ioredis';
 
-export const redisConfig = (
-  configService: ConfigService,
-): RedisModuleOptions => {
+export const redisConfig = (configService: ConfigService): RedisModuleOptions => {
   const options: RedisModuleOptions = {
     type: 'single',
     url: configService.get<string>(

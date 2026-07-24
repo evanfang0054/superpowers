@@ -21,7 +21,7 @@ export function buildPinoOptions(): Params {
     pinoHttp: {
       genReqId: (req: any, res: any) => {
         const existing = req.headers['x-request-id'];
-        const id = (typeof existing === 'string' && existing.length > 0) ? existing : randomUUID();
+        const id = typeof existing === 'string' && existing.length > 0 ? existing : randomUUID();
         res.setHeader('X-Request-Id', id);
         return id;
       },
@@ -65,9 +65,7 @@ export function buildPinoOptions(): Params {
       // 慢请求标记
       customSuccessMessage: (req: any, res: any, time: number) => {
         const slow = time > SLOW_REQUEST_MS;
-        return `${req.method} ${req.url} ${res.statusCode} ${time}ms${
-          slow ? ' [SLOW]' : ''
-        }`;
+        return `${req.method} ${req.url} ${res.statusCode} ${time}ms${slow ? ' [SLOW]' : ''}`;
       },
       customErrorMessage: (req: any, res: any, _err: Error, responseTime?: number) => {
         const time = responseTime ?? 0;
