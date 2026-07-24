@@ -69,7 +69,8 @@ export class AuthController {
   ) {
     // 从 Header 中提取原始 token
     const authHeader = req.headers.authorization || '';
-    const token = authHeader.replace('Bearer ', '');
+    const match = authHeader.match(/^Bearer\s+(.+)$/i);
+    const token = match?.[1] ?? '';
     return this.authService.logout(user.id, user.jti, token);
   }
 }

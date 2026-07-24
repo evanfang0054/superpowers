@@ -20,9 +20,10 @@ async function bootstrap() {
   // 全局路由前缀 — nginx 反向代理 /api/ → /api/
   app.setGlobalPrefix('api');
 
-  // 全局 CORS
+  // 全局 CORS — 通过 CORS_ORIGINS 环境变量配置，逗号分隔多个 origin
+  const corsOrigins = process.env.CORS_ORIGINS;
   app.enableCors({
-    origin: true,
+    origin: corsOrigins ? corsOrigins.split(',') : true,
     credentials: true,
   });
 

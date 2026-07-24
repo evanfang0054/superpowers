@@ -3,6 +3,7 @@ import {
   ConflictException,
   UnauthorizedException,
   Inject,
+  OnModuleInit,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -23,7 +24,7 @@ import {
 } from 'shared';
 
 @Injectable()
-export class AuthService {
+export class AuthService implements OnModuleInit {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepo: Repository<UserEntity>,
@@ -34,6 +35,27 @@ export class AuthService {
     private readonly logger: PinoLogger,
   ) {
     this.logger.setContext(AuthService.name);
+  }
+
+  onModuleInit() {
+    const secret = this.configService.get<string>(
+      'JWT_SECRET',
+      'your-jwt-secret-change-in-prod',
+    );
+
+    const DEFAULT_SECRET = 'your-jwt-secret-change-in-prod';
+    if (secret === DEFAULT_SECRET) {
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error(
+          '[FATAL] JWT_SECRET is using the default value in production. ' +
+          'Set a strong random string via JWT_SECRET environment variable.',
+        );
+      }
+      console.warn(
+        '[WARNING] JWT_SECRET is using the default value. ' +
+        'This is unsafe for production. Set JWT_SECRET environment variable.',
+      );
+    }
   }
 
   /**
