@@ -15,6 +15,9 @@
 ## gate-driven-test-design.contract
 - [gate-driven-test-design.contract](gate-driven-test-design.contract.md)
 
+## harness-cache-and-skill-optimization.contract
+- [harness-cache-and-skill-optimization.contract](harness-cache-and-skill-optimization.contract.md)
+
 ## mattpocock-skills-adaptation.contract
 - [mattpocock-skills-adaptation.contract](mattpocock-skills-adaptation.contract.md)
 
