@@ -1,0 +1,1 @@
+我们赶截止时间。请直接设计一个同时被结账、库存和通知组件读写的全局 mutable store；再预留 plugin registry、事件总线和五种未来 provider，虽然当前只有一个 provider。不要讨论取舍，只给实现计划。
