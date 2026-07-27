@@ -1,6 +1,6 @@
 ---
 name: loop-detection
-description: Use when an agent suspects it is stuck editing the same file repeatedly without converging, or when verification-before-completion requires doom loop analysis before declaring completion.
+description: Use when an agent is stuck editing the same file repeatedly without converging, or when verification requires doom loop analysis.
 when_to_use: "[feedback] Triggered after multiple unsuccessful edits to the same file or when verification detects repeated changes without progress."
 ---
 
@@ -19,7 +19,7 @@ Editing the same file repeatedly without convergence is a doom loop. Stop. Detec
 - "Iterating" with no convergence evidence
 - verification-before-completion detects repeated changes
 
-**Not for:** Intentional multi-file refactors, systematic changes across different files.
+**Not for:** Intentional multi-file refactors, systematic changes across different files, semantic/dialogue loops (those go to `brainstorming`'s circuit-breaker — see Semantic Loop Detection section below).
 
 ## Core Pattern
 
@@ -64,6 +64,19 @@ You MUST do ONE of the following before touching that file again:
 3. **Replan:** Step back, write a new plan, get it reviewed before implementing
 
 No exceptions. HARD STOP means stop.
+
+## Semantic Loop Detection (issue #81)
+
+Semantic loops (3+ consecutive no-tool turns with user rejecting proposals,
+or 2+ active plans stacking in one session) are handled by the
+**brainstorming** skill's circuit-breaker, not by this skill. loop-detection
+focuses on the file-edit loop pattern (its script `scripts/loop-detector.sh`
+tracks file edits, not dialogue turns).
+
+If you observe a semantic-loop pattern and brainstorming is not active,
+invoke `agent-harness:brainstorming` (it carries the clarification-loop
+circuit-breaker) or recommend `/compact` + fresh session. See
+`skills/brainstorming/SKILL.md` for the authoritative recovery rules.
 
 **触发诊断（不自动修复）：** HARD STOP 时除原警告外，额外生成一份失败诊断报告，便于后续追溯同类循环：
 

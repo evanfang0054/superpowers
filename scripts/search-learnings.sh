@@ -62,10 +62,12 @@ format_learnings() {
     local max_entries="${3:-0}"          # 0 = no limit
     local min_confidence="${4:-0}"       # 0 = no filter
     local recent_within_days="${5:-0}"   # 0 = no filter
+    local is_summary="${6:-0}"           # 1 = summary mode (freeze confidence)
     LEARNINGS_FILTER="$filter" LEARNINGS_TYPE_FILTER="$type_filter" \
         LEARNINGS_MAX_ENTRIES="$max_entries" \
         LEARNINGS_MIN_CONFIDENCE="$min_confidence" \
         LEARNINGS_RECENT_WITHIN_DAYS="$recent_within_days" \
+        LEARNINGS_SUMMARY_MODE="$is_summary" \
         python3 - "$LEARNINGS_FILE" << 'PYTHON'
 import json
 import sys
@@ -79,6 +81,7 @@ type_filter = os.environ.get('LEARNINGS_TYPE_FILTER', '').lower()
 max_entries = int(os.environ.get('LEARNINGS_MAX_ENTRIES', '0') or '0')
 min_confidence = int(os.environ.get('LEARNINGS_MIN_CONFIDENCE', '0') or '0')
 recent_within_days = int(os.environ.get('LEARNINGS_RECENT_WITHIN_DAYS', '0') or '0')
+summary_mode = os.environ.get('LEARNINGS_SUMMARY_MODE', '0') == '1'
 
 try:
     with open(file_path, 'r') as f:
@@ -107,12 +110,16 @@ for line in lines:
             if filter_text not in text_to_search:
                 continue
         
-        # Calculate effective confidence with decay
+        # Calculate effective confidence with decay.
+        # In summary mode (--min-confidence or throttle flags present),
+        # freeze to the original value to keep output deterministic across
+        # days — prompt cache prefix match breaks if the confidence
+        # number changes (issue #79 / C1+I3 fix).
         conf = e.get('confidence', 5)
         source = e.get('source', '')
         ts = e.get('ts', '')
-        
-        if source in ('observed', 'inferred') and ts:
+
+        if not summary_mode and source in ('observed', 'inferred') and ts:
             try:
                 # Handle ISO format with Z suffix
                 ts_clean = ts.replace('Z', '+00:00')
@@ -147,7 +154,10 @@ for e in entries:
             seen[dk] = e
 
 results = list(seen.values())
-results.sort(key=lambda x: x.get('_effective_confidence', 0), reverse=True)
+# Sort: deterministic order so identical learning sets produce byte-equal
+# summary output (cache-friendly prefix, issue #79). Confidence is still
+# surfaced per-entry but no longer drives ordering.
+results.sort(key=lambda x: (x.get('type', ''), x.get('key', '')))
 
 # Apply throttle filters (--max-entries / --min-confidence / --recent-within-days)
 if min_confidence > 0:
@@ -184,13 +194,19 @@ type_counts = [f"{len(arr)} {t}{'s' if len(arr) > 1 else ''}" for t, arr in by_t
 print(f"LEARNINGS: {len(results)} loaded ({', '.join(type_counts)})")
 print()
 
-# Output by type
-for t, arr in sorted(by_type.items()):
+# Output by type. Groups are iterated in sorted order and entries within each
+# group are sorted by key — both deterministic, so two runs over the same
+# learning set produce byte-equal output (cache-friendly, issue #79).
+for t in sorted(by_type.keys()):
+    arr = sorted(by_type[t], key=lambda e: e.get('key', ''))
     print(f"## {t.capitalize()}s")
     for e in arr:
         files = f" (files: {', '.join(e.get('files', []))})" if e.get('files') else ""
-        date = e.get('ts', '')[:10] if e.get('ts') else 'unknown'
-        print(f"- [{e['key']}] (confidence: {e['_effective_confidence']}/10, {e.get('source', 'unknown')}, {date})")
+        # Note: deliberately omit ts-derived date here. Including it would
+        # make the summary non-stable across days and break prompt-cache
+        # prefix matching (issue #79). In summary mode confidence is frozen
+        # to the original value; display it so the model sees signal strength.
+        print(f"- [{e['key']}] (confidence: {e['_effective_confidence']}/10, {e.get('source', 'unknown')})")
         print(f"  {e.get('insight', '')}{files}")
     print()
 PYTHON
@@ -229,7 +245,7 @@ set -- "${new_args[@]}"
 
 case "$1" in
     --summary)
-        format_learnings "" "" "$MAX_ENTRIES" "$MIN_CONFIDENCE" "$RECENT_WITHIN_DAYS"
+        format_learnings "" "" "$MAX_ENTRIES" "$MIN_CONFIDENCE" "$RECENT_WITHIN_DAYS" "1"
         ;;
     --all)
         echo "=== All Learnings ($total entries) ==="

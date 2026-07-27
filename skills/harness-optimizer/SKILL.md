@@ -1,6 +1,6 @@
 ---
 name: harness-optimizer
-description: "Use when用户提供 Claude Code 会话 ID，想复盘某次会话、生成分析报告，或基于该会话优化某个明确指定的项目、workflow、skill 或 harness。特别适用于需要区分分析样本来源与真正优化对象的场景，例如"根据这个会话优化我的项目"而不是默认优化分析器自身。"
+description: "Use when用户提供会话 ID，想复盘会话或基于该会话优化指定的项目、workflow、skill 或 harness。"
 disable-model-invocation: true
 ---
 

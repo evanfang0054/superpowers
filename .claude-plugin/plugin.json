@@ -1,7 +1,7 @@
 {
   "name": "agent-harness",
   "description": "Core skills library for Claude Code: TDD, debugging, collaboration patterns, and proven techniques",
-  "version": "6.3.0",
+  "version": "6.3.2",
   "author": {
     "name": "evanfang0054",
     "email": "380616679@qq.com"
@@ -16,5 +16,6 @@
     "collaboration",
     "best-practices",
     "workflows"
-  ]
+  ],
+  "hooks": "./hooks/hooks.json"
 }

@@ -43,7 +43,7 @@
 > 注：`explicit-skill-requests` / `skill-triggering` / `subagent-driven-dev` 套件需要消耗 Claude API 配额并在 headless 模式下真实触发 skill 行为，结果取决于模型当前行为，非纯脚本断言。
 
 ### 发布
-- `npm run release`（执行 `./scripts/bump-version.sh`）
+- `pnpm run release`（执行 `./scripts/bump-version.sh`）
 
 ### Auto-Loop（`scripts/auto-loop.sh`）
 

@@ -1,6 +1,6 @@
 ---
 name: session-learnings
-description: "Capture and reuse project-specific knowledge across sessions. Use when you discover a non-obvious pattern, pitfall, or architectural insight. Also automatically read learnings at session start to avoid repeating mistakes. PROACTIVELY invoke this skill after debugging sessions, when user corrects your approach, or when you discover undocumented project conventions."
+description: "Capture and reuse project knowledge across sessions. Use when discovering patterns/pitfalls, after debugging, or when user corrects your approach."
 ---
 
 # Session Learnings

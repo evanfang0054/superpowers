@@ -22,6 +22,12 @@ Subagent (general-purpose):
 
     Read the task brief: [BRIEF_FILE]
 
+    **Plan file policy (issue #82):** the brief should already contain the task's
+    plan section. Do NOT Read the whole plan file — that burns ~3K tokens. If a
+    requirement seems missing, ask the controller instead of opening the plan.
+    Only as a last resort, Read the specific referenced section (not the whole
+    plan) and name in your report why it was necessary.
+
     Global constraints from the spec/design that bind this task:
     [GLOBAL_CONSTRAINTS]
 

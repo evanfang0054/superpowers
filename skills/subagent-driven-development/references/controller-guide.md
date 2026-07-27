@@ -83,7 +83,7 @@ Everything you paste into a dispatch prompt — and everything a subagent prints
 stays resident in your context for the rest of the session and is re-read on every later
 turn. Hand artifacts over as files:
 
-- **Task brief:** `"$SDD_SKILL_DIR/scripts/task-brief" PLAN_FILE N` extracts the task's full text to a uniquely named file and prints the path. Compose the dispatch so the brief stays the single source of requirements. Dispatch contains: (1) one line of task context; (2) brief path introduced as "read this first"; (3) interfaces/decisions from earlier tasks the brief cannot know; (4) your ambiguity resolutions; (5) report-file path and report contract.
+- **Task brief:** `"$SDD_SKILL_DIR/scripts/task-brief" PLAN_FILE N` extracts the task's full text to a uniquely named file and prints the path. Compose the dispatch so the brief stays the single source of requirements. **Before dispatching (issue #82):** open the brief and check for any "see <plan>.md ..." or "per <plan>.md Task M" references. For each, copy the referenced section verbatim into the brief (or, if huge, quote the binding constraints and acceptance criteria). A self-contained brief lets the implementer skip Reading the whole plan and saves ~3K tokens per dispatch — the largest avoidable SDD cost. Dispatch contains: (1) one line of task context; (2) brief path introduced as "read this first"; (3) interfaces/decisions from earlier tasks the brief cannot know; (4) your ambiguity resolutions; (5) report-file path and report contract.
 - **Report file:** name after the brief (brief `…/task-N-brief.md` → report `…/task-N-report.md`). Implementer writes the full report there and returns status, commits, a one-line test summary, and concerns.
 - **Reviewer inputs:** task reviewer gets three paths — brief, report, review package — plus global constraints.
 - Fix dispatches append their fix report (with test results) to the same report file.
@@ -114,7 +114,13 @@ After compaction, trust the ledger and `git log` over your own recollection.
 - Skip task review, or accept a report missing either verdict (spec compliance AND task quality are both required).
 - Proceed with unfixed Critical/Important issues.
 - Dispatch multiple implementation subagents in parallel (conflicts).
-- Make a subagent read the whole plan file — hand it its task brief.
+- Make a subagent read the whole plan file — hand it its task brief (extracted via `scripts/task-brief`). The brief is the single source of truth; subagents Read the brief, not the plan.
+- **Dispatch a brief that references the plan by path without inlining the
+  relevant section (issue #82).** If a brief line says "see plan2-backend.md
+  Task 3", either (a) paste that section into the brief before dispatch, or
+  (b) confirm the section is already in the brief. A subagent forced to Read
+  the whole plan burns ~3K tokens per dispatch (241 subagents × 3K ≈ 720K
+  tokens on the hack project trace).
 - Skip scene-setting context.
 - Ignore subagent questions.
 - Accept "close enough" on spec compliance.

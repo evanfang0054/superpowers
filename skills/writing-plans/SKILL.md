@@ -24,6 +24,20 @@ If the spec covers multiple independent subsystems, it should have been broken i
 
 **大型任务分段:** If the task is full-stack, spans multiple apps, includes backend + frontend + AI, or will likely exceed 8 implementation tasks, do not create one monolithic plan. First output a directory-level execution map and 默认拆成多个 plan (for example: infrastructure / backend / frontend / design-polish). Each plan must have its own confirmation gate and testable outcome.
 
+**单会话承载上限 (issue #81):** A single session should carry at most **2 active plans** concurrently. To check the current count before starting a new plan:
+1. Count files in `docs/agent-harness/plans/*.md` (or wherever the project stores plans).
+2. For each file, check frontmatter `status:` — if missing, treat as `active`.
+3. If 2+ plans are already `active` (or `status` is absent), do not start a third.
+
+If a third plan is about to start while two are still in flight, stop and recommend one of:
+1. Finish or shelve one of the active plans before starting the new one
+2. Start a fresh session for the new plan
+3. Run `agent-harness:retrospective` to close the current session cleanly
+
+**Escape hatch:** If multiple plans have hard dependencies (infrastructure + feature on top of it, backend + frontend contract work), stacking is legitimate. Note the dependency chain in the new plan's frontmatter (`depends_on: <plan-file>`) so the next plan-creation step knows not to count this as independent stacking.
+
+Rationale: hack project sessions stacking 4 plans in one session triggered 8 compacts and ~96KB of accumulated summary text. Each compact forces re-establishing context, inflating input tokens. See loop-detection's semantic-loop section for the cross-reference.
+
 **GDD gate:** Before writing implementation tasks, check whether the spec has a GDD / gate-driven-test-design artifact when the work carries non-trivial behavior, contract, or regression risk. If missing, stop and tell the user to generate GDD first (or explicitly skip GDD). Do not silently proceed into implementation tasks.
 
 **Design sync:** If a design doc, prototype, or `harness-design` artifact exists, the plan must include explicit 设计同步点. Name the design token / interaction constraints, where they land in code, and which task verifies them. Do not let design intent live only in prose.

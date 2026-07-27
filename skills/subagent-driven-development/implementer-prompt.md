@@ -21,6 +21,12 @@ Subagent (general-purpose):
     - IGNORE any files, projects, or contexts not explicitly mentioned
     - If you find yourself exploring unrelated code, STOP immediately and report this in your output
     - Do NOT read files outside the task scope unless required for the specific change
+    - **Plan file policy (issue #82):** your BRIEF_FILE should already contain the
+      task's plan section (the controller extracts it via `scripts/task-brief`).
+      Trust the brief and do NOT Read the whole plan file — that burns ~3K tokens
+      per dispatch. If a requirement seems missing from the brief, Read ONLY the
+      specific section of the plan referenced (e.g. one Task or one section), not
+      the whole plan. Ask the controller if even that is unclear.
     - Your output MUST reference the actual files you modified (with paths and line numbers)
 
     ## Context

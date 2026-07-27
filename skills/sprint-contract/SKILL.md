@@ -1,6 +1,6 @@
 ---
 name: sprint-contract
-description: "Use after brainstorming produces a spec and before writing-plans begins, to negotiate explicit Definition of Done and prevent ambiguity in completion criteria."
+description: "Use after brainstorming produces a spec and before writing-plans — negotiates explicit Definition of Done to prevent ambiguity."
 when_to_use: "[feedforward] Triggered between brainstorming and writing-plans for non-trivial tasks."
 ---
 
@@ -29,17 +29,34 @@ If you are debating whether to skip, do not skip. Debate = non-trivial.
 
 The agent plays both roles in sequence. This is not a form to fill out -- it is a negotiation.
 
+**Outcome statement prerequisite (issue #83):** Before generating the initial
+Definition of Done, write one paragraph (2-4 sentences) describing the
+**user-visible outcome** the feature should produce — what the user sees,
+does, or avoids having to do once it ships. Write it in the user's voice, not
+implementation terms. If you cannot write this paragraph, the spec is not
+ready for a contract yet. **Do NOT push the user back into brainstorming** —
+that risks a bounce loop between brainstorming's HARD-GATE and sprint-contract.
+Instead:
+1. Present the user with two options: (a) supplement the outcome description
+   here and continue, or (b) invoke `agent-harness:office-hours` to re-align
+   on goals before returning to the contract.
+2. office-hours sits upstream of brainstorming in the workflow and avoids
+   the loop.
+This blocks the #83 failure mode of negotiating detailed acceptance criteria
+for the wrong problem.
+
 ```
-1. GENERATOR: Read the spec. Produce initial Definition of Done.
-2. EVALUATOR: Challenge every criterion. Is it testable? Is it unambiguous?
+1. OUTCOME: Write the user-visible outcome paragraph (2-4 sentences).
+2. GENERATOR: Read the spec + outcome. Produce initial Definition of Done.
+3. EVALUATOR: Challenge every criterion. Is it testable? Is it unambiguous?
    Could two people disagree on whether it's met?
-3. GENERATOR: Revise based on evaluator challenges.
-4. EVALUATOR: Accept or challenge again.
-5. Repeat until evaluator accepts without further challenges.
-6. Save contract to docs/agent-harness/contracts/{feature-name}.contract.md
+4. GENERATOR: Revise based on evaluator challenges.
+5. EVALUATOR: Accept or challenge again.
+6. Repeat until evaluator accepts without further challenges.
+7. Save contract to docs/agent-harness/contracts/{feature-name}.contract.md
 ```
 
-**Minimum 2 rounds.** If evaluator accepts on round 1, the criteria were too vague.
+**Minimum 2 rounds of generator-evaluator.** If evaluator accepts on round 1, the criteria were too vague.
 
 ## Contract Template
 

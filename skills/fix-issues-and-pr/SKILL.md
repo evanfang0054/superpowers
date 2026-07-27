@@ -1,6 +1,6 @@
 ---
 name: fix-issues-and-pr
-description: Use when the user wants to fix existing GitHub issues and open a single PR, without re-analyzing sessions. Trigger on "修 #12", "把 open issues 都修了提 PR", "fix issue #15", "拉 issue 来修". Do NOT use when analyzing sessions or creating new issues.
+description: Fix existing GitHub issues via SDD and ship as one PR. Trigger on "修 #12", "fix issue #15", "open issues 都修了".
 argument-hint: "\"#12,#15\" or \"all\""
 ---
 

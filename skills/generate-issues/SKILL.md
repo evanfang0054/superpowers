@@ -1,6 +1,6 @@
 ---
 name: generate-issues
-description: Use when the user wants to inventory session problems and file them as GitHub issues, with no code changes or PRs. Trigger on "分析会话提 issue", "找出最近会话问题", "只生成 issue 不修复", "盘点会话问题". Do NOT use when fixing, writing code, or opening PRs.
+description: Analyze sessions and file GitHub issues, no code changes. Trigger on "分析会话提 issue", "只生成 issue 不修复", "盘点会话问题".
 argument-hint: "[natural language request]"
 ---
 

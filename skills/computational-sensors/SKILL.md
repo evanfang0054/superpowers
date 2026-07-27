@@ -1,6 +1,6 @@
 ---
 name: computational-sensors
-description: Use when setting up or running deterministic checks (lint/typecheck/test/coverage) before semantic review, or when verification-before-completion needs computational evidence.
+description: Use when running deterministic checks (lint/typecheck/test/coverage) before semantic review, or when verification needs computational evidence.
 when_to_use: "[feedforward, feedback] Configure at project setup; run during verification to catch issues before semantic review."
 ---
 

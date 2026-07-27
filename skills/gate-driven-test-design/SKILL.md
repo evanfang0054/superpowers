@@ -1,6 +1,6 @@
 ---
 name: gate-driven-test-design
-description: Use after brainstorming produces an approved design spec, before writing-plans, when you need to recursively derive a risk-based test coverage tree (Level Items + Gates + Assertions) from the design.
+description: Use after brainstorming produces an approved design spec, before writing-plans — derives a risk-based test coverage tree (Gates + Assertions).
 when_to_use: "[feedforward] Triggered between brainstorming and writing-plans for features with non-trivial behavior, contracts, or regression risk."
 ---
 

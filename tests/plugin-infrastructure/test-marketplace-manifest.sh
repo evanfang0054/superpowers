@@ -32,6 +32,15 @@ else
     fail "source points to valid dir (got '$SOURCE')"
 fi
 
+# 非运行时目录不应进入 git archive / 插件分发包
+for excluded in demo tests docs; do
+    if git -C "$REPO_ROOT" check-attr export-ignore -- "$excluded" | grep -q 'export-ignore: set'; then
+        pass "$excluded excluded from generated archives"
+    else
+        fail "$excluded excluded from generated archives"
+    fi
+done
+
 # owner.name 非空
 OWNER=$(jq -r '.owner.name // empty' "$MARKET_JSON")
 if [ -n "$OWNER" ]; then pass "owner.name non-empty"; else fail "owner.name non-empty"; fi
