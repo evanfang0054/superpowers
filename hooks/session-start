@@ -105,11 +105,11 @@ if [ "$SESSION_SOURCE" = "precompact" ]; then
 
     # Emit an empty-but-valid JSON for each platform.
     if [ -n "${CURSOR_PLUGIN_ROOT:-}" ]; then
-        printf '{\n  "additional_context": ""\n}\n'
+        printf '{\n  "additional_context": ""\n}\n' | cat
     elif [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -z "${COPILOT_CLI:-}" ]; then
-        printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": ""\n  }\n}\n'
+        printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": ""\n  }\n}\n' | cat
     else
-        printf '{\n  "additionalContext": ""\n}\n'
+        printf '{\n  "additionalContext": ""\n}\n' | cat
     fi
     exit 0
 fi

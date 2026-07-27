@@ -62,7 +62,70 @@ else
     fail "KB hint included for agent-harness projects"
 fi
 
-rm -f "$MOCK_ENV_FILE"
+run_session_start() {
+    local input="$1" platform="$2" stdout_file="$3" stderr_file="$4"
+    case "$platform" in
+        cursor)
+            printf '%s' "$input" | env CURSOR_PLUGIN_ROOT="$REPO_ROOT" CLAUDE_PROJECT_DIR="$TMP_PROJECT" bash "$SESSION_START" >"$stdout_file" 2>"$stderr_file"
+            ;;
+        claude)
+            printf '%s' "$input" | env CLAUDE_PLUGIN_ROOT="$REPO_ROOT" CLAUDE_PROJECT_DIR="$TMP_PROJECT" bash "$SESSION_START" >"$stdout_file" 2>"$stderr_file"
+            ;;
+        copilot)
+            printf '%s' "$input" | env COPILOT_CLI=1 CLAUDE_PROJECT_DIR="$TMP_PROJECT" bash "$SESSION_START" >"$stdout_file" 2>"$stderr_file"
+            ;;
+    esac
+}
+
+STDOUT_FILE=$(mktemp)
+STDERR_FILE=$(mktemp)
+for platform in cursor claude copilot; do
+    if run_session_start '{"source":"startup"}' "$platform" "$STDOUT_FILE" "$STDERR_FILE" \
+       && jq empty "$STDOUT_FILE" 2>/dev/null \
+       && [ ! -s "$STDERR_FILE" ]; then
+        pass "$platform startup emits valid JSON with clean stderr"
+    else
+        fail "$platform startup emits valid JSON with clean stderr"
+    fi
+done
+
+for source in startup clear; do
+    if run_session_start '{"source":"'"$source"'"}' claude "$STDOUT_FILE" "$STDERR_FILE" \
+       && jq -e '.hookSpecificOutput.additionalContext | contains("using-agent-harness")' "$STDOUT_FILE" >/dev/null 2>&1 \
+       && [ ! -s "$STDERR_FILE" ]; then
+        pass "$source injects the full bootstrap"
+    else
+        fail "$source injects the full bootstrap"
+    fi
+done
+
+if run_session_start '{"source":"precompact"}' claude "$STDOUT_FILE" "$STDERR_FILE" \
+   && jq -e '.hookSpecificOutput.additionalContext == ""' "$STDOUT_FILE" >/dev/null 2>&1 \
+   && [ ! -s "$STDERR_FILE" ]; then
+    pass "precompact emits valid empty context with clean stderr"
+else
+    fail "precompact emits valid empty context with clean stderr"
+fi
+
+# Every platform-specific JSON writer must pipe printf through cat so Git Bash
+# absorbs a downstream EPIPE instead of surfacing printf's Permission denied.
+if ! grep -E '^[[:space:]]*printf .*\\n' "$SESSION_START" | grep -v '| cat' >/dev/null; then
+    pass "session-start JSON printf output is piped through cat"
+else
+    fail "session-start JSON printf output is piped through cat"
+fi
+
+CODEX_SESSION_START="$REPO_ROOT/hooks/session-start-codex"
+if grep -E '^[[:space:]]*printf .*\\n.*\| cat$' "$CODEX_SESSION_START" >/dev/null \
+   && printf '{}' | bash "$CODEX_SESSION_START" >"$STDOUT_FILE" 2>"$STDERR_FILE" \
+   && jq empty "$STDOUT_FILE" 2>/dev/null \
+   && [ ! -s "$STDERR_FILE" ]; then
+    pass "Codex JSON printf uses cat and emits clean valid JSON"
+else
+    fail "Codex JSON printf uses cat and emits clean valid JSON"
+fi
+
+rm -f "$MOCK_ENV_FILE" "$STDOUT_FILE" "$STDERR_FILE"
 rm -rf "$TMP_PROJECT"
 
 print_summary "SessionStart Injection"
