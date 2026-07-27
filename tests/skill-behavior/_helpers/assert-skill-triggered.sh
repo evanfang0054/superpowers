@@ -63,6 +63,56 @@ assert_output_contains() {
     return 1
 }
 
+# assert_assistant_text_contains <pattern> [test-name]
+# Only inspect assistant text blocks, excluding tool input/output.
+assert_assistant_text_contains() {
+    local pattern="$1"
+    local name="${2:-assistant text contains pattern}"
+    local assistant_text
+
+    if [ -z "${LOG_FILE:-}" ] || [ ! -f "$LOG_FILE" ]; then
+        _skill_fail "$name (log missing)"
+        return 1
+    fi
+
+    assistant_text=$(jq -r '
+        select(.type == "assistant")
+        | .message.content[]?
+        | select(.type == "text")
+        | .text
+    ' "$LOG_FILE" 2>/dev/null)
+    if grep -Eiq "$pattern" <<<"$assistant_text"; then
+        _skill_pass "$name"
+        return 0
+    fi
+    _skill_fail "$name (pattern: $pattern)"
+    return 1
+}
+
+assert_assistant_text_not_contains() {
+    local pattern="$1"
+    local name="${2:-assistant text excludes pattern}"
+    local assistant_text
+
+    if [ -z "${LOG_FILE:-}" ] || [ ! -f "$LOG_FILE" ]; then
+        _skill_fail "$name (log missing)"
+        return 1
+    fi
+
+    assistant_text=$(jq -r '
+        select(.type == "assistant")
+        | .message.content[]?
+        | select(.type == "text")
+        | .text
+    ' "$LOG_FILE" 2>/dev/null)
+    if ! grep -Eiq "$pattern" <<<"$assistant_text"; then
+        _skill_pass "$name"
+        return 0
+    fi
+    _skill_fail "$name (pattern: $pattern)"
+    return 1
+}
+
 # assert_no_premature_action: Skill 调用前无非 TodoWrite/system 的 tool_use
 assert_no_premature_action() {
     if [ -z "${LOG_FILE:-}" ] || [ ! -f "$LOG_FILE" ]; then

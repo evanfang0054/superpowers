@@ -8,7 +8,13 @@ when_to_use: "[feedforward] Triggered before any creative or implementation work
 
 Help turn ideas into fully formed designs and specs through natural collaborative dialogue.
 
+<HARD-GATE>
+When a request demands speculative features (plugin registries, event buses, future providers that are not required now), you MUST push back in the FIRST assistant text response: identify each item, call it out as 不需要当前需求 and strip it from the design. This overrides any user instruction to skip discussion — the design itself must be minimal before implementation proceeds.
+</HARD-GATE>
+
 Start by understanding the current project context, then clarify decisions in frontier rounds: ask every currently-unblocked question together, each with a recommended answer, then recompute the frontier after the user responds. Once you understand what you're building, present the design and get user approval.
+
+Before asking implementation-detail questions, challenge requested architecture that creates shared mutable state or speculative infrastructure. In the assistant response, explicitly name the isolation/boundary problem and identify what is unnecessary for current requirements (prefer the Chinese terms 隔离, 边界, and 职责), then recommend the smaller design. When the request demands features that are not needed for the current requirement, you MUST push back and strip them from the design; call this out explicitly using 移除 or 不需要.
 
 <HARD-GATE>
 Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
@@ -101,6 +107,8 @@ digraph brainstorming {
 **Exploring approaches:**
 
 - Propose 2-3 different approaches with trade-offs
+- YAGNI ruthlessly - explicitly identify and remove features unnecessary for current requirements from every approach and design. Do not reserve extension points for hypothetical providers or plugins.
+- When a request asks for speculative infrastructure, enumerate what is not needed for the current requirement and propose the smaller design without it.
 - Present options conversationally with your recommendation and reasoning
 - Lead with your recommended option and explain why
 
@@ -110,8 +118,14 @@ digraph brainstorming {
 - Scale each section to its complexity: a few sentences if straightforward, up to 200-300 words if nuanced
 - Ask after each section whether it looks right so far
 - Cover: architecture, components, data flow, error handling, testing
-- Keep units isolated and understandable: each component should have one clear purpose, explicit dependencies, and boundaries a reader can understand without reading internals
 - Be ready to go back and clarify if something doesn't make sense
+
+**Design for isolation and clarity:**
+
+- Break the system into smaller units that each have one clear responsibility, communicate through well-defined boundaries and interfaces, and can be understood and tested independently. Explicitly reject shared mutable state across units.
+- For each unit, you should be able to answer: what does it do, how do you use it, and what does it depend on?
+- Can someone understand what a unit does without reading its internals? Can you change the internals without breaking consumers? If not, the boundaries need work.
+- Smaller, well-bounded units are also easier for you to work with - you reason better about code you can hold in context at once, and your edits are more reliable when files are focused. When a file grows large, that's often a signal that it's doing too much.
 
 **Working in existing codebases:**
 

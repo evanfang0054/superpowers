@@ -54,10 +54,10 @@ run_skill() {
     local prompt
     prompt=$(cat "$prompt_file")
 
-    local timestamp
-    timestamp=$(date +%s)
-    local output_dir="/tmp/agent-harness-tests/${timestamp}/skill-behavior/${skill_name}"
-    mkdir -p "$output_dir"
+    local output_root="/tmp/agent-harness-tests"
+    local output_dir
+    mkdir -p "$output_root"
+    output_dir=$(mktemp -d "$output_root/skill-behavior-${skill_name}.XXXXXX")
 
     # 隔离 HOME 避免用户配置污染（参考 explicit-skill-requests/run-test.sh）
     local isolated_home
@@ -83,6 +83,9 @@ run_skill() {
         --verbose \
         > "$LOG_FILE" 2>&1 || true
 
+    # stream-json 为行缓冲，claude 退出后可能仍有内核页缓存未刷盘；
+    # 给文件系统 2 秒时间完成最终 flush
+    sleep 2
     cd "$SKILL_BEHAVIOR_DIR"
     # 注意：不清理 isolated_home 和 project_dir，供事后排查
     echo "Skill run complete. Log: $LOG_FILE" >&2
