@@ -69,8 +69,6 @@
 ## brainstorming-optimization
 - [2026-07-21-brainstorming-optimization-design](2026-07-21-brainstorming-optimization-design.md)
 
-## context-budget-and-memory-fixes
-- [2026-07-26-context-budget-and-memory-fixes-design](2026-07-26-context-budget-and-memory-fixes-design.md)
 
 ## domain-modeling
 - [2026-07-21-domain-modeling-design](2026-07-21-domain-modeling-design.md)

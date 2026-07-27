@@ -23,7 +23,6 @@
 - brainstorming-optimization → specs/2026-07-21-brainstorming-optimization-design.md
 - mattpocock-skills-adaptation → specs/2026-07-22-mattpocock-skills-adaptation-design.md
 - sdd-fan-out → specs/2026-07-24-sdd-fan-out-design.md
-- context-budget-and-memory-fixes → specs/2026-07-26-context-budget-and-memory-fixes-design.md
 - fruit-shop-code-quality → demo/fruit-shop/docs/agent-harness/specs/2026-07-24-fruit-shop-code-quality-design.md
 
 > 维护方式：手动追加，或跑 `scripts/index-knowledge-base.sh` 自动重建。
