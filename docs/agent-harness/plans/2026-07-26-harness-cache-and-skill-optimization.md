@@ -19,6 +19,8 @@ dod: "P1 静态前缀字节级稳定+learnings≤4KB+占位符置尾；P2 四 sk
 
 **契约映射：** 每个任务标注对应 contract DoD 条目（见 `../contracts/harness-cache-and-skill-optimization.contract.md`）。
 
+**并行 spec 协调：** 仓库存在 `context-budget-and-memory-fixes` spec（2026-07-26），主题为 top-N summary + 就近解析，与 P1 的 Task 1/2 同区域（session-start / search-learnings.sh）。执行顺序约定：本 plan P1 先执行完毕；对方写 plan 时，其 top-10 注入与本 plan Task 2 的压缩格式叠加后重新标定字节断言。
+
 ---
 
 ## P1 缓存前缀加固
@@ -95,20 +97,28 @@ files: scripts/search-learnings.sh
 scripts/search-learnings.sh --summary | wc -c
 ```
 
-- [ ] **Step 2: 修改 summary 格式**
+- [ ] **Step 2: 修改 summary 格式（以 summary_mode 条件分支实现，不影响 --all/--recent/关键词模式）**
 
-在 `search-learnings.sh` 内嵌 python 的 summary 输出处，将每条目格式改为单行紧凑格式，正文截断到首句（第一个 `。` 或 `.` 处，上限 120 字符），去掉 `(files: ...)` 尾注，保留类型分组标题：
+在 `search-learnings.sh` 内嵌 python 的条目输出段，将条目打印改为条件分支——`summary_mode` 时紧凑格式，否则保持原样：
 
 ```python
-def first_sentence(text, limit=120):
+# 条目打印改为 summary_mode 条件分支
+if summary_mode:
+    # summary: 单行紧凑，首句截断 ≤120 字符，无 files 尾注
+    insight = e.get('insight', '')
     for sep in ('\u3002', '. '):
-        idx = text.find(sep)
-        if 0 < idx < limit:
-            return text[:idx + len(sep)].strip()
-    return text[:limit].strip()
-
-# 条目输出行改为：
-print(f"- [{key}] ({confidence}/10) {first_sentence(text)}")
+        idx = insight.find(sep)
+        if 0 < idx < 120:
+            insight = insight[:idx + len(sep)].strip()
+            break
+    else:
+        insight = insight[:120].strip()
+    print(f"- [{e['key']}] ({e['_effective_confidence']}/10) {insight}")
+else:
+    # 非 summary 模式（--all / --recent / 关键词搜索）保持原格式
+    files = f" (files: {', '.join(e.get('files', []))})" if e.get('files') else ""
+    print(f"- [{e['key']}] (confidence: {e['_effective_confidence']}/10, {e.get('source', 'unknown')})")
+    print(f"  {e.get('insight', '')}{files}")
 ```
 
 - [ ] **Step 3: 验证体积与格式**
@@ -140,9 +150,11 @@ files: skills/auto-loop/orchestrator-prompt.md
 **Files:**
 - Modify: `skills/auto-loop/orchestrator-prompt.md`
 
+File note: `{{SCAN_TARGET}}`/`{{FILTER}}`/`{{MODE}}`/`{{STATE_FILE}}` 在稳定指令体内散落多处（53-149 行），填充后单次 run 内全文本就是静态的；跨 run 前缀仍会被体内散留占位符打断，此改动收益有限——但靠近文件顶部的集中上下文块（37-49 行）移走可减少每次 run 前缀的变异性，仍是正确做法。auto-loop.sh 的 jq gsub 做全文替换，与位置无关，无需同步修改。
+
 - [ ] **Step 1: 结构重排**
 
-将第 38-46 行区域的运行上下文块（含 `{{REQUEST}}` `{{SCOPE}}` `{{SCAN_TARGET}}` `{{BRANCH}}` `{{MODE}}` `{{FILTER}}` `{{TARGET_ISSUES}}` `{{MAX_ISSUES}}` 的整段）剪切，移到文件末尾，标题改为 `## 本次运行上下文（每次运行不同，置于文件末尾以保护缓存前缀）`。稳定指令体（生存规则、state.json 协议、8 步链路、会话筛选协议）保持在前部原顺序。稳定段内嵌的 `{{REPO_ROOT}}`（第 21-30 行示例命令处）保留原位。
+将第 37-49 行区域的运行上下文块（含 `{{REQUEST}}` `{{SCOPE}}` `{{SCAN_TARGET}}` `{{BRANCH}}` `{{MODE}}` `{{FILTER}}` `{{TARGET_ISSUES}}` `{{MAX_ISSUES}}` `{{STATE_FILE}}` 的整段）剪切，移到文件末尾，标题改为 `## 本次运行上下文（每次运行不同，置于文件末尾以保护缓存前缀）`。稳定指令体（生存规则、state.json 协议、8 步链路、会话筛选协议）保持在前部原顺序。稳定段内嵌的 `{{REPO_ROOT}}`（约第 21-30 行示例命令处）保留原位。
 
 - [ ] **Step 2: 验证占位符仍全部存在**
 
@@ -200,11 +212,12 @@ cd tests/skill-behavior/harness-design && ./run-test.sh | tee /tmp/harness-desig
 
 保留在 SKILL.md：使用前提、handoff contract、核心原则 #0、核心哲学、架构选型、工作流程、异常处理、反AI slop速查、技术红线、References路由表（更新路由表加入新文件）、产出要求、核心提醒。
 
-- [ ] **Step 3: 验证尺寸与保留项**
+- [ ] **Step 3: 验证尺寸、保留项与硬指引**
 
 ```bash
 wc -c skills/harness-design/SKILL.md   # Expected: ≤ 12288
 grep -c "核心原则 #0\|技术红线\|References路由表" skills/harness-design/SKILL.md  # Expected: ≥ 3
+grep -c "^> 需要.*读 references/" skills/harness-design/SKILL.md  # Expected: ≥ 3（每移出一个章节一条硬指引）
 ```
 
 - [ ] **Step 4: 重跑 behavior test 对比 baseline**
@@ -246,11 +259,12 @@ cd tests/skill-behavior/writing-skills && ./run-test.sh | tee /tmp/writing-skill
 
 保留：Overview、TDD Mapping、When to Create、Skill Types、Directory Structure、SKILL.md Structure 骨架、CSO 规则文字。已有的顶层辅助文件（anthropic-best-practices.md 等）不动。
 
-- [ ] **Step 3: 验证**
+- [ ] **Step 3: 验证尺寸、保留项与硬指引**
 
 ```bash
 wc -c skills/writing-skills/SKILL.md   # Expected: 明显小于 23857（目标 ~8KB，超出可接受）
 grep -c "TDD Mapping\|RED\|GREEN" skills/writing-skills/SKILL.md  # Expected: ≥ 3（TDD 流程保留）
+grep -c "^> 需要.*读 references/" skills/writing-skills/SKILL.md  # Expected: ≥ 2（每移出一个章节一条硬指引）
 ```
 
 - [ ] **Step 4: 重跑 behavior test 对比**
@@ -299,10 +313,11 @@ cd tests/skill-behavior/brainstorming && ./run-test.sh | tee /tmp/brainstorming-
 
 **禁止移出**：Checklist、Process Flow 流程图、HARD-GATE、Clarification Loop Circuit-Breaker（loop-detection 交叉引用）、The Process、After the Design。
 
-- [ ] **Step 3: 验证保留项**
+- [ ] **Step 3: 验证保留项与硬指引**
 
 ```bash
 grep -c "HARD-GATE\|Circuit-Breaker\|digraph" skills/brainstorming/SKILL.md  # Expected: ≥ 3
+grep -c "^> .*读 references/" skills/brainstorming/SKILL.md  # Expected: ≥ 1（六问表格硬指引）
 ```
 
 - [ ] **Step 4: 重跑 behavior test 对比**
@@ -344,10 +359,11 @@ cd tests/skill-behavior/writing-plans && ./run-test.sh | tee /tmp/writing-plans-
 
 **禁止移出**：No Placeholders、Scope Check、单会话承载上限、GDD gate、Self-Review、Execution Handoff。
 
-- [ ] **Step 3: 验证保留项**
+- [ ] **Step 3: 验证保留项与硬指引**
 
 ```bash
 grep -c "No Placeholders\|Blocking:\|### Task N:" skills/writing-plans/SKILL.md  # Expected: ≥ 3
+grep -c "^> .*读 references/" skills/writing-plans/SKILL.md  # Expected: ≥ 2（task-examples.md 和 fan-out 示例各一条）
 ```
 
 - [ ] **Step 4: 重跑 behavior test 对比**
@@ -397,11 +413,13 @@ disable-model-invocation: true
 
 - [ ] **Step 3: 验证 slash 入口仍可用**
 
+`disable-model-invocation: true` 后 skill 从 Skill 工具自动触发池移除，但 slash 入口（`/agent-harness:generate-issues`）不受影响。验证命令：
+
 ```bash
-claude -p "Invoke the Skill tool with agent-harness:generate-issues, then immediately stop and report whether the skill loaded" --max-turns 3 2>&1 | tail -5
+claude -p "/agent-harness:generate-issues --help, then stop and report" --max-turns 3 2>&1 | tail -5
 ```
 
-Expected: skill 内容成功加载（无 "skill not found"）
+Expected: skill 内容成功加载（无 "skill not found" 或 "not recognized"）
 
 - [ ] **Step 4: 跑 skill 加载测试**
 
@@ -501,14 +519,13 @@ Seam: 构造 3 条 failed 记录后运行 stop-hook 的 stdout
 files: hooks/stop-hook.sh
 
 **Files:**
-- Modify: `hooks/stop-hook.sh`（在 ralph state 不存在的早退路径之前插入）
+- Modify: `hooks/stop-hook.sh`（非 ralph 早退分支 exit 0 之前插入）
 
-- [ ] **Step 1: 写检查逻辑**
-
-在 stop-hook.sh 读取 RALPH_STATE_FILE、确认**不在** ralph loop 的分支处插入（不影响 ralph 流程）：
+- [ ] **Step 1: 写检查逻辑（插入 hooks/stop-hook.sh:32-35 的 `[[ ! -f "$RALPH_STATE_FILE" ]]` → `exit 0` 块内，紧贴 exit 0 之前）**
 
 ```bash
 # 闭环信号：同一 spec_topic 最近 3 次 gate 全 failed → 提示运行 harness-optimizer（仅提示不执行）
+# 采用 spec_topic 聚合（contact boundary conditions 降级许可，因 phase-metrics.jsonl 无 skill 级字段）
 METRICS_FILE="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}/.agent-harness/phase-metrics.jsonl"
 if [ -f "$METRICS_FILE" ] && command -v jq >/dev/null 2>&1; then
   failed_topic=$(tail -50 "$METRICS_FILE" | jq -rs '
@@ -523,6 +540,8 @@ if [ -f "$METRICS_FILE" ] && command -v jq >/dev/null 2>&1; then
   fi
 fi
 ```
+
+注意：插入点在 `exit 0` 之前、`[[ ! -f "$RALPH_STATE_FILE" ]]` 块内——当 ralph loop 激活时此块被跳过，新逻辑不受影响。
 
 - [ ] **Step 2: 手动构造数据验证触发**
 
