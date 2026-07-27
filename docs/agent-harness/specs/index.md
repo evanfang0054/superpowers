@@ -69,12 +69,8 @@
 ## brainstorming-optimization
 - [2026-07-21-brainstorming-optimization-design](2026-07-21-brainstorming-optimization-design.md)
 
-
 ## domain-modeling
 - [2026-07-21-domain-modeling-design](2026-07-21-domain-modeling-design.md)
-
-## harness-cache-and-skill-optimization
-- [2026-07-26-harness-cache-and-skill-optimization-design](2026-07-26-harness-cache-and-skill-optimization-design.md)
 
 ## harness-engineering-improvements
 - [2026-06-29-harness-engineering-improvements-design](2026-06-29-harness-engineering-improvements-design.md)
