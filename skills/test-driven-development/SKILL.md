@@ -216,6 +216,8 @@ Next failing test for next feature.
 | **Clear** | Name describes behavior | `test('test1')` |
 | **Shows intent** | Demonstrates desired API | Obscures what code should do |
 
+For deeper guidance on test quality, use the `agent-harness:writing-good-tests` skill; its two principles require each test to name the break it catches and exercise the real behavior.
+
 ## Why Order Matters
 
 **"I'll write tests after to verify it works"**
