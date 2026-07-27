@@ -8,11 +8,36 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 MANIFEST="$REPO_ROOT/.codex-plugin/plugin.json"
 PACKAGE_JSON="$REPO_ROOT/package.json"
+SYNC_SCRIPT="$REPO_ROOT/scripts/sync-to-codex-plugin.sh"
 
 FAILURES=0
 
 pass() { echo "  [PASS] $1"; }
 fail() { echo "  [FAIL] $1"; FAILURES=$((FAILURES + 1)); }
+
+grep_ok() {
+    local file="$1"
+    local pattern="$2"
+    local desc="$3"
+    if grep -q "$pattern" "$file"; then
+        pass "$desc"
+    else
+        fail "$desc"
+        echo "    pattern not found: $pattern"
+    fi
+}
+
+grep_not_ok() {
+    local file="$1"
+    local pattern="$2"
+    local desc="$3"
+    if ! grep -q "$pattern" "$file"; then
+        pass "$desc"
+    else
+        fail "$desc"
+        echo "    pattern should not exist: $pattern"
+    fi
+}
 
 assert_exists() {
     local path="$1"
@@ -21,6 +46,28 @@ assert_exists() {
         pass "$desc"
     else
         fail "$desc (路径不存在: $path)"
+    fi
+}
+
+assert_executable() {
+    local path="$1"
+    local desc="$2"
+    if [[ -x "$path" ]]; then
+        pass "$desc"
+    else
+        fail "$desc (不可执行: $path)"
+    fi
+}
+
+assert_contains() {
+    local output="$1"
+    local pattern="$2"
+    local desc="$3"
+    if echo "$output" | grep -q -F -- "$pattern"; then
+        pass "$desc"
+    else
+        fail "$desc"
+        echo "    pattern not found: $pattern"
     fi
 }
 
@@ -46,6 +93,30 @@ assert_valid_json() {
         fail "$desc"
     fi
 }
+
+echo "=== Test: sync-to-codex-plugin.sh 存在性与品牌一致性 ==="
+
+# 1. 源脚本存在且可执行
+assert_exists "$SYNC_SCRIPT" "sync-to-codex-plugin.sh 存在"
+assert_executable "$SYNC_SCRIPT" "sync-to-codex-plugin.sh 可执行"
+
+# 2. --help 包含 --dry-run
+HELP_OUTPUT="$("$SYNC_SCRIPT" --help 2>&1 || true)"
+assert_contains "$HELP_OUTPUT" "--dry-run" "--help 输出含 --dry-run"
+
+# 3. 源脚本无 .superpowers 残留（品牌一致性）
+grep_not_ok "$SYNC_SCRIPT" '\.superpowers' "源脚本无 .superpowers 文本残留"
+
+# 4. 源脚本含 .agent-harness 品牌引用
+grep_ok "$SYNC_SCRIPT" 'agent-harness' "源脚本含 agent-harness 品牌引用"
+
+# 5. 源脚本含 /.pi/ 排除规则（pi 扩展不泄漏）
+grep_ok "$SYNC_SCRIPT" '"/\.pi/"' "源脚本含 /.pi/ 排除规则"
+
+# 6. 源脚本引用 skills/hooks/agents 同步路径
+grep_ok "$SYNC_SCRIPT" 'skills' "源脚本引用 skills 目录"
+grep_ok "$SYNC_SCRIPT" 'hooks' "源脚本引用 hooks 目录"
+grep_ok "$SYNC_SCRIPT" 'agents' "源脚本引用 agents 目录"
 
 echo "=== Test: Codex plugin manifest 一致性 ==="
 
