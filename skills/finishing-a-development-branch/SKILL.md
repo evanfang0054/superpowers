@@ -183,7 +183,7 @@ Then: Done
 
 **If `GIT_DIR == GIT_COMMON`:** Normal repo, no worktree to clean up. Done.
 
-**If `WORKTREE_PATH` is under `.worktrees/` or `worktrees/`:** Superpowers created this worktree -- we own cleanup:
+**If `WORKTREE_PATH` is under `.worktrees/` or `worktrees/`:** SDD worktree -- subagent-driven-development owns cleanup:
 
 ```bash
 git worktree remove "$WORKTREE_PATH"
@@ -275,7 +275,7 @@ git worktree prune  # Self-healing: clean up any stale registrations
 
 **Calls:**
 - **subagent-driven-development** cleanup script (`scripts/cleanup-workspace`) - Removes SDD workspace artifacts after branch completion
-- **Step 6** provenance-based cleanup - Removes git worktree if owned by Superpowers
+- **Step 6** provenance-based cleanup - Removes git worktree created by subagent-driven-development
 
 **Pairs with:**
 - **session-learnings** - Record insights discovered during this branch

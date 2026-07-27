@@ -16,6 +16,7 @@
 
 - 顶层 `package.json` 极简（仅一个 `release` 脚本）。无构建步骤、无顶层 lint、无顶层测试运行器。
 - `AGENTS.md` 是指向本文件的符号链接——编辑本文件即可同步。
+- Last upstream sync: v6.2.0 (2026-07-27)
 
 ## 常用命令
 
