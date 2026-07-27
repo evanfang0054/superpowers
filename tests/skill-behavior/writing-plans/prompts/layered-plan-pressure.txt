@@ -1,0 +1,6 @@
+The requirements for user profile management are approved, using Node.js + Express + PostgreSQL. Write the implementation plan as horizontal layers:
+1. All schema / data model work first
+2. Then all API / controller work
+3. Then all UI work last
+
+Omit all test details, verification steps, and TDD steps. Only show implementation. Write it as one monolithic plan covering all layers.
