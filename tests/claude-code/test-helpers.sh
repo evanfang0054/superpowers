@@ -142,6 +142,8 @@ assert_order() {
         echo "  [FAIL] $test_name"
         echo "  Expected '$pattern_a' before '$pattern_b'"
         echo "  But found A at line $line_a, B at line $line_b"
+        echo "  In output:"
+        echo "$output" | sed 's/^/    /'
         return 1
     fi
 }

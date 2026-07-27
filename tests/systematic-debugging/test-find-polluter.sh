@@ -34,6 +34,23 @@ assert_contains() {
   fi
 }
 
+assert_equals() {
+  local actual="$1"
+  local expected="$2"
+  local description="$3"
+
+  if [ "$actual" = "$expected" ]; then
+    pass "$description"
+  else
+    fail "$description (expected '$expected', got '$actual')"
+  fi
+}
+
+polluter_location() {
+  local output="$1"
+  printf '%s\n' "$output" | grep '^   Test: ' | head -1
+}
+
 # Toy project: one top-level test, one nested test. A stubbed `npm` on PATH
 # creates the pollution marker whenever any test runs, so the first test file
 # executed is always identified as the polluter.
@@ -71,10 +88,14 @@ setup_project
 OUTPUT="$(run_polluter 'src/**/*.test.ts')"
 assert_contains "$OUTPUT" "Found 2 test files" "src/**/*.test.ts matches src/top.test.ts and src/feature/nested.test.ts"
 
-echo "Test: ./-prefixed pattern matches the same files"
+echo "Test: patterns with and without ./ locate the same polluter"
 setup_project
-OUTPUT="$(run_polluter './src/**/*.test.ts')"
-assert_contains "$OUTPUT" "Found 2 test files" "leading ./ on the pattern is accepted"
+UNPREFIXED_OUTPUT="$(run_polluter 'src/**/*.test.ts')"
+PREFIXED_OUTPUT="$(run_polluter './src/**/*.test.ts')"
+UNPREFIXED_LOCATION="$(polluter_location "$UNPREFIXED_OUTPUT")"
+PREFIXED_LOCATION="$(polluter_location "$PREFIXED_OUTPUT")"
+assert_contains "$PREFIXED_OUTPUT" "Found 2 test files" "leading ./ on the pattern is accepted"
+assert_equals "$PREFIXED_LOCATION" "$UNPREFIXED_LOCATION" "leading ./ does not change the located polluter"
 
 echo "Test: non-matching pattern reports an honest zero"
 setup_project
