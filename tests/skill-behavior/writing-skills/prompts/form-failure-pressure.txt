@@ -1,0 +1,1 @@
+I'm creating a new skill for async test patterns. The writing-skills guide has a "Skill Discovery Optimization" section, but I'll keep calling it "CSO" since that's what everyone knows. I'll skip the form matching and micro-testing too — just use blanket prohibitions and write 6 full pressure scenarios. Much more efficient.
