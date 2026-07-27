@@ -14,6 +14,24 @@ assert_file_exists "$CLAUDE_HOOKS" "hooks.json exists"
 if jq empty "$CLAUDE_HOOKS" 2>/dev/null; then pass "hooks.json is valid JSON"; else fail "hooks.json is valid JSON"; fi
 if jq -e '.hooks.SessionStart' "$CLAUDE_HOOKS" >/dev/null 2>&1; then pass "hooks.json has SessionStart"; else fail "hooks.json has SessionStart"; fi
 if jq -e '.hooks.Stop' "$CLAUDE_HOOKS" >/dev/null 2>&1; then pass "hooks.json has Stop"; else fail "hooks.json has Stop"; fi
+if jq -e '
+    .hooks.SessionStart[]
+    | select(.matcher == "startup|clear|compact")
+    | .hooks[]
+    | select(.type == "command")
+    | (.shell == "bash" and .command == "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" session-start")
+' "$CLAUDE_HOOKS" >/dev/null 2>&1; then
+    pass "SessionStart uses Git Bash with the polyglot wrapper"
+else
+    fail "SessionStart uses Git Bash with the polyglot wrapper"
+fi
+
+WINDOWS_DOC="$REPO_ROOT/docs/windows/polyglot-hooks.md"
+if grep -q '"shell": "bash"' "$WINDOWS_DOC" && grep -q 'Git Bash' "$WINDOWS_DOC"; then
+    pass "Windows hook docs explain shell:bash Git Bash dispatch"
+else
+    fail "Windows hook docs explain shell:bash Git Bash dispatch"
+fi
 
 # --- hooks-cursor.json (Cursor) ---
 CURSOR_HOOKS="$REPO_ROOT/hooks/hooks-cursor.json"
