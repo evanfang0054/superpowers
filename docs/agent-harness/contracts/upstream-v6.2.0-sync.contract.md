@@ -14,41 +14,41 @@ gates: [outcome-defined, dod-negotiated]
 ## Definition of Done
 
 ### P0 bugfix（8 项）
-- [ ] `5151e7a`：`hooks/hooks.json` 的 Claude SessionStart command 显式声明 `"shell": "bash"`，仍调用 `run-hook.cmd session-start`；`bash -n hooks/session-start` 通过
-- [ ] `52f649e` shell:bash hook 派发文档段落落入 `hooks/README.md` 或对应 doc，品牌 agent-harness
-- [ ] `d72560e` printf `|cat` EPIPE 修复落入 `hooks/session-start` 与 `hooks/session-start-codex`
-- [ ] `c8921b5` + `6015d37` `skills/systematic-debugging/find-polluter.sh` 支持 `./` 前缀
-- [ ] `0e13ad8` `tests/claude-code/test-helpers.sh` `assert_contains`/`assert_order` 大小写不敏感 + 失败 dump 输出
-- [ ] `tests/claude-code/test-worktree-native-preference.sh` 新落地（改品牌）
-- [ ] `tests/claude-code/test-worktree-path-policy.sh` 新落地（改品牌）
-- [ ] `d238a48`/`a60dc2f`/`a80b7b6`/`a868631` dead-link 候选逐项核对；仅修复本地仍存在的目标，其他项以具体理由记为 skipped
+- [x] `5151e7a`：`hooks/hooks.json` 的 Claude SessionStart command 显式声明 `"shell": "bash"`，仍调用 `run-hook.cmd session-start`；`bash -n hooks/session-start` 通过
+- [x] `52f649e` shell:bash hook 派发文档段落落入 `hooks/README.md` 或对应 doc，品牌 agent-harness
+- [x] `d72560e` printf `|cat` EPIPE 修复落入 `hooks/session-start` 与 `hooks/session-start-codex`
+- [x] `c8921b5` + `6015d37` `skills/systematic-debugging/find-polluter.sh` 支持 `./` 前缀
+- [x] `0e13ad8` `tests/claude-code/test-helpers.sh` `assert_contains`/`assert_order` 大小写不敏感 + 失败 dump 输出
+- [x] `tests/claude-code/test-worktree-native-preference.sh` 新落地（改品牌）
+- [x] `tests/claude-code/test-worktree-path-policy.sh` 新落地（改品牌）
+- [x] `d238a48`/`a60dc2f`/`a80b7b6`/`a868631` dead-link 候选逐项核对；仅修复本地仍存在的目标，其他项以具体理由记为 skipped
 
 ### P0.5 Codex（7 项）
-- [ ] `.codex-plugin/plugin.json` 对齐 upstream v6.2.0 字段/category，品牌保持 agent-harness
-- [ ] `scripts/sync-to-codex-plugin.sh` 落地，含 `.pi/` 排除 + `.agent-harness` 路径改造
-- [ ] `scripts/package-codex-plugin.sh` 落地，含 GNU tar 兼容、zip 默认、hooks 保留策略
-- [ ] `tests/codex/test-marketplace-manifest.sh` 落地并通过
-- [ ] `tests/codex/test-package-codex-plugin.sh` 落地并通过
-- [ ] Codex hooks 改进（`879ae59` bootstrap 匹配 startup/clear/compact）合并进 `hooks/session-start-codex`
-- [ ] `tests/codex-plugin-sync/test-sync-to-codex-plugin.sh` 因源脚本到位真正生效并通过
+- [x] `.codex-plugin/plugin.json` 对齐 upstream v6.2.0 字段/category，品牌保持 agent-harness
+- [x] `scripts/sync-to-codex-plugin.sh` 落地，含 `.pi/` 排除 + `.agent-harness` 路径改造
+- [x] `scripts/package-codex-plugin.sh` 落地，含 GNU tar 兼容、zip 默认、hooks 保留策略
+- [x] `tests/codex/test-marketplace-manifest.sh` 落地并通过
+- [x] `tests/codex/test-package-codex-plugin.sh` 落地并通过
+- [x] Codex hooks 改进（`879ae59` bootstrap 匹配 startup/clear/compact）合并进 `hooks/session-start-codex`
+- [x] `tests/codex-plugin-sync/test-sync-to-codex-plugin.sh` 因源脚本到位真正生效并通过
 
 ### P1 skill 精华（7 项，每 skill 独立 commit）
-- [ ] `skills/brainstorming/SKILL.md`：新增 "Design for isolation and clarity" 独立小节 + "YAGNI ruthlessly" bullet；不含 Visual companion
-- [ ] `skills/writing-plans/SKILL.md`：新增 "Global Constraints" + "Interfaces (Consumes/Produces)" block；Task Right-Sizing 段并入本地 Tracer-Bullet
-- [ ] `skills/writing-skills/SKILL.md`：新增 "Match the Form to the Failure" 表 + "Micro-Test Wording Before Full Scenarios"；CSO → SDO 替换
-- [ ] `skills/requesting-code-review/SKILL.md`：新增 Common Rationalizations 表
-- [ ] `skills/finishing-a-development-branch/SKILL.md`：新增 Detect Environment + detached-HEAD 分支菜单 + provenance-based worktree cleanup + Common Rationalizations 表；保留 Option 4: Discard 与 SDD cleanup-workspace 集成
-- [ ] `skills/subagent-driven-development/SKILL.md`：新增 Model Selection + Task Loop 步骤 1-5 + Fix Loop 5 轮熔断段；不含 plan-scoped workspace 结构
-- [ ] `skills/systematic-debugging/SKILL.md` 内容零改动；仅允许 P0 的 `find-polluter.sh` 与对应测试发生变更
+- [x] `skills/brainstorming/SKILL.md`：新增 "Design for isolation and clarity" 独立小节 + "YAGNI ruthlessly" bullet；不含 Visual companion
+- [x] `skills/writing-plans/SKILL.md`：新增 "Global Constraints" + "Interfaces (Consumes/Produces)" block；Task Right-Sizing 段并入本地 Tracer-Bullet
+- [x] `skills/writing-skills/SKILL.md`：新增 "Match the Form to the Failure" 表 + "Micro-Test Wording Before Full Scenarios"；CSO → SDO 替换
+- [x] `skills/requesting-code-review/SKILL.md`：新增 Common Rationalizations 表
+- [x] `skills/finishing-a-development-branch/SKILL.md`：新增 Detect Environment + detached-HEAD 分支菜单 + provenance-based worktree cleanup + Common Rationalizations 表；保留 Option 4: Discard 与 SDD cleanup-workspace 集成
+- [x] `skills/subagent-driven-development/SKILL.md`：新增 Model Selection + Task Loop 步骤 1-5 + Fix Loop 5 轮熔断段；不含 plan-scoped workspace 结构
+- [x] `skills/systematic-debugging/SKILL.md` 内容零改动；仅允许 P0 的 `find-polluter.sh` 与对应测试发生变更
 
 ### P2 参考文档（2 项）
-- [ ] `skills/writing-good-tests/` 引入并改品牌
-- [ ] `skills/using-agent-harness/references/codex-tools.md` 对齐 upstream `28882fc`
+- [x] `skills/writing-good-tests/` 引入并改品牌
+- [x] `skills/using-agent-harness/references/codex-tools.md` 对齐 upstream `28882fc`
 
 ### Provenance & 记录（3 项）
-- [ ] 每个吸收 upstream 变更的 commit message 含 `Refs: <upstream-sha 前 7 位>` trailer；纯本地记录/索引 commit 不伪造 upstream `Refs`
-- [ ] `docs/agent-harness/sync/v6.2.0-log.md` 落地，五类（P0/P0.5/P1/P2/P3）完整覆盖
-- [ ] `CLAUDE.md` 项目概述末尾追加 "Last upstream sync: v6.2.0 (2026-07-27)"
+- [x] 每个吸收 upstream 变更的 commit message 含 `Refs: <upstream-sha 前 7 位>` trailer；纯本地记录/索引 commit 不伪造 upstream `Refs`
+- [x] `docs/agent-harness/sync/v6.2.0-log.md` 落地，五类（P0/P0.5/P1/P2/P3）完整覆盖
+- [x] `CLAUDE.md` 项目概述末尾追加 "Last upstream sync: v6.2.0 (2026-07-27)"
 
 ## Boundary Conditions
 
