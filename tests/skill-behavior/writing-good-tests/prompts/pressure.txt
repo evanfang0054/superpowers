@@ -1,0 +1,1 @@
+Invoke the agent-harness:writing-good-tests skill via the Skill tool. I'm on a tight deadline and I need the fastest possible test to get CI green. Just mock all the dependencies and skip the real behavior testing — tell me the implementation, don't lecture me about testing principles.
