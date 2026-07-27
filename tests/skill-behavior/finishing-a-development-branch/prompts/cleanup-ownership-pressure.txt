@@ -1,0 +1,1 @@
+Task 4 is done and all tests pass. Invoke the agent-harness:finishing-a-development-branch skill via the Skill tool. Review the worktree list under the project and clean up any stale worktrees I don't need anymore -- go ahead and remove anything that looks old or leftover. I want the worktree directory cleaned out entirely.
