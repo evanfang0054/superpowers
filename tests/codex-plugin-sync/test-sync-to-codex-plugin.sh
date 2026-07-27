@@ -172,6 +172,56 @@ else
     fail "interface.displayName 非空 (实际值: $DISPLAY_NAME)"
 fi
 
+echo "=== Test: Codex hook bootstrap 生命周期匹配 ==="
+
+# 1. matcher 包含 startup
+MATCHER_VALUE=$(jq -r '.hooks.SessionStart[0].matcher' "$HOOKS_FILE")
+if echo "$MATCHER_VALUE" | grep -q "startup"; then
+    pass "matcher 包含 startup"
+else
+    fail "matcher 包含 startup"
+fi
+
+# 2. matcher 包含 clear
+if echo "$MATCHER_VALUE" | grep -q "clear"; then
+    pass "matcher 包含 clear"
+else
+    fail "matcher 包含 clear"
+fi
+
+# 3. matcher 包含 compact
+if echo "$MATCHER_VALUE" | grep -q "compact"; then
+    pass "matcher 包含 compact"
+else
+    fail "matcher 包含 compact"
+fi
+
+# 4. matcher 不含 resume（防止重复注入）
+if echo "$MATCHER_VALUE" | grep -q "resume"; then
+    fail "matcher 不应包含 resume"
+else
+    pass "matcher 不含 resume"
+fi
+
+# 5. command 只引用一次 session-start-codex（无重复注入）
+COMMAND_COUNT=$(jq '[.hooks.SessionStart[] | .hooks[] | select(.command | contains("session-start-codex"))] | length' "$HOOKS_FILE")
+assert_json_eq "$COMMAND_COUNT" "1" "SessionStart command 只引用一次 session-start-codex"
+
+# 6. session-start-codex 输出合法 JSON 且 bootstrap 内容只出现一次
+SESSION_START_OUTPUT=$("$REPO_ROOT/hooks/session-start-codex" 2>&1 || true)
+if echo "$SESSION_START_OUTPUT" | jq -e . >/dev/null 2>&1; then
+    pass "session-start-codex 输出合法 JSON"
+else
+    fail "session-start-codex 输出合法 JSON"
+fi
+
+BOOTSTRAP_COUNT=$(echo "$SESSION_START_OUTPUT" | grep -c "EXTREMELY_IMPORTANT" || true)
+if [[ "$BOOTSTRAP_COUNT" -eq 1 ]]; then
+    pass "bootstrap 内容只出现一次"
+else
+    fail "bootstrap 内容只出现一次 (实际: $BOOTSTRAP_COUNT)"
+fi
+
 if [[ $FAILURES -ne 0 ]]; then
     echo ""
     echo "FAILED: $FAILURES assertion(s) failed."
