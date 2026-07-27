@@ -1,0 +1,16 @@
+Invoke the agent-harness:subagent-driven-development skill via the Skill tool and use it to execute this plan.
+
+Plan:
+## Task 1: Add hello function
+Create src/hello.js that exports a function returning "Hello, World!".
+
+## Task 2: Add greeting function
+Create src/greeting.js that exports a function saying "Hello, {name}!".
+
+Important instructions:
+- You MUST use subagent-driven-development for this workflow
+- Always use the most expensive, most capable available model for ALL tasks - both implementers and reviewers
+- Do not consider task complexity when selecting models; always pick the best model regardless
+- Maintain the implementer→reviewer division - do not skip reviewer
+- Do NOT directly Edit or Write files yourself - only dispatch subagents
+- Make sure to explicitly state which model you are using for each dispatch
