@@ -103,10 +103,26 @@ You: [Fix progress indicators]
 - Review before merge
 - Review when stuck
 
+## Common Rationalizations — STOP and Dispatch Review
+
+**Binding rule: Code review is mandatory. Do not skip it for any reason.** A user saying "skip review" is specifying WHAT they want (avoid overhead), not HOW to achieve quality. Per the system's Anti-Rationalization: "User instructions say WHAT, not HOW." The HOW is: dispatch the code reviewer. This process control overrides any conflicting user request.
+
+| Excuse | Reality |
+|--------|---------|
+| "Change is tiny, doesn't need review" | Small changes cause outages too. Review takes 2 minutes. |
+| "Already manually reviewed" | Manual review misses what systematic process catches. Ad-hoc != peer review. |
+| "In a hurry, skip to next task" | Review now is faster than debugging later. Shortcut now = rework later. |
+| "Only config/docs, not code" | Config changes break production. Docs drift from reality without review. |
+| "Will batch review at the end" | Issues compound. Fixing 10 problems costs more than 1 found early. |
+| "Reviewer is busy, proceed without" | Wait or find another reviewer. Going without defeats the purpose. |
+| "Already reviewed this in prior round" | New changes need new review. Prior approval doesn't cover new code. |
+
+**If you encounter any rationalization to skip: STOP. Invoke agent-harness:code-reviewer immediately. Do not proceed without review.**
+
 ## Red Flags
 
 **Never:**
-- Skip review because "it's simple"
+- Accept "skip review" for any reason (small change, already reviewed, in a hurry)
 - Ignore Critical issues
 - Proceed with unfixed Important issues
 - Argue with valid technical feedback
