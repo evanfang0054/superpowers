@@ -13,15 +13,15 @@ gates: [outcome-defined, dod-negotiated]
 
 ## Definition of Done
 
-### P0 bugfix（10 项）
-- [ ] `5151e7a` Windows Git Bash SessionStart 落入 `hooks/session-start`，`bash -n` 通过
+### P0 bugfix（8 项）
+- [ ] `5151e7a`：`hooks/hooks.json` 的 Claude SessionStart command 显式声明 `"shell": "bash"`，仍调用 `run-hook.cmd session-start`；`bash -n hooks/session-start` 通过
 - [ ] `52f649e` shell:bash hook 派发文档段落落入 `hooks/README.md` 或对应 doc，品牌 agent-harness
 - [ ] `d72560e` printf `|cat` EPIPE 修复落入 `hooks/session-start` 与 `hooks/session-start-codex`
-- [ ] `c8921b5` + `6015d37` `scripts/find-polluter.sh` 支持 `./` 前缀
+- [ ] `c8921b5` + `6015d37` `skills/systematic-debugging/find-polluter.sh` 支持 `./` 前缀
 - [ ] `0e13ad8` `tests/claude-code/test-helpers.sh` `assert_contains`/`assert_order` 大小写不敏感 + 失败 dump 输出
 - [ ] `tests/claude-code/test-worktree-native-preference.sh` 新落地（改品牌）
 - [ ] `tests/claude-code/test-worktree-path-policy.sh` 新落地（改品牌）
-- [ ] `d238a48`/`a60dc2f`/`a80b7b6`/`a868631` doc 死链修复（挑本地仍存在的锚点）
+- [ ] `d238a48`/`a60dc2f`/`a80b7b6`/`a868631` dead-link 候选逐项核对；仅修复本地仍存在的目标，其他项以具体理由记为 skipped
 
 ### P0.5 Codex（7 项）
 - [ ] `.codex-plugin/plugin.json` 对齐 upstream v6.2.0 字段/category，品牌保持 agent-harness
@@ -39,14 +39,14 @@ gates: [outcome-defined, dod-negotiated]
 - [ ] `skills/requesting-code-review/SKILL.md`：新增 Common Rationalizations 表
 - [ ] `skills/finishing-a-development-branch/SKILL.md`：新增 Detect Environment + detached-HEAD 分支菜单 + provenance-based worktree cleanup + Common Rationalizations 表；保留 Option 4: Discard 与 SDD cleanup-workspace 集成
 - [ ] `skills/subagent-driven-development/SKILL.md`：新增 Model Selection + Task Loop 步骤 1-5 + Fix Loop 5 轮熔断段；不含 plan-scoped workspace 结构
-- [ ] `skills/systematic-debugging` 内容零改动，仅确认 P0 `test-helpers.sh` 已同步
+- [ ] `skills/systematic-debugging/SKILL.md` 内容零改动；仅允许 P0 的 `find-polluter.sh` 与对应测试发生变更
 
 ### P2 参考文档（2 项）
 - [ ] `skills/writing-good-tests/` 引入并改品牌
 - [ ] `skills/using-agent-harness/references/codex-tools.md` 对齐 upstream `28882fc`
 
 ### Provenance & 记录（3 项）
-- [ ] 每个 commit message 含 `Refs: <upstream-sha 前 7 位>` trailer
+- [ ] 每个吸收 upstream 变更的 commit message 含 `Refs: <upstream-sha 前 7 位>` trailer；纯本地记录/索引 commit 不伪造 upstream `Refs`
 - [ ] `docs/agent-harness/sync/v6.2.0-log.md` 落地，五类（P0/P0.5/P1/P2/P3）完整覆盖
 - [ ] `CLAUDE.md` 项目概述末尾追加 "Last upstream sync: v6.2.0 (2026-07-27)"
 
@@ -75,7 +75,7 @@ gates: [outcome-defined, dod-negotiated]
 - `tests/codex-plugin-sync/test-sync-to-codex-plugin.sh` 退出码 0
 - `tests/codex/test-marketplace-manifest.sh` 与 `test-package-codex-plugin.sh` 退出码 0
 - `tests/claude-code/test-worktree-native-preference.sh` 与 `test-worktree-path-policy.sh` 退出码 0
-- `git log --grep='Refs: ' feat/agent-sup-v6.2.0` 覆盖每个 upstream 吸收 commit
+- 从 decision log 的 `adopted`/`adapted` 行抽取 SHA7 集合，与 `SYNC_BASE_SHA..HEAD` 所有合法 `Refs:` trailer 的 SHA7 集合排序去重后完全相等；trailer 格式仅允许 `Refs: SHA7[, SHA7...]`
 
 **Inferential（人工审）**
 - 每个 skill diff：本地魔改段落无误删、吸收段落无 "superpowers" 品牌残留
@@ -85,5 +85,5 @@ gates: [outcome-defined, dod-negotiated]
 
 - Generator 轮 1：粗颗粒度 DoD，无可验证性
 - Evaluator 轮 1：挑战颗粒度 / provenance / 决策日志完成标准 / P3 跳过验证
-- Generator 轮 2：拆成 29 项可勾选原子标准，加计算/推断双重验收
+- Generator 轮 2：拆成 27 项可勾选原子标准，加计算/推断双重验收
 - Final consensus：本 DoD + Boundary + Acceptance
