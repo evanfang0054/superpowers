@@ -1,5 +1,16 @@
 # Agent Harness Release Notes
 
+## v6.6.0 (2026-07-27)
+
+### Changes
+
+- feat: 吸收 upstream v6.2.0 同步（18 任务，P0-P3 全覆盖）
+- feat(hooks): Windows Git Bash 显式 shell:bash 派发、EPIPE 修复
+- feat(codex): 隔离式 sync/package 脚本、marketplace manifest 对齐、GNU tar/bsdtar 双宿主
+- feat(skills): brainstorming/writing-plans/writing-skills/requesting-code-review/finishing-branch/SDD 六项精华回捞
+- feat(testing): 引入 writing-good-tests 测试反模式参考、worktree native preference/path-policy 测试
+- docs(sync): 建立 v6.2.0 同步决策日志与验收记录
+
 ## v6.5.1 (2026-07-24)
 
 ### Changes
