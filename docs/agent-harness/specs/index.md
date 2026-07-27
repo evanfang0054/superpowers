@@ -85,3 +85,6 @@
 ## sdd-fan-out
 - [2026-07-24-sdd-fan-out-design](2026-07-24-sdd-fan-out-design.md)
 
+## upstream-v6.2.0-sync
+- [2026-07-27-upstream-v6.2.0-sync-design](2026-07-27-upstream-v6.2.0-sync-design.md)
+
