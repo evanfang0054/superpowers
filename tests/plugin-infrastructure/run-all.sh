@@ -37,6 +37,9 @@ TESTS=(
     "test-auto-loop-cli.sh"
     "test-auto-loop-fix-only.sh"
     "test-skill-large-plan-guardrails.sh"
+    "test-domain-modeling-skill.sh"
+    "test-session-start-context-md.sh"
+    "test-harness-init-context-md.sh"
 )
 
 for test in "${TESTS[@]}"; do

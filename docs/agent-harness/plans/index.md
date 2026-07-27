@@ -78,6 +78,12 @@
 ## 2026-06-27-rebrand-to-agent-harness
 - [2026-06-27-rebrand-to-agent-harness](2026-06-27-rebrand-to-agent-harness.md)
 
+## brainstorming-optimization
+- [2026-07-21-brainstorming-optimization](2026-07-21-brainstorming-optimization.md)
+
+## domain-modeling
+- [2026-07-21-domain-modeling](2026-07-21-domain-modeling.md)
+
 ## failure-diagnosis
 - [2026-06-29-failure-diagnosis](2026-06-29-failure-diagnosis.md)
 
@@ -89,6 +95,9 @@
 
 ## knowledge-base
 - [2026-06-29-knowledge-base](2026-06-29-knowledge-base.md)
+
+## mattpocock-skills-adaptation
+- [2026-07-22-mattpocock-skills-adaptation](2026-07-22-mattpocock-skills-adaptation.md)
 
 ## phase-metrics
 - [2026-06-29-phase-metrics](2026-06-29-phase-metrics.md)

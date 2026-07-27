@@ -275,6 +275,25 @@ wc -w skills/path/SKILL.md
 - `creating-skills`, `testing-skills`, `debugging-with-logs`
 - Active, describes the action you're taking
 
+## Optimize for Predictable Behavior
+
+**Optimize for predictability, not prose quality:**
+A skill is successful when it makes agent behavior more predictable under pressure scenarios. Beautiful wording that does not change behavior is noise.
+
+**Budget both kinds of load:**
+- Model-invoked skills spend context automatically. Keep trigger descriptions precise and the loaded prompt small.
+- User-invoked skills spend user attention. Make names discoverable and behavior obvious.
+- When advising on load, use the exact labels “model-invoked” and “user-invoked” so the distinction stays explicit.
+
+**Use progressive disclosure:**
+Keep always-loaded instructions short. Move rare examples, long references, and edge-case matrices into auxiliary files when they are only needed after a specific branch is chosen.
+
+**Prune no-ops:**
+Delete instructions that do not constrain behavior: “be thoughtful”, “use best practices”, “consider trade-offs”, “be flexible”. Replace them with observable actions and stop conditions.
+
+**Use leading words for stable behavior:**
+Prefer repeated explicit labels such as MUST, STOP, RED, GREEN, VERIFY, HARD-GATE, and Critical when the skill needs deterministic behavior.
+
 ### 4. Cross-Referencing Other Skills
 
 **When writing documentation that references other skills:**

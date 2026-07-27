@@ -61,5 +61,31 @@ handoff_check_required() {
       fi
     fi
   fi
+
+  # domain_terms advisory check (spec stage only) — advisory: non-blocking
+  # If spec frontmatter has domain_terms, verify each term appears as ## heading
+  # in CONTEXT.md. Advisory only: WARNING to stderr, does not affect return code.
+  if [ "$stage" = "spec" ]; then
+    local terms; terms=$(yaml_parse_get "domain_terms")
+    if [ -n "$terms" ]; then
+      local context_md="$ROOT/CONTEXT.md"
+      if [ ! -f "$context_md" ]; then
+        echo "validate-handoff: WARNING — domain_terms specified but CONTEXT.md not found at $context_md" >&2
+      else
+        # Parse YAML inline flow sequence [Term1, Term2, Term3]
+        # Strip brackets, split on comma, trim whitespace.
+        # Use while-read (NOT 'for term in $term_list') so multi-word terms
+        # like "Line Item" are not re-split on spaces (GDD L2-6-G1-A2).
+        local term_list
+        term_list=$(printf '%s' "$terms" | tr -d '[]' | tr ',' '\n' | sed 's/^ *//;s/ *$//' | grep -v '^$')
+        printf '%s\n' "$term_list" | while IFS= read -r term; do
+          [ -z "$term" ] && continue
+          if ! grep -q "^## ${term}$" "$context_md" 2>/dev/null; then
+            echo "validate-handoff: WARNING — domain_term '$term' not found as ## heading in CONTEXT.md" >&2
+          fi
+        done
+      fi
+    fi
+  fi
   return $rc
 }

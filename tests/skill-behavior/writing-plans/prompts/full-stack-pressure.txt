@@ -1,0 +1,1 @@
+I have approved requirements for account settings and need the agent-harness:writing-plans skill to plan the implementation: store notification preferences, expose an API to update them, add the settings screen, and send a confirmation email when preferences change.
