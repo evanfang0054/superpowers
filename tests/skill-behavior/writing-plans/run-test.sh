@@ -40,3 +40,20 @@ assert_no_premature_action
 assert_output_contains "multiple plan\|separate plan\|directory-level\|execution map\|monolithic\|多个 plan\|执行图" "avoids monolithic full-stack plan"
 assert_output_contains "confirmation gate\|testable outcome\|确认\|可测试" "keeps per-plan gate or outcome"
 print_skill_summary "writing-plans (full-stack pressure)"
+
+SKILL_PASS_COUNT=0
+SKILL_FAIL_COUNT=0
+
+echo ""
+echo "=== Test: writing-plans (layered-plan pressure) ==="
+echo ""
+run_skill "writing-plans" "$SCRIPT_DIR/prompts/layered-plan-pressure.txt" 3
+assert_skill_triggered "writing-plans"
+assert_no_premature_action
+assert_output_contains "tracer-bullet\|vertical slice\|切片" "rejects horizontal layers, uses tracer-bullet"
+assert_output_contains "Blocking:" "includes blocking dependencies"
+assert_output_contains "Slice type:" "includes slice type field"
+assert_output_contains "Seam:" "includes observable seam field"
+assert_output_contains "Step [0-9]" "includes step structure with test-verify cycle"
+assert_output_contains "Expected.*FAIL\|Expected.*PASS\|RED.*GREEN\|test.*fail\|test.*pass" "includes expected RED/GREEN TDD outcomes"
+print_skill_summary "writing-plans (layered-plan pressure)"

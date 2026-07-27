@@ -81,6 +81,8 @@ This structure informs the task decomposition. Each task should produce self-con
 
 For broad refactors, do not pretend the work is a normal feature slice. Mark tasks as `Slice type: refactor` and use expand-contract: Expand the new path, Migrate callers with verification, then Contract by removing the old path after behavior is proven unchanged.
 
+**Task Right-Sizing:** A task is the smallest unit that carries its own test cycle and is worth a fresh reviewer's gate. Fold setup, configuration, scaffolding, and documentation steps into the task whose deliverable needs them; split only where a reviewer could meaningfully reject one task while approving its neighbor. Each task ends with an independently testable deliverable.
+
 ## Bite-Sized Task Granularity
 
 **Each step is one action (2-5 minutes):**
@@ -115,6 +117,10 @@ dod: "<definition of done from sprint contract>"
 
 ---
 ```
+
+## Global Constraints
+
+The spec's project-wide requirements — version floors, dependency limits, naming and copy rules, platform requirements — one line each, with exact values copied verbatim from the spec. Every task's requirements implicitly include this section.
 
 ## Commit Strategy
 
@@ -184,6 +190,10 @@ Seam: <observable boundary for TDD, or none for non-TDD verification tasks>
 - Create: `exact/path/to/file.py`
 - Modify: `exact/path/to/existing.py:123-145`
 - Test: `tests/exact/path/to/test.py`
+
+**Interfaces (Consumes/Produces):**
+- Consumes: [what this task uses from earlier tasks — exact signatures]
+- Produces: [what later tasks rely on — exact function names, parameter and return types. A task's implementer sees only their own task; this block is how they learn the names and types neighboring tasks use.]
 
 - [ ] **Step 1: Write the failing test**
 
