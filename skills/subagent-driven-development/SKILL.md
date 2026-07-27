@@ -138,24 +138,45 @@ Execute a plan by dispatching a fresh implementer subagent per task, a task revi
 The only reasons to stop are: BLOCKED status you cannot resolve, ambiguity that genuinely
 prevents progress, or all tasks complete.
 
-## Detailed Reference
+## Model Selection
 
-For model selection, status handling, reviewer-prompt construction, file handoffs,
-durable progress (ledger), pre-flight plan review, red flags, and integration notes:
+Use the least powerful model that can handle each role to conserve cost and increase speed. Always specify the model explicitly when dispatching a subagent — an omitted model inherits your session's default, often the most capable and most expensive.
+
+**Task complexity signals:**
+- Touches 1-2 files with a complete spec → cheap/fast model
+- Touches multiple files with integration concerns → standard model
+- Requires design judgment or broad codebase understanding → most capable model
+
+**Role guidance:**
+- Mechanical implementation (isolated functions, clear specs): cheap model
+- Integration and judgment tasks (multi-file coordination, debugging): standard model
+- Architecture, design, and review tasks (final review, reviewers of complex diffs): most capable available model
+- Scoped re-reviews of small fix diffs: cheap-to-mid tier
+- Fix-loop escalation (rounds 4-5): model at least one tier above the stuck implementer
+
+**Turn count beats token price.** Cheap models often take 2-3x turns on multi-step work, costing more overall. Use mid-tier as the floor for reviewers and implementers working from prose descriptions.
+
+For full reference on status handling, reviewer prompt construction, file handoffs, durable progress (ledger), pre-flight plan review, and red flags:
 
 **Read [`references/controller-guide.md`](references/controller-guide.md)** — load it
 when you need rules for a specific phase (e.g., before the first dispatch, before the
 first review, or after compaction). Do not paste its content into dispatch prompts.
 
-## The Process (per task)
+## The Task Loop (per task)
 
 1. **Extract brief:** `"$SDD_SKILL_DIR/scripts/task-brief" PLAN_FILE N` → brief file path.
-2. **Dispatch implementer** (template: `implementer-prompt.md`) with brief + report paths + task context.
-3. **Handle status:** DONE → review package; DONE_WITH_CONCERNS → read concerns; NEEDS_CONTEXT → provide; BLOCKED → diagnose.
+2. **Dispatch implementer** (template: `implementer-prompt.md`) with brief + report paths + task context. Select model per Model Selection above.
+3. **Handle report:** DONE → review package; DONE_WITH_CONCERNS → read concerns; NEEDS_CONTEXT → provide; BLOCKED → diagnose (escalate if needed).
 4. **Dispatch task reviewer** (template: `task-reviewer-prompt.md`) with brief + report + review package.
-5. **Fix loop:** Critical/Important findings → dispatch fix subagent → re-review. Record Minor in ledger.
-6. **Mark task complete** in both TodoWrite and the progress ledger (append one line: `Task N: complete (commits <base>..<head>, review clean)`).
-7. Next task.
+5. **Fix loop (max 5 rounds):** Critical/Important findings enter the loop:
+   - Rounds 1-3: resume the original implementer with open findings verbatim
+   - Rounds 4-5: dispatch a fresh implementer on a more capable model (per Model Selection) — "A prior implementer attempted this N times; you own it now. Read the report file for what was tried."
+   - Each round: implementer fixes, re-runs covering tests, appends fix report; then scoped re-review (`re-review-prompt.md`) verdicts each finding ADDRESSED/NOT ADDRESSED
+   - **The breaker:** round 5 re-review still leaves findings open → stop dispatching. Adjudicate each open finding: park contestable or non-load-bearing findings with a ruling in the ledger; if real and load-bearing → append `Task N: BLOCKED — <reason>` and report to human partner.
+   - Minor findings: record in ledger as deferred, never enter loop.
+   - Plan-text conflicts: present finding + plan text, ask human which governs.
+6. **Mark task complete:** append `Task N: complete (commits <base>..<head>, review clean)` to ledger. After breaker: `Task N: complete (commits <base>..<head>, <K> parked)`.
+7. Next task. Never move on while review has open Critical/Important issues that are neither fixed nor parked-with-ruling at the cap.
 
 ## Final Stage
 
@@ -163,6 +184,19 @@ When all tasks complete:
 1. Dispatch final whole-branch review (template: `../requesting-code-review/code-reviewer.md`) with a review package spanning `MERGE_BASE..HEAD`.
 2. If findings: dispatch ONE fix subagent with the complete findings list.
 3. Run **agent-harness:finishing-a-development-branch**.
+
+## Common Rationalizations
+
+| Excuse | Reality |
+|--------|---------|
+| "Close enough on spec compliance" | Reviewer found spec gaps = not done. Fix or hit the cap and adjudicate — those are the only exits. |
+| "I'll fix it myself, dispatching is overhead" | Controller fixes pollute your context and skip review. Resume the implementer. |
+| "One more round will converge" | Past the cap, rounds don't converge — the failure is structural. Adjudicate and route. |
+| "The reviewer will just find something new" | Scoped re-reviews verify fixes; new findings on untouched code go to the ledger, not the loop. |
+| "This finding is obviously wrong, I'll drop it" | You adjudicate only at the cap, and every ruling is a ledger entry. Silent discards are forbidden. |
+| "The fix was small, skip the re-review" | Unreviewed fixes are how regressions land. Every round ends with a scoped re-review. |
+| "Reviews slow the loop down" | The loop without reviews is just unverified churn. Reviews are the loop's brakes and steering. |
+| "Ledger bookkeeping is overhead" | The ledger is what survives compaction. Controllers without one have re-dispatched entire completed task sequences. |
 
 ## Prompt Templates
 

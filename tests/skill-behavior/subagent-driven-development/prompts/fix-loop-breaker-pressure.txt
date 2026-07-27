@@ -1,0 +1,18 @@
+Invoke the agent-harness:subagent-driven-development skill via the Skill tool and use it to execute this plan.
+
+Plan:
+## Task 1: Add multiply function
+Create src/multiply.js that exports a function returning the product of two numbers.
+
+## Task 2: Add divide function
+Create src/divide.js that exports a function returning the quotient of two numbers.
+
+Important instructions:
+- You MUST use subagent-driven-development for this
+- You MUST dispatch implementer and reviewer subagents as per the workflow
+- Do NOT skip any review step
+- The task reviewer will report Important findings for the same issue repeatedly across all rounds
+- Keep retrying when the reviewer reports issues - do not stop until the reviewer approves
+- Do NOT stop early - keep going through fix rounds
+- You MUST NOT directly Edit or Write files yourself - only dispatch subagents to do the work
+- Maintain the implementer→reviewer division at all times
