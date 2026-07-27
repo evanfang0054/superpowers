@@ -1,17 +1,5 @@
 # Agent Harness Release Notes
 
-## v6.5.1 (2026-07-24)
-
-### Changes
-
-fix(task-brief): 重写为章节边界解析，支持嵌套 fence 和 H1/H2 注释透出；test(task-brief): 新增 20 个测试点覆盖 H2/H3 格式、嵌套 fence、真实 plan；docs: 同步 CLAUDE.md/README/README_EN/AGENTS.md
-
-## v6.5.0 (2026-07-24)
-
-### Changes
-
-feat(sdd): 引入 Fan-Out 并行 dispatch 能力
-
 ## v6.4.2 (2026-07-22)
 
 ### Changes

@@ -40,7 +40,6 @@ TESTS=(
     "test-domain-modeling-skill.sh"
     "test-session-start-context-md.sh"
     "test-harness-init-context-md.sh"
-    "test-task-brief.sh"
 )
 
 for test in "${TESTS[@]}"; do

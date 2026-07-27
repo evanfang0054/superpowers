@@ -6,9 +6,6 @@
 ## brainstorming-optimization.contract
 - [brainstorming-optimization.contract](brainstorming-optimization.contract.md)
 
-## context-budget-and-memory-fixes.contract
-- [context-budget-and-memory-fixes.contract](context-budget-and-memory-fixes.contract.md)
-
 ## design-md-generation.contract
 - [design-md-generation.contract](design-md-generation.contract.md)
 
