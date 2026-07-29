@@ -23,5 +23,6 @@
 - brainstorming-optimization → specs/2026-07-21-brainstorming-optimization-design.md
 - mattpocock-skills-adaptation → specs/2026-07-22-mattpocock-skills-adaptation-design.md
 - upstream-v6-2-adaptation → specs/2026-07-29-upstream-v6-2-adaptation-design.md
+- changesets-migration → specs/2026-07-29-changesets-migration-design.md
 
 > 维护方式：手动追加，或跑 `scripts/index-knowledge-base.sh` 自动重建。

@@ -81,3 +81,6 @@
 ## upstream-v6-2-adaptation
 - [2026-07-29-upstream-v6-2-adaptation-design](2026-07-29-upstream-v6-2-adaptation-design.md)
 
+## changesets-migration
+- [2026-07-29-changesets-migration-design](2026-07-29-changesets-migration-design.md)
+
