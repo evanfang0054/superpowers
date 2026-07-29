@@ -1,5 +1,11 @@
 # Agent Harness Release Notes
 
+## v6.4.3 (2026-07-29)
+
+### Changes
+
+- 移除 plugin manifest 中的 hooks 声明，并精简关键词配置。
+
 ## v6.4.2 (2026-07-22)
 
 ### Changes
