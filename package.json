@@ -1,10 +1,16 @@
 {
   "name": "agent-harness",
   "version": "6.4.4",
+  "private": true,
   "description": "Agent Harness skills and runtime bootstrap for coding agents",
   "type": "module",
   "scripts": {
-    "release": "./scripts/bump-version.sh"
+    "release": "changeset version && ./scripts/sync-plugin-versions.sh",
+    "changeset": "changeset"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.0",
+    "@changesets/changelog-github": "^0.5.0"
   },
   "keywords": [
     "pi-package",
