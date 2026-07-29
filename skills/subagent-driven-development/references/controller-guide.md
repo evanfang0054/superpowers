@@ -46,7 +46,7 @@ dispatch with all related briefs. The two-stage review still applies to the comb
 
 ## Handling Implementer Status
 
-- **DONE:** Generate review package (`"$SDD_SKILL_DIR/scripts/review-package" BASE HEAD`), then dispatch the task reviewer with the printed path. BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`.
+- **DONE:** Generate review package (`"$SDD_SKILL_DIR/scripts/review-package" PLAN_FILE BASE HEAD`), then dispatch the task reviewer with the printed path. BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`.
 - **DONE_WITH_CONCERNS:** Read the concerns. Correctness/scope concerns are addressed before review; observations are noted and reviewed.
 - **NEEDS_CONTEXT:** Provide missing context and re-dispatch.
 - **BLOCKED:** (1) context problem → more context, same model; (2) reasoning problem → more capable model; (3) task too large → break it up; (4) plan wrong → escalate.
@@ -60,6 +60,34 @@ unchanged code or spanning tasks. Resolve each before marking the task complete:
 hold the plan and cross-task context the reviewer lacks. A confirmed gap is a failed
 spec review — back to the implementer and re-review.
 
+## Fix and Scoped Re-Review Contract
+
+Trigger a fix loop for spec ❌, Critical, Important, or a controller-confirmed
+`⚠️ Cannot verify from diff`. Record the dispatch commit as `FIX_BASE` before
+each fix; never substitute `HEAD~1`.
+
+1. **Rounds 1–3:** resume the original implementer. If resume is unavailable,
+   make a fresh dispatch carrying the brief, same report file, and open findings.
+2. **Rounds 4–5:** use a fresh implementer at least one model tier stronger.
+3. **Every round:** append fix evidence and tests to `task-N-report.md`, create
+   `review-package PLAN_FILE FIX_BASE HEAD`, then dispatch
+   `re-review-prompt.md` with original findings, brief, report, and package.
+   The re-reviewer reads the package; it only decides original findings plus new
+   Critical/Important breakage in the fix diff—never a whole-branch review.
+4. **Round 5:** park only a non-load-bearing or disputable finding, with a
+   ruling. For a load-bearing finding, append `BLOCKED` and stop the current
+   plan. Do not dispatch the next task.
+
+Ledger entries use these forms:
+
+```markdown
+Task <N>: minor (deferred): <one-liner>
+Task <N>: fix round <R>/5 (<X> addressed, <Y> open — <finding one-liners>; commits <a7>..<b7>)
+Task <N>: parked — <finding> — ruling: <why the code stands>
+Task <N>: BLOCKED — <reason>
+Task <N>: complete (commits <base7>..<head7>, review clean)
+```
+
 ## Constructing Reviewer Prompts
 
 Per-task reviews are task-scoped gates. The broad review happens once, at the final
@@ -69,13 +97,13 @@ whole-branch review. When you fill a reviewer template:
 - Don't ask a reviewer to re-run tests the implementer already ran on the same code.
 - Don't pre-judge findings ("do not flag", "don't treat X as a defect", "at most Minor", "the plan chose") — let the reviewer raise it and adjudicate in the loop.
 - The global-constraints block is the reviewer's attention lens: copy binding requirements verbatim from the plan (exact values, formats, relationships).
-- Hand the reviewer its diff as a file: `"$SDD_SKILL_DIR/scripts/review-package" BASE HEAD`. The output never enters your own context; the reviewer sees commit list + stat summary + full diff in one Read. Use the BASE recorded before dispatching the implementer — never `HEAD~1`.
+- Hand the reviewer its diff as a file: `"$SDD_SKILL_DIR/scripts/review-package" PLAN_FILE BASE HEAD`. The output never enters your own context; the reviewer sees commit list + stat summary + full diff in one Read. Use the BASE recorded before dispatching the implementer — never `HEAD~1`.
 - A dispatch prompt describes one task, not session history. Do not paste accumulated prior-task summaries into later dispatches.
 - Dispatch fix subagents for Critical/Important findings. Record Minor findings in the progress ledger; point the final review at that list for triage.
 - A finding labeled plan-mandated is the human's decision — present finding + plan text, ask which governs.
-- Final whole-branch review: `"$SDD_SKILL_DIR/scripts/review-package" MERGE_BASE HEAD` (MERGE_BASE = `git merge-base main HEAD`), include the printed path.
+- Final whole-branch review: `"$SDD_SKILL_DIR/scripts/review-package" PLAN_FILE MERGE_BASE HEAD` (MERGE_BASE = `git merge-base main HEAD`), include the printed path.
 - Every fix dispatch carries the implementer contract: re-run the tests covering its change and report results. Name the covering test files in the dispatch.
-- If the final review returns findings, dispatch ONE fix subagent with the complete findings list — not one fixer per finding.
+- If the final review returns findings, dispatch ONE fix subagent with the complete findings list, create `review-package PLAN_FILE FIX_BASE HEAD`, and dispatch exactly ONE scoped re-review via `re-review-prompt.md`. Adjudicate residuals; never start a second fix wave.
 
 ## File Handoffs
 
@@ -94,18 +122,22 @@ Conversation memory does not survive compaction. Controllers that lost their pla
 have re-dispatched entire completed task sequences — the single most expensive failure
 observed. Track progress in a ledger file, not only in todos.
 
-At skill start, ensure the SDD ledger directory exists and check for a ledger:
+At skill start, resolve the current-plan workspace and validate its ledger identity:
 ```
-SDD_DIR="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}"/.agent-harness/sdd
-mkdir -p "$SDD_DIR"
+SDD_DIR=$("$SDD_SKILL_DIR/scripts/sdd-workspace" PLAN_FILE)
 LEDGER="$SDD_DIR/progress.md"
-[ -f "$LEDGER" ] && cat "$LEDGER" || echo "(no prior SDD progress)"
+EXPECTED="# SDD ledger — plan: $PLAN_FILE"
+# Read completed-task/fix-round state only if the first line equals "$EXPECTED".
+# Otherwise initialize a new ledger with "$EXPECTED".
 ```
 
-Tasks listed as complete in the ledger are DONE — do not re-dispatch them. When a task's
-review comes back clean, append one line: `Task N: complete (commits <base7>..<head7>, review clean)`.
+`.agent-harness/sdd` is git-ignored and `git clean -fdx` deletes its artifacts.
+Do not promise automatic recovery; use Git history if the workspace is gone.
 
-After compaction, trust the ledger and `git log` over your own recollection.
+Tasks listed as complete in an identity-matching ledger are DONE — do not re-dispatch them.
+Clean the current-plan workspace only after final whole-branch review is clean and accepted
+fixes are on this branch, before entering finishing options. After compaction, trust the
+validated ledger and `git log` over recollection.
 
 ## Red Flags
 

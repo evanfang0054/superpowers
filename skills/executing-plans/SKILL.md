@@ -43,7 +43,18 @@ Load plan, review critically, execute all tasks iteratively in the current sessi
 
 ## The Process
 
-### Step 1: Load and Review Plan
+### Step 1: Choose Execution Isolation, Load, and Review Plan
+
+Before reading or executing implementation steps, use the user's approved isolation decision:
+
+1. User specified a branch: execute on that branch.
+2. User did not specify an isolation location: create an independent branch before executing.
+3. User explicitly requested a worktree: create or enter that worktree.
+4. Without an explicit worktree request: do not use a worktree.
+
+Never start implementation on `main`/`master` without explicit user consent.
+
+Then:
 1. Read plan file
 2. Review critically - identify any questions or concerns about the plan
 3. If concerns: Raise them with your human partner before starting

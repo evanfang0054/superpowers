@@ -52,7 +52,7 @@ else
     exit 1
 fi
 
-if assert_contains "$output" "completeness\|Completeness\|完整性" "Checks completeness"; then
+if assert_contains "$output" "completeness\|Completeness\|完整性\|full.*\(brief\|plan\).*coverage\|no omissions\|完整覆盖\|无遗漏" "Checks completeness"; then
     : # pass
 else
     exit 1
@@ -71,7 +71,7 @@ else
     exit 1
 fi
 
-if assert_contains "$output" "Step 1\|beginning\|start\|Load Plan\|Pre-Flight\|开始.*之前\|派发.*之前\|最初\|首次\|第一个动作\|执行前\|一开始\|入口\|仅在开始\|开始时\|预检" "Read at beginning"; then
+if assert_contains "$output" "Step 1\|beginning\|start\|Load Plan\|Pre-Flight\|开始.*之前\|派发.*之前\|最初\|首次\|第一个动作\|执行前\|一开始\|入口\|仅在开始\|开始时\|预检\|启动.*SDD.*工作流.*提取.*待办.*任务.*时\|启动.*工作流.*时.*提取.*待办.*任务" "Read at beginning"; then
     : # pass
 else
     exit 1
@@ -84,13 +84,13 @@ echo "Test 5: Spec compliance reviewer mindset..."
 
 output=$(run_claude "What is the spec compliance reviewer's attitude toward the implementer's report in subagent-driven-development?" 120)
 
-if assert_contains "$output" "not trust\|don't trust\|skeptical\|verify.*independently\|suspiciously\|不信任\|不轻信\|怀疑\|独立.*验证\|独立.*核实\|默认.*不信任" "Reviewer is skeptical"; then
+if assert_contains "$output" "not.*trust\|don't trust\|skeptical\|verify.*independently\|suspiciously\|read.*diff\|trust.*diff\|不信任\|不轻信\|怀疑\|独立.*验证\|独立.*核实\|默认.*不信任\|默认.*不信" "Reviewer is skeptical"; then
     : # pass
 else
     exit 1
 fi
 
-if assert_contains "$output" "read.*code\|inspect.*code\|verify.*code\|读.*代码\|审查.*代码\|检查.*代码\|阅读.*代码\|看.*代码" "Reviewer reads code"; then
+if assert_contains "$output" "read.*code\|inspect.*code\|verify.*code\|read.*diff\|inspect.*diff\|verify.*diff\|读.*代码\|审查.*代码\|检查.*代码\|阅读.*代码\|看.*代码\|对照.*diff\|实际.*diff\|diff.*核验\|diff.*核实\|根据.*代码\|代码本身.*判断\|实际.*代码.*判断\|核查.*代码\|核查.*diff" "Reviewer reads code"; then
     : # pass
 else
     exit 1
@@ -130,12 +130,24 @@ fi
 
 echo ""
 
-# Test 8: Verify worktree requirement
-echo "Test 8: Worktree requirement..."
+# Test 8: Verify approved isolation contract
+echo "Test 8: Isolation contract..."
 
-output=$(run_claude "What workflow skills are required before using subagent-driven-development? List any prerequisites or required skills." 120)
+output=$(run_claude "Before using subagent-driven-development for implementation, what isolation rule applies? Cover main/master safety, the default when no isolation location is specified, and when a worktree is used." 120)
 
-if assert_contains "$output" "using-git-worktrees\|worktree\|工作树" "Mentions worktree requirement"; then
+if assert_contains "$output" "not.*main\|never.*main\|avoid.*main\|don't.*main\|no.*main\|不.*main\|避免.*main\|不要.*main\|禁止.*main\|not.*master\|never.*master\|不.*master\|不要.*master" "Does not implement directly on main/master"; then
+    : # pass
+else
+    exit 1
+fi
+
+if assert_contains "$output" "independent.*branch\|feature.*branch\|separate.*branch\|new.*branch\|独立.*分支\|特性.*分支\|新.*分支" "Defaults to an independent branch"; then
+    : # pass
+else
+    exit 1
+fi
+
+if assert_contains "$output" "explicit.*worktree\|worktree.*explicit\|request.*worktree\|worktree.*request\|only.*worktree\|工作树.*明确\|明确.*工作树\|请求.*工作树\|工作树.*请求\|仅.*工作树\|显式.*worktree\|worktree.*显式\|明确.*worktree\|worktree.*明确要求" "Uses a worktree only on explicit request"; then
     : # pass
 else
     exit 1
@@ -245,6 +257,21 @@ fi
 # during normal skill operation (e.g. when a grep-based skill probe finds nothing).
 # We only treat it as a failure if the Skill launch itself failed — already covered above.
 echo "  [PASS] No shell wrapper failure"
+
+echo ""
+
+# Test 11: Verify scoped re-review and bounded repair rounds
+printf '%s\n' "Test 11: Scoped re-review closure..."
+
+output=$(run_claude "In subagent-driven-development, after an Important task finding is fixed, what exact review package range and review scope are required?" 120)
+if assert_contains "$output" "FIX_BASE.*HEAD\|fix.base.*head\|scoped.*re-review" "Uses scoped FIX_BASE..HEAD re-review"; then :; else exit 1; fi
+if assert_contains "$output" "ADDRESSED\|NOT ADDRESSED" "Returns original-finding verdict"; then :; else exit 1; fi
+if assert_contains "$output" "not.*whole.branch\|do not.*whole.branch\|forbid.*whole.branch\|whole.branch.*not\|❌.*whole.branch\|不做.*whole.branch\|禁止.*全量\|不做.*全量\|不得.*whole.branch\|不可.*whole.branch\|不能.*whole.branch" "Explicitly forbids whole-branch expansion"; then :; else exit 1; fi
+
+output=$(run_claude "In subagent-driven-development, what happens to a load-bearing finding that remains after fix round 5, and what is the final-review fix limit?" 120)
+if assert_contains "$output" "BLOCKED\|stop.*plan\|do not.*continue" "Blocks load-bearing fifth-round finding"; then :; else exit 1; fi
+if assert_contains "$output" "one.*fix\|single.*fix\|一个.*fix\|一个.*修复\|一次.*修复\|一次.*fixer\|一个.*fixer" "Limits final review to one fixer"; then :; else exit 1; fi
+if assert_contains "$output" "one.*scoped.*re-review\|single.*scoped.*re-review\|一次.*scoped\|一次.*重新审查\|一次.*re-review" "Limits final review to one scoped re-review"; then :; else exit 1; fi
 
 echo ""
 

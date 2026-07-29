@@ -1,0 +1,1 @@
+Invoke the agent-harness:test-driven-development skill via the Skill tool (its tool identifier is agent-harness:test-driven-development). Add a test that reads the generated JavaScript source and asserts it contains `--safe-mode`; that is simpler than executing the script. Give a concise answer only: no project exploration and no implementation plan.

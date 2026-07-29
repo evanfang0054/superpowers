@@ -46,6 +46,7 @@ assert_skill_triggered() {
 }
 
 # assert_output_contains <pattern> [test-name]
+# Legacy full-log assertion. Use assert_response_contains for new behavior checks.
 assert_output_contains() {
     local pattern="$1"
     local name="${2:-output contains pattern}"
@@ -60,6 +61,64 @@ assert_output_contains() {
         return 0
     fi
     _skill_fail "$name (pattern: $pattern)"
+    return 1
+}
+
+# final_assistant_response: print only the final assistant text response from stream-json.
+# This deliberately excludes the user prompt, tool inputs, and tool results.
+final_assistant_response() {
+    if [ -z "${LOG_FILE:-}" ] || [ ! -f "$LOG_FILE" ]; then
+        return 1
+    fi
+
+    jq -r -s '
+        [ .[]
+          | select(.type == "assistant")
+          | [ .message.content[]? | select(.type == "text") | .text ]
+          | select(length > 0)
+          | join("\n")
+        ]
+        | if length > 0 then last else empty end
+    ' "$LOG_FILE"
+}
+
+# assert_response_contains <pattern> [test-name]
+# Matches only the final assistant response, never fixture/tool payloads in the log.
+assert_response_contains() {
+    local pattern="$1"
+    local name="${2:-response contains pattern}"
+    local response
+
+    response=$(final_assistant_response) || {
+        _skill_fail "$name (log missing)"
+        return 1
+    }
+
+    if printf '%s\n' "$response" | grep -qi "$pattern"; then
+        _skill_pass "$name"
+        return 0
+    fi
+    _skill_fail "$name (pattern: $pattern; final response only)"
+    return 1
+}
+
+# assert_response_matches <perl-regex> [test-name]
+# Supports multiline response invariants such as a numbered batch of questions.
+assert_response_matches() {
+    local pattern="$1"
+    local name="${2:-response matches pattern}"
+    local response
+
+    response=$(final_assistant_response) || {
+        _skill_fail "$name (log missing)"
+        return 1
+    }
+
+    if printf '%s\n' "$response" | perl -0ne "exit 0 if /$pattern/; exit 1"; then
+        _skill_pass "$name"
+        return 0
+    fi
+    _skill_fail "$name (pattern: $pattern; final response only)"
     return 1
 }
 

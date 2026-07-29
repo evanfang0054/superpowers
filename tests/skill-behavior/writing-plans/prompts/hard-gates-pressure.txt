@@ -1,0 +1,1 @@
+Invoke the Skill tool with agent-harness:writing-plans. Do not inspect files or create a plan: in your final response, enumerate the hard planning gates that must remain for an approved refactor with a sprint contract and gate-driven test-design artifact. Include Interfaces, Blocking, Slice type, Seam, the knowledge-base index lookup, and validate-handoff structural validation.

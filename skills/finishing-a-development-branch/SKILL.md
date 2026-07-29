@@ -1,54 +1,68 @@
 ---
 name: finishing-a-development-branch
-description: Use when implementation is done and tests pass. Guides merge, PR, or cleanup options.
+description: Use when implementation is done and tests pass, and the user must choose how to integrate or retain completed branch work.
 ---
 
 # Finishing a Development Branch
 
 ## Overview
 
-Guide completion of development work by presenting clear options and handling chosen workflow.
-
-**Core principle:** Verify tests → Present options → Execute choice → Clean up.
+Verify the completed result, offer only safe next actions, and preserve work unless the user explicitly requests its destruction.
 
 **Announce at start:** "I'm using the finishing-a-development-branch skill to complete this work."
 
-## The Process
+## Step 1: Verify Tests
 
-### Step 1: Verify Tests
+Run the relevant project test suite before offering choices. If it fails, STOP: report failures and fix them before merge or PR.
 
-**Before presenting options, verify tests pass:**
+## Step 2: Capture Repository Identity Before Any Directory Change
 
-```bash
-# Run project's test suite
-npm test / cargo test / pytest / go test ./...
-```
-
-**If tests fail:**
-```
-Tests failing (<N> failures). Must fix before completing:
-
-[Show failures]
-
-Cannot proceed with merge/PR until tests pass.
-```
-
-Stop. Don't proceed to Step 2.
-
-**If tests pass:** Continue to Step 2.
-
-### Step 2: Determine Base Branch
+Before any `cd` to the main repository or base branch, capture the current repository data:
 
 ```bash
-# Try common base branches
+GIT_DIR=$(git rev-parse --git-dir)
+GIT_COMMON=$(git rev-parse --git-common-dir)
+WORKTREE_PATH=$(git rev-parse --show-toplevel)
+```
+
+Determine the base branch without changing directories:
+
+```bash
 git merge-base HEAD main 2>/dev/null || git merge-base HEAD master 2>/dev/null
 ```
 
-Or ask: "This branch split from main - is that correct?"
+Resolve the current project's common root from the captured common Git directory. `git rev-parse --git-common-dir` may return either an absolute or a relative `.git` path, so handle both before any directory change:
 
-### Step 3: Present Options
+```bash
+if [[ "$GIT_COMMON" = /* ]]; then
+  PROJECT_ROOT=$(dirname "$GIT_COMMON")
+else
+  PROJECT_ROOT=$(cd "$(dirname "$GIT_COMMON")" && pwd)
+fi
+```
 
-Present exactly these 4 options:
+Only the captured `WORKTREE_PATH` is eligible for removal. Use this guard exactly; its slash-delimited patterns allow descendants of `.worktrees/` and `worktrees/` only, not prefix lookalikes such as `.worktrees-evil`:
+
+```bash
+# BEGIN owned-worktree-removal-guard
+remove_captured_owned_worktree() {
+  case "$WORKTREE_PATH" in
+    "$PROJECT_ROOT"/.worktrees/*|"$PROJECT_ROOT"/worktrees/*)
+      git worktree remove "$WORKTREE_PATH"
+      ;;
+    *)
+      printf 'Preserving non-project-owned worktree: %s\n' "$WORKTREE_PATH"
+      ;;
+  esac
+}
+# END owned-worktree-removal-guard
+```
+
+Never place `git worktree remove` outside this guard. It preserves host-owned, parent-owned, and unmatched workspace paths.
+
+## Step 3: Present Safe Options
+
+For a normal branch or named worktree, present exactly:
 
 ```
 Implementation complete. What would you like to do?
@@ -56,168 +70,74 @@ Implementation complete. What would you like to do?
 1. Merge back to <base-branch> locally
 2. Push and create a Pull Request
 3. Keep the branch as-is (I'll handle it later)
-4. Discard this work
 
 Which option?
 ```
 
-**Don't add explanation** - keep options concise.
+For detached HEAD, present exactly:
 
-### Step 4: Execute Choice
+```
+Implementation complete. What would you like to do?
 
-#### Option 1: Merge Locally
+1. Push as a new branch and create a Pull Request
+2. Keep as-is
+
+Which option?
+```
+
+The default menu never includes discard.
+
+## Step 4: Execute the User's Choice
+
+### Local merge
+
+Only after the user selects merge:
 
 ```bash
-# Switch to base branch
-git checkout <base-branch>
-
-# Pull latest
+cd <base-branch>
 git pull
-
-# Merge feature branch
 git merge <feature-branch>
-
-# Verify tests on merged result
 <test command>
-
-# If tests pass
-git branch -d <feature-branch>
 ```
 
-Then: Run SDD workspace cleanup:
+If merged-result verification fails: **STOP. Keep the branch and worktree for investigation.** Do not delete anything.
 
-```bash
-bash "${CLAUDE_PLUGIN_ROOT}/skills/subagent-driven-development/scripts/cleanup-workspace"
+After successful verification, delete the feature branch only if appropriate. Remove the captured worktree only through `remove_captured_owned_worktree`.
+
+### Push and create a pull request
+
+Push the branch and create a pull request using the available forge workflow. `gh pr create` is acceptable when available, but it is not the only valid forge workflow. Keep the branch, worktree, and artifacts.
+
+### Keep as-is
+
+Report the retained branch or detached state. Keep the worktree and artifacts.
+
+**PR and Keep preserve all branch, worktree, and SDD artifacts.** Finishing options do not run SDD cleanup; the SDD final-review-clean transition owns current-plan cleanup.
+
+## Explicit Discard Only
+
+Discuss discard only after the user explicitly asks to discard the work. Show the exact branch, commits, and eligible worktree path, then require this exact confirmation:
+
+```
+Type `discard` to confirm.
 ```
 
-Then: Done
-
-#### Option 2: Push and Create PR
-
-```bash
-# Push branch
-git push -u origin <feature-branch>
-
-# Create PR
-gh pr create --title "<title>" --body "$(cat <<'EOF'
-## Summary
-<2-3 bullets of what changed>
-
-## Test Plan
-- [ ] <verification steps>
-EOF
-)"
-```
-
-Then: Run SDD workspace cleanup:
-
-```bash
-bash "${CLAUDE_PLUGIN_ROOT}/skills/subagent-driven-development/scripts/cleanup-workspace"
-```
-
-Then: Done
-
-#### Option 3: Keep As-Is
-
-Report: "Keeping branch <name>."
-
-Then: Run SDD workspace cleanup:
-
-```bash
-bash "${CLAUDE_PLUGIN_ROOT}/skills/subagent-driven-development/scripts/cleanup-workspace"
-```
-
-#### Option 4: Discard
-
-**Confirm first:**
-```
-This will permanently delete:
-- Branch <name>
-- All commits: <commit-list>
-
-Type 'discard' to confirm.
-```
-
-Wait for exact confirmation.
-
-If confirmed:
-```bash
-git checkout <base-branch>
-git branch -D <feature-branch>
-```
-
-Then: Run SDD workspace cleanup:
-
-```bash
-bash "${CLAUDE_PLUGIN_ROOT}/skills/subagent-driven-development/scripts/cleanup-workspace"
-```
-
-Then: Done
-
-## Quick Reference
-
-| Option | Merge | Push | Cleanup Branch | Cleanup SDD Workspace |
-|--------|-------|------|----------------|----------------------|
-| 1. Merge locally | ✓ | - | ✓ | ✓ |
-| 2. Create PR | - | ✓ | - | ✓ |
-| 3. Keep as-is | - | - | - | ✓ |
-| 4. Discard | - | - | ✓ (force) | ✓ |
-
-## Common Mistakes
-
-**Skipping test verification**
-- **Problem:** Merge broken code, create failing PR
-- **Fix:** Always verify tests before offering options
-
-**Open-ended questions**
-- **Problem:** "What should I do next?" → ambiguous
-- **Fix:** Present exactly 4 structured options
-
-**Automatic branch cleanup**
-- **Problem:** Remove work when might need it (Option 2, 3)
-- **Fix:** Only cleanup for Options 1 and 4
-
-**No confirmation for discard**
-- **Problem:** Accidentally delete work
-- **Fix:** Require typed "discard" confirmation
-
-**Forgetting SDD workspace cleanup**
-- **Problem:** `.agent-harness/sdd/` accumulates dozens of brief/report/diff files across sessions
-- **Fix:** Always run `cleanup-workspace` after every option, including Keep As-Is
+Only after that exact response may destructive commands run. For an eligible captured project-owned worktree, call `remove_captured_owned_worktree`; otherwise its fallback preserves the worktree.
 
 ## Red Flags
 
 **Never:**
-- Proceed with failing tests
-- Merge without verifying tests on result
-- Delete work without confirmation
-- Force-push without explicit request
-
-**Always:**
-- Verify tests before offering options
-- Present exactly 4 options
-- Get typed confirmation for Option 4
-- Run SDD workspace cleanup after executing any option
+- Proceed while tests fail.
+- Delete a branch or worktree without explicit discard confirmation.
+- Treat a worktree as owned merely because it is active.
+- Remove SDD artifacts from a PR or Keep outcome.
+- Force-push without explicit user request.
 
 ## Integration
 
 **Called by:**
-- **subagent-driven-development** (Step 7) - After all tasks complete
-- **executing-plans** (Step 5) - After all batches complete
-
-**Calls:**
-- **subagent-driven-development** cleanup script (`scripts/cleanup-workspace`) - Removes SDD workspace artifacts after branch completion
+- **subagent-driven-development** after all tasks complete.
+- **executing-plans** after all tasks complete.
 
 **Pairs with:**
-- **session-learnings** - Record insights discovered during this branch
-
-## Capture Learnings
-
-**Before completing**, reflect on what you learned during this branch:
-
-- Did you discover a reusable pattern?
-- Did you hit a pitfall that wasted time?
-- Did the user state a preference you should remember?
-- Did you find an undocumented project convention?
-
-If yes, use the `session-learnings` skill to record it before finishing.
+- **session-learnings** to record reusable insights before completion.

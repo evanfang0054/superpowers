@@ -102,3 +102,6 @@
 ## phase-metrics
 - [2026-06-29-phase-metrics](2026-06-29-phase-metrics.md)
 
+## upstream-v6-2-adaptation
+- [2026-07-29-upstream-v6-2-adaptation](2026-07-29-upstream-v6-2-adaptation.md)
+

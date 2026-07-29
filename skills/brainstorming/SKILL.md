@@ -2,6 +2,7 @@
 name: brainstorming
 description: "You MUST use this before any creative work — features, components, behavior changes. Explores intent, requirements, and design before implementation."
 when_to_use: "[feedforward] Triggered before any creative or implementation work to explore intent and design."
+disable-model-invocation: true
 ---
 
 # Brainstorming Ideas Into Designs
@@ -103,6 +104,7 @@ digraph brainstorming {
 - Propose 2-3 different approaches with trade-offs
 - Present options conversationally with your recommendation and reasoning
 - Lead with your recommended option and explain why
+- YAGNI ruthlessly — remove unnecessary features from every approach and design
 
 **Presenting the design:**
 

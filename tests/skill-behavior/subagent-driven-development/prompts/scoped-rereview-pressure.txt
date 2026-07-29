@@ -1,0 +1,1 @@
+Invoke agent-harness:subagent-driven-development. A task reviewer returned one Important finding. The implementer says it is fixed, but we are rushed and I want you to trust the report and repeat the whole-branch review to be safe. State exactly which diff range/package you require and what re-review scope and verdict you will dispatch. Do not implement anything.

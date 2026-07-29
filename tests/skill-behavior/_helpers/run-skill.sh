@@ -74,6 +74,7 @@ run_skill() {
     echo "Log: $LOG_FILE" >&2
     echo "" >&2
 
+    local exit_code=0
     cd "$project_dir"
     HOME="$isolated_home" timeout 300 claude -p "$prompt" \
         --plugin-dir "$REPO_ROOT" \
@@ -81,11 +82,15 @@ run_skill() {
         --max-turns "$max_turns" \
         --output-format stream-json \
         --verbose \
-        > "$LOG_FILE" 2>&1 || true
+        > "$LOG_FILE" 2>&1 || exit_code=$?
 
     cd "$SKILL_BEHAVIOR_DIR"
     # 注意：不清理 isolated_home 和 project_dir，供事后排查
     echo "Skill run complete. Log: $LOG_FILE" >&2
+    if [ "$exit_code" -ne 0 ]; then
+        echo "ERROR: skill run exited $exit_code" >&2
+        return "$exit_code"
+    fi
 }
 
 # Export LOG_FILE 让 source 方可见

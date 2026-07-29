@@ -3,7 +3,7 @@
 # Usage: ./find-polluter.sh <file_or_dir_to_check> <test_pattern>
 # Example: ./find-polluter.sh '.git' 'src/**/*.test.ts'
 
-set -e
+set -euo pipefail
 
 if [ $# -ne 2 ]; then
   echo "Usage: $0 <file_to_check> <test_pattern>"
@@ -19,8 +19,17 @@ echo "Test pattern: $TEST_PATTERN"
 echo ""
 
 # Get list of test files
-TEST_FILES=$(find . -path "$TEST_PATTERN" | sort)
-TOTAL=$(echo "$TEST_FILES" | wc -l | tr -d ' ')
+TEST_PATTERN="${TEST_PATTERN#./}"
+TEST_FILES=$( {
+  find . -path "./$TEST_PATTERN"
+  find . -path "./${TEST_PATTERN//\*\*\//}"
+} | sort -u )
+
+if [[ -z "$TEST_FILES" ]]; then
+  TOTAL=0
+else
+  TOTAL=$(printf '%s\n' "$TEST_FILES" | wc -l | tr -d ' ')
+fi
 
 echo "Found $TOTAL test files"
 echo ""

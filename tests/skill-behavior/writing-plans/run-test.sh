@@ -40,3 +40,22 @@ assert_no_premature_action
 assert_output_contains "multiple plan\|separate plan\|directory-level\|execution map\|monolithic\|多个 plan\|执行图" "avoids monolithic full-stack plan"
 assert_output_contains "confirmation gate\|testable outcome\|确认\|可测试" "keeps per-plan gate or outcome"
 print_skill_summary "writing-plans (full-stack pressure)"
+
+SKILL_PASS_COUNT=0
+SKILL_FAIL_COUNT=0
+
+echo ""
+echo "=== Test: writing-plans (hard gates pressure) ==="
+echo ""
+run_skill "writing-plans" "$SCRIPT_DIR/prompts/hard-gates-pressure.txt" 3
+assert_skill_triggered "writing-plans"
+assert_no_premature_action
+assert_response_contains "Interfaces" "keeps interface planning"
+assert_response_contains "Blocking" "keeps blocking field"
+assert_response_contains "Slice type\|Slice-type" "keeps slice type field"
+assert_response_contains "Seam" "keeps observable seam field"
+assert_response_contains "GDD\|gate-driven-test-design" "keeps GDD gate"
+assert_response_contains "contract\|Definition of Done" "keeps sprint contract gate"
+assert_response_contains "knowledge.base\|index.md" "keeps knowledge-base lookup"
+assert_response_contains "validate-handoff" "keeps structural validation"
+print_skill_summary "writing-plans (hard gates pressure)"

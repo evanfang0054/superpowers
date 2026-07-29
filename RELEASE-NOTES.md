@@ -1,5 +1,14 @@
 # Agent Harness Release Notes
 
+## v6.4.4 (2026-07-29)
+
+### Changes
+
+- 适配 Superpowers v6.2.0 已核验能力：补齐 find-polluter 路径匹配与空结果计数修复，Claude SessionStart hook 显式使用 bash，并改进 headless helper 诊断。
+- 将 SDD artifacts 迁移到按计划隔离的 .agent-harness/sdd/<plan-basename> 工作区，新增计划身份 ledger、scoped re-review prompt、五轮修复上限和 final review 生命周期约束。
+- 收紧 finishing 流程：默认独立分支、discard 仅在明确请求时启用，worktree cleanup 只清理项目拥有目录，PR/Keep 不再无条件删除活跃 artifacts。
+- 补充 TDD good-tests reference、reviewer 上下文隔离规则，以及受影响 skill 的压力场景和确定性/行为测试覆盖。
+
 ## v6.4.3 (2026-07-29)
 
 ### Changes

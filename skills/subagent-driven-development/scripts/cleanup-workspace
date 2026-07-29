@@ -7,20 +7,21 @@
 # Rationale: this is best-effort cleanup after finishing a development branch;
 # a cleanup error should not undo an otherwise-successful merge/PR.
 #
-# Usage: cleanup-workspace
+# Usage: cleanup-workspace PLAN_FILE
 set -euo pipefail
 
-dir="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}/.agent-harness/sdd"
-
-if [ ! -d "$dir" ]; then
-  exit 0
+if [ $# -ne 1 ]; then
+  echo "usage: cleanup-workspace PLAN_FILE" >&2
+  exit 2
 fi
 
-shopt -s dotglob nullglob
-if rm -rf "${dir:?}/"*; then
-  echo "cleaned: $dir"
+script_dir="$(cd "$(dirname "$0")" && pwd)"
+if ! workspace=$("$script_dir/sdd-workspace" "$1"); then
+  echo "warning: cleanup-workspace failed to resolve current plan workspace" >&2
+elif rm -rf "$workspace"; then
+  echo "cleaned: $workspace"
 else
-  echo "warning: cleanup-workspace failed to remove contents of $dir" >&2
+  echo "warning: cleanup-workspace failed to remove $workspace" >&2
 fi
 
 exit 0

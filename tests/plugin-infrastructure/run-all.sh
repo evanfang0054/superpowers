@@ -40,6 +40,8 @@ TESTS=(
     "test-domain-modeling-skill.sh"
     "test-session-start-context-md.sh"
     "test-harness-init-context-md.sh"
+    "../sdd-scripts/test-cleanup-workspace.sh"
+    "../sdd-scripts/test-finishing-contract.sh"
 )
 
 for test in "${TESTS[@]}"; do

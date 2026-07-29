@@ -31,3 +31,20 @@ assert_no_premature_action
 assert_output_contains "no-op\|observable\|constrain behavior\|predictable" "rejects vague no-op rewrite framing"
 assert_output_contains "be thoughtful\|use best practices\|consider edge cases" "identifies vague instructions"
 print_skill_summary "writing-skills (vague rewrite pressure)"
+
+SKILL_PASS_COUNT=0
+SKILL_FAIL_COUNT=0
+
+echo ""
+echo "=== Test: writing-skills (hard gates pressure) ==="
+echo ""
+run_skill "writing-skills" "$SCRIPT_DIR/prompts/hard-gates-pressure.txt" 3
+assert_skill_triggered "writing-skills"
+assert_no_premature_action
+assert_response_contains "RED.*GREEN.*REFACTOR\|RED/GREEN/REFACTOR" "keeps RED-GREEN-REFACTOR"
+assert_response_contains "predictab" "keeps predictability"
+assert_response_contains "model-invoked" "keeps model-invoked load"
+assert_response_contains "user-invoked" "keeps user-invoked load"
+assert_response_contains "progressive disclosure" "keeps progressive disclosure"
+assert_response_contains "no-op" "keeps no-op pruning"
+print_skill_summary "writing-skills (hard gates pressure)"

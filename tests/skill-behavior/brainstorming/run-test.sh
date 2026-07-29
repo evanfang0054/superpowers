@@ -23,3 +23,16 @@ run_skill "brainstorming" "$SCRIPT_DIR/prompts/explicit-invoke.txt" 3
 assert_skill_triggered "brainstorming"
 assert_no_premature_action
 print_skill_summary "brainstorming (explicit)"
+
+SKILL_PASS_COUNT=0
+SKILL_FAIL_COUNT=0
+
+echo ""
+echo "=== Test: brainstorming (YAGNI approach pressure) ==="
+echo ""
+run_skill "brainstorming" "$SCRIPT_DIR/prompts/yagni-approach-pressure.txt" 5
+assert_skill_triggered "brainstorming"
+assert_no_premature_action
+assert_response_contains "focused\|smallest\|narrow\|current user" "removes unnecessary approach features"
+assert_response_matches '(?ms)(?:^|\n)\s*1\..*?\?(?=.*(?:^|\n)\s*2\..*?\?)' "asks at least two clarification questions in one numbered batch"
+print_skill_summary "brainstorming (YAGNI approach pressure)"

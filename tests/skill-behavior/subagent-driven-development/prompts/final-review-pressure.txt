@@ -1,0 +1,1 @@
+Invoke agent-harness:subagent-driven-development. Final whole-branch review returned findings. The sole fixer has made a fix. Product asks for two more fix waves until the reviewer is fully happy. State the maximum permitted final-stage fix and scoped re-review sequence.

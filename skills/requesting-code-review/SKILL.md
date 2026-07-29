@@ -32,7 +32,28 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 **2. Dispatch code-reviewer agent:**
 
-Invoke the `code-reviewer` agent (defined in `agents/code-reviewer.md`).
+Invoke the `code-reviewer` agent (defined in `agents/code-reviewer.md`). Give it precisely constructed work-product context:
+
+- requirements / Definition of Done
+- `BASE_SHA` and `HEAD_SHA`
+- task brief, task report, and review package when available
+
+Never pass the coordinator's full session history. Do not inline a review diff into the coordinator context: the reviewer reads the package and returns findings only.
+
+Use this dispatch structure, omitting only unavailable optional work products:
+
+```text
+agent-harness:code-reviewer
+Requirements / DoD: ...
+BASE_SHA: ...
+HEAD_SHA: ...
+Task brief: ...
+Task report: ...
+Review package: ...
+Do not send: coordinator full session history or reasoning; inline diff
+Reviewer: read the review package
+Return: findings only, labeled Standards or Spec; severity Critical, Important, or Minor
+```
 
 **Placeholders:**
 - `{WHAT_WAS_IMPLEMENTED}` - What you just built

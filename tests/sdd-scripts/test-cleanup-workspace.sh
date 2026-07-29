@@ -3,101 +3,88 @@
 # Usage: ./test-cleanup-workspace.sh
 #
 # Tests:
-# 1. 目录不存在 → exit 0，无输出
-# 2. 目录有内容（含 .gitignore）→ 全部清空，保留空目录
-# 3. rm 失败时不阻断 → 仍 exit 0，stderr 有 warning（root 用户跳过）
+# 1. Missing current plan workspace → exit 0 after resolving/removing it
+# 2. Plan-aware cleanup removes only that plan workspace, preserving siblings/.gitignore
+# 3. rm failure is best-effort → exit 0 and emits a warning (root skips)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLUGIN_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 SCRIPT="$PLUGIN_DIR/skills/subagent-driven-development/scripts/cleanup-workspace"
 TEST_DIR="/tmp/agent-harness-cleanup-test-$$"
+PLAN_A=""
 
-# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m'
-
 PASS=0
 FAIL=0
 
-log_pass() { echo -e "${GREEN}✅ PASS${NC}: $1"; ((PASS++)); }
-log_fail() { echo -e "${RED}❌ FAIL${NC}: $1"; ((FAIL++)); }
-
+log_pass() { echo -e "${GREEN}PASS${NC}: $1"; ((PASS++)); }
+log_fail() { echo -e "${RED}FAIL${NC}: $1"; ((FAIL++)); }
 cleanup() { rm -rf "$TEST_DIR"; }
 trap cleanup EXIT
 
-# 每个用例在独立临时目录中运行，通过 CLAUDE_PROJECT_DIR 指定路径
-# （与 v2 脚本的 fallback 链一致：CLAUDE_PROJECT_DIR 优先，git rev-parse 备用）
 setup_repo() {
-    rm -rf "$TEST_DIR"
-    mkdir -p "$TEST_DIR"
-    cd "$TEST_DIR"
-    export CLAUDE_PROJECT_DIR="$TEST_DIR"
+  rm -rf "$TEST_DIR"
+  mkdir -p "$TEST_DIR/plans"
+  export CLAUDE_PROJECT_DIR="$TEST_DIR"
+  PLAN_A="$TEST_DIR/plans/plan-a.md"
+  touch "$PLAN_A"
+}
+
+workspace_for() {
+  printf '%s/.agent-harness/sdd/%s\n' "$TEST_DIR" "$(basename "$1" .md)"
 }
 
 echo "=== cleanup-workspace Tests ==="
 echo "Script: $SCRIPT"
-echo "Test dir: $TEST_DIR"
 echo ""
 
-# ==========================================
-# Test 1: 目录不存在 → exit 0，无输出
-# ==========================================
-echo "--- Test 1: 目录不存在 → exit 0 ---"
+echo "--- Test 1: missing current workspace → exit 0 ---"
 setup_repo
-
-out=$(bash "$SCRIPT" 2>/tmp/cleanup-stderr-1); rc=$?
-if [ "$rc" = "0" ] && [ -z "$out" ] && [ ! -d ".agent-harness/sdd" ]; then
-    log_pass "exit=0, stdout empty, dir not created"
-else
-    log_fail "rc=$rc, out='$out', stderr='$(cat /tmp/cleanup-stderr-1)'"
-fi
-
-# ==========================================
-# Test 2: 目录有内容（含 .gitignore）→ 全部清空，保留空目录
-# ==========================================
-echo "--- Test 2: 目录有内容 → 清空 ---"
-setup_repo
-mkdir -p .agent-harness/sdd
-touch .agent-harness/sdd/.gitignore
-touch .agent-harness/sdd/progress.md
-touch .agent-harness/sdd/task-1-brief.md
-touch .agent-harness/sdd/task-1-report.md
-touch .agent-harness/sdd/review-aaa..bbb.diff
-
-out=$(bash "$SCRIPT" 2>/tmp/cleanup-stderr-2); rc=$?
-remaining=$(ls -A .agent-harness/sdd/ 2>/dev/null | wc -l | tr -d ' ')
+out=$(bash "$SCRIPT" "$PLAN_A" 2>/tmp/cleanup-stderr-1); rc=$?
 if [ "$rc" = "0" ] && \
-   echo "$out" | grep -q "^cleaned:" && \
-   [ -d ".agent-harness/sdd" ] && \
-   [ "$remaining" = "0" ]; then
-    log_pass "exit=0, 'cleaned:' printed, dir kept empty (.gitignore removed)"
+   printf '%s\n' "$out" | grep -Fq "cleaned: $TEST_DIR/.agent-harness/sdd/plan-a" && \
+   [ ! -d "$TEST_DIR/.agent-harness/sdd/plan-a" ]; then
+  log_pass "exit=0 and current workspace is absent after cleanup"
 else
-    log_fail "rc=$rc, out='$out', remaining=$remaining, stderr='$(cat /tmp/cleanup-stderr-2)'"
+  log_fail "rc=$rc, out='$out', stderr='$(< /tmp/cleanup-stderr-1)'"
 fi
 
-# ==========================================
-# Test 3: rm 失败时不阻断 → exit 0，stderr 有 warning
-# ==========================================
-echo "--- Test 3: rm 失败 → 不阻断 ---"
-if [ "$(id -u)" = "0" ]; then
-    echo "    (skipped: running as root, permission test unreliable)"
+echo "--- Test 2: current plan only → sibling and .gitignore preserved ---"
+setup_repo
+workspace_a=$(workspace_for "$PLAN_A")
+workspace_b="$TEST_DIR/.agent-harness/sdd/plan-b"
+mkdir -p "$workspace_a" "$workspace_b"
+touch "$workspace_a/task-1-brief.md" "$workspace_b/task-1-brief.md"
+printf '*\n' > "$TEST_DIR/.agent-harness/sdd/.gitignore"
+out=$(bash "$SCRIPT" "$PLAN_A" 2>/tmp/cleanup-stderr-2); rc=$?
+if [ "$rc" = "0" ] && \
+   printf '%s\n' "$out" | grep -Fq "cleaned: $workspace_a" && \
+   [ ! -e "$workspace_a" ] && \
+   [ -f "$workspace_b/task-1-brief.md" ] && \
+   [ -f "$TEST_DIR/.agent-harness/sdd/.gitignore" ]; then
+  log_pass "only current plan workspace removed"
 else
-    setup_repo
-    mkdir -p .agent-harness/sdd
-    touch .agent-harness/sdd/.gitignore .agent-harness/sdd/progress.md
-    # 父目录改只读，rm 无法删除内部文件
-    chmod 555 .agent-harness/sdd
+  log_fail "rc=$rc, out='$out', workspace_a=$([ -e "$workspace_a" ] && echo present || echo absent), sibling=$([ -f "$workspace_b/task-1-brief.md" ] && echo present || echo absent), gitignore=$([ -f "$TEST_DIR/.agent-harness/sdd/.gitignore" ] && echo present || echo absent), stderr='$(< /tmp/cleanup-stderr-2)'"
+fi
 
-    out=$(bash "$SCRIPT" 2>/tmp/cleanup-stderr-3); rc=$?
-    chmod 755 .agent-harness/sdd  # 恢复以便 trap cleanup 能清理
-    err=$(cat /tmp/cleanup-stderr-3)
-    if [ "$rc" = "0" ] && \
-       echo "$err" | grep -q "warning: cleanup-workspace failed"; then
-        log_pass "exit=0 even on rm failure, stderr has warning"
-    else
-        log_fail "rc=$rc, out='$out', stderr='$err'"
-    fi
+echo "--- Test 3: rm failure → best-effort warning and exit 0 ---"
+if [ "$(id -u)" = "0" ]; then
+  echo "    (skipped: running as root, permission test unreliable)"
+else
+  setup_repo
+  workspace_a=$(workspace_for "$PLAN_A")
+  mkdir -p "$workspace_a"
+  chmod 555 "$TEST_DIR/.agent-harness/sdd"
+  out=$(bash "$SCRIPT" "$PLAN_A" 2>/tmp/cleanup-stderr-3); rc=$?
+  chmod 755 "$TEST_DIR/.agent-harness/sdd" 2>/dev/null || true
+  err=$(< /tmp/cleanup-stderr-3)
+  if [ "$rc" = "0" ] && printf '%s\n' "$err" | grep -q 'warning: cleanup-workspace failed'; then
+    log_pass "exit=0 with warning on cleanup failure"
+  else
+    log_fail "rc=$rc, out='$out', stderr='$err'"
+  fi
 fi
 
 echo ""

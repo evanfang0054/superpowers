@@ -12,11 +12,22 @@
 # Single source of truth for the workspace location, so task-brief and
 # review-package cannot drift to different directories.
 #
-# Usage: sdd-workspace
+# Usage: sdd-workspace PLAN_FILE
 set -euo pipefail
 
-root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}"
-dir="$root/.agent-harness/sdd"
+if [ $# -ne 1 ]; then
+  echo "usage: sdd-workspace PLAN_FILE" >&2
+  exit 2
+fi
+
+plan=$1
+[ -f "$plan" ] || { echo "no such plan file: $plan" >&2; exit 2; }
+slug=$(basename "$plan" .md)
+[ -n "$slug" ] && [ "$slug" != "." ] && [ "$slug" != ".." ] \
+  || { echo "cannot derive a workspace name from: $plan" >&2; exit 2; }
+root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel)}"
+base="$root/.agent-harness/sdd"
+dir="$base/$slug"
 mkdir -p "$dir"
-printf '*\n' > "$dir/.gitignore"
+printf '*\n' > "$base/.gitignore"
 cd "$dir" && pwd

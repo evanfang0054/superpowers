@@ -100,9 +100,8 @@ Subagent (general-purpose):
 
     Review your work with fresh eyes. Ask yourself:
 
-    **Completeness:**
-    - Did I fully implement everything in the spec?
-    - Did I miss any requirements?
+    **Completeness (brief/plan coverage):**
+    - Did I fully implement every requirement in the task brief and any referenced plan section, with no omissions?
     - Are there edge cases I didn't handle?
 
     **Quality:**
@@ -128,6 +127,15 @@ Subagent (general-purpose):
     If a reviewer finds issues and you fix them, re-run the tests that cover
     the amended code and append the results to your report file. Reviewers
     will not re-run tests for you — your report is the test evidence.
+
+    ## Fix-Round Context (only when fixing findings)
+
+    [FIX_ROUND: <R>/5 | original findings | prior fix evidence]
+
+    Address only the supplied open findings. Append this round's implementation
+    evidence and covering-test results to [REPORT_FILE]. Do not claim a finding
+    is fixed without code and test evidence; the scoped re-reviewer will read
+    the `FIX_BASE..HEAD` package independently.
 
     ## Report Format
 

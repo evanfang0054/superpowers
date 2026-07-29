@@ -22,12 +22,12 @@ A polyglot script is valid syntax in multiple languages simultaneously. Our wrap
 ```cmd
 : << 'CMDBLOCK'
 @echo off
-"C:\Program Files\Git\bin\bash.exe" -l -c "\"$(cygpath -u \"$CLAUDE_PLUGIN_ROOT\")/hooks/session-start.sh\""
+"C:\Program Files\Git\bin\bash.exe" -l -c "\"$(cygpath -u \"$CLAUDE_PLUGIN_ROOT\")/hooks/session-start\""
 exit /b
 CMDBLOCK
 
 # Unix shell runs from here
-"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh"
+"${CLAUDE_PLUGIN_ROOT}/hooks/session-start"
 ```
 
 ### How It Works
@@ -53,9 +53,9 @@ CMDBLOCK
 
 ```
 hooks/
-├── hooks.json           # Points to the .cmd wrapper
-├── session-start.cmd    # Polyglot wrapper (cross-platform entry point)
-└── session-start.sh     # Actual hook logic (bash script)
+├── hooks.json           # Points to the reusable .cmd wrapper
+├── run-hook.cmd         # Polyglot cross-platform hook entry point
+└── session-start        # Actual hook logic (bash script)
 ```
 
 ### hooks.json
@@ -65,20 +65,19 @@ hooks/
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "startup|resume|clear|compact",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.cmd\""
-          }
-        ]
+        "matcher": "startup|clear|compact",
+        "hooks": [{
+          "type": "command",
+          "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" session-start",
+          "shell": "bash"
+        }]
       }
     ]
   }
 }
 ```
 
-Note: The path must be quoted because `${CLAUDE_PLUGIN_ROOT}` may contain spaces on Windows (e.g., `C:\Program Files\...`).
+The explicit `shell: "bash"` makes the plugin configuration use bash to invoke the wrapper. The path remains quoted because `${CLAUDE_PLUGIN_ROOT}` may contain spaces on Windows (for example, `C:\Program Files\...`). If bash cannot be resolved through the configured shell, PowerShell/CMD fallback can parse quoting and environment-variable syntax differently; use the configured wrapper rather than pointing directly at a hook script.
 
 ## Requirements
 
@@ -93,7 +92,7 @@ Note: The path must be quoted because `${CLAUDE_PLUGIN_ROOT}` may contain spaces
 
 ## Writing Cross-Platform Hook Scripts
 
-Your actual hook logic goes in the `.sh` file. To ensure it works on Windows (via Git Bash):
+Your actual hook logic goes in the shell hook script. To ensure it works on Windows (via Git Bash):
 
 ### Do:
 - Use pure bash builtins when possible
@@ -164,7 +163,7 @@ shift
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" session-start.sh"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" session-start"
           }
         ]
       }
@@ -202,7 +201,7 @@ The hooks.json is pointing directly to the `.sh` file. Point to the `.cmd` wrapp
 Claude Code may run hooks differently. Test by simulating the hook environment:
 ```powershell
 $env:CLAUDE_PLUGIN_ROOT = "C:\path\to\plugin"
-cmd /c "C:\path\to\plugin\hooks\session-start.cmd"
+cmd /c "C:\path\to\plugin\hooks\run-hook.cmd session-start"
 ```
 
 ## Related Issues

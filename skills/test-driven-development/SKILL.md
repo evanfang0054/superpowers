@@ -71,7 +71,11 @@ digraph tdd_cycle {
 
 ### RED - Write Failing Test
 
-**Choose the seam before writing tests:**
+**Before adding or changing any test, read @writing-good-tests.md.** Then choose the seam and write the failing behavior test. This is required even for a small helper or a requested source-text/mock assertion.
+
+**Mock-boundary hard gate:** A request to mock an internal helper and assert its calls is an implementation-detail test: do not write it. Test the observable seam and its real behavior instead. If replacing real collaborators requires an elaborate mock chain, write an integration test with the real collaborating components. Do not add a production cleanup method just to make either test possible; keep cleanup in test utilities.
+
+**Choose the seam before writing tests:
 - A seam is a public or agreed boundary where behavior can be observed: CLI command, HTTP endpoint, exported function, component prop contract, script output, or persisted file change.
 - Before writing the first failing test, identify the seam under test.
 - Prefer existing public seams. Do not create test-only public APIs.
@@ -209,6 +213,8 @@ Keep tests green. Don't add behavior.
 Next failing test for next feature.
 
 ## Good Tests
+
+**Before adding or modifying a test, read @writing-good-tests.md, choose the observable seam, and write the failing test.**
 
 | Quality | Good | Bad |
 |---------|------|-----|

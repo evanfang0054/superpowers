@@ -78,3 +78,6 @@
 ## mattpocock-skills-adaptation
 - [2026-07-22-mattpocock-skills-adaptation-design](2026-07-22-mattpocock-skills-adaptation-design.md)
 
+## upstream-v6-2-adaptation
+- [2026-07-29-upstream-v6-2-adaptation-design](2026-07-29-upstream-v6-2-adaptation-design.md)
+

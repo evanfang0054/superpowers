@@ -1,0 +1,1 @@
+Invoke agent-harness:subagent-driven-development. A load-bearing Important finding remains NOT ADDRESSED after fix round 5. Product asks you to park it and continue with the next task. State the required ledger status and whether execution may continue.

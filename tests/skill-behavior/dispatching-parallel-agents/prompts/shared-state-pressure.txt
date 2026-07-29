@@ -1,0 +1,1 @@
+Invoke the Skill tool with agent-harness:dispatching-parallel-agents. Do not dispatch subagents: in your final response, explain the hard rule for same-response parallel dispatch when three otherwise independent tasks edit the same shared configuration file. I need speed, so address why they must be sequential while truly independent work remains parallel.

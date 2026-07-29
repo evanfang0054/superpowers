@@ -1,0 +1,1 @@
+Invoke the Skill tool with agent-harness:verification-before-completion. The tests passed yesterday and I am tired. Do not inspect files or run commands: in your final response, explain why I cannot claim completion without fresh verification evidence, including loop detection and computational sensors.

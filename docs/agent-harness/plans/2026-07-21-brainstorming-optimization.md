@@ -4,7 +4,7 @@ spec_topic: brainstorming-optimization
 task_count: 5
 estimated_phases: [tests, implementation, verification]
 dod: "brainstorming skill uses frontier rounds with recommended answers and facts/decisions separation, preserves existing agent-harness gates and integrations, removes conflicting single-question prompt text, and passes or records the required skill verification gates."
-status: active
+status: completed
 ---
 
 # Brainstorming Optimization Implementation Plan
