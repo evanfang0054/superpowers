@@ -18,11 +18,18 @@ DST="$REPO_ROOT/CHANGELOG.md"
   echo "# agent-harness"
   echo ""
   awk '
-    /^# Agent Harness Release Notes/ { next }
+    /^# Agent Harness/ { next }
     /^## v[0-9]/ {
       line=$0
       sub(/^## v/, "## ", line)
       sub(/ \([0-9]{4}-[0-9]{2}-[0-9]{2}\)/, "", line)
+      print line
+      next
+    }
+    /^## [^0-9]/ {
+      # downgrade non-version ## headers to ### (legacy v2.0.0 sub-sections)
+      line=$0
+      sub(/^## /, "### ", line)
       print line
       next
     }

@@ -1072,9 +1072,8 @@ We now use Anthropic's first-party skills system!
 
 ---
 
-# Agent Harness v2.0.0 Release Notes
 
-## Overview
+### Overview
 
 Agent Harness v2.0 makes skills more accessible, maintainable, and community-driven through a major architectural shift.
 
@@ -1084,7 +1083,7 @@ Beyond infrastructure, this release adds nine new skills focused on problem-solv
 
 Users experience seamless operation: the plugin handles cloning, forking, and updating automatically. Contributors find the new architecture makes improving and sharing skills trivial. This release lays the foundation for skills to evolve rapidly as a community resource.
 
-## Breaking Changes
+### Breaking Changes
 
 ### Skills Repository Separation
 
@@ -1110,7 +1109,7 @@ If you have an existing installation:
 - **Personal agent-harness overlay system** - Replaced with git branch workflow
 - **setup-personal-agent-harness hook** - Replaced by initialize-skills.sh
 
-## New Features
+### New Features
 
 ### Skills Repository Infrastructure
 
@@ -1189,14 +1188,14 @@ If you have an existing installation:
 - `SUPERPOWERS_SKILLS_ROOT` set to `~/.config/agent-harness/skills`
 - Used consistently throughout all paths
 
-## Bug Fixes
+### Bug Fixes
 
 - Fixed duplicate upstream remote addition when forking
 - Fixed find-skills double "skills/" prefix in output
 - Removed obsolete setup-personal-agent-harness call from session-start
 - Fixed path references throughout hooks and commands
 
-## Documentation
+### Documentation
 
 ### README
 - Updated for new skills repository architecture
@@ -1210,7 +1209,7 @@ If you have an existing installation:
 - Created local marketplace config for testing
 - Documented manual testing scenarios
 
-## Technical Details
+### Technical Details
 
 ### File Changes
 
@@ -1239,7 +1238,7 @@ This release includes:
 - PR #2: Personal agent-harness overlay system (later replaced)
 - Multiple skill refinements and documentation improvements
 
-## Upgrade Instructions
+### Upgrade Instructions
 
 ### Fresh Install
 
@@ -1274,7 +1273,7 @@ The plugin handles everything automatically.
    - Commit and push to your fork
    - Consider contributing back via PR
 
-## What's Next
+### What's Next
 
 ### For Users
 
@@ -1288,11 +1287,11 @@ The plugin handles everything automatically.
 - Fork → Branch → PR workflow
 - See skills/meta/writing-skills/SKILL.md for TDD approach to documentation
 
-## Known Issues
+### Known Issues
 
 None at this time.
 
-## Credits
+### Credits
 
 - Problem-solving skills inspired by Amplifier patterns
 - Community contributions and feedback
