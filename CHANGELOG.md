@@ -1,6 +1,7 @@
-# Agent Harness Release Notes
+# agent-harness
 
-## v6.4.4 (2026-07-29)
+
+## 6.4.4
 
 ### Changes
 
@@ -9,13 +10,13 @@
 - 收紧 finishing 流程：默认独立分支、discard 仅在明确请求时启用，worktree cleanup 只清理项目拥有目录，PR/Keep 不再无条件删除活跃 artifacts。
 - 补充 TDD good-tests reference、reviewer 上下文隔离规则，以及受影响 skill 的压力场景和确定性/行为测试覆盖。
 
-## v6.4.3 (2026-07-29)
+## 6.4.3
 
 ### Changes
 
 - 移除 plugin manifest 中的 hooks 声明，并精简关键词配置。
 
-## v6.4.2 (2026-07-22)
+## 6.4.2
 
 ### Changes
 
@@ -25,13 +26,13 @@
 - Added tracer-bullet planning fields and expand-contract guidance.
 - Added writing-skills predictability, context-load, progressive-disclosure, no-op pruning, and pressure-test guidance.
 
-## v6.4.1 (2026-07-22)
+## 6.4.1
 
 ### Changes
 
 Optimize brainstorming skill clarification flow with frontier rounds, recommended answers, fact/decision separation, and English-only prompt text.
 
-## v6.4.0 (2026-07-21)
+## 6.4.0
 
 ### Changes
 
@@ -46,13 +47,13 @@ Optimize brainstorming skill clarification flow with frontier rounds, recommende
 - 加固 auto-loop worktree 和规划护栏
 - 补充知识库 ADR 索引测试和 domain-modeling 行为测试
 
-## v6.3.2 (2026-07-08)
+## 6.3.2
 
 ### Changes
 
 - Token 优化与插件分发改进：让 SessionStart 上下文更利于缓存命中，精简 skill description，新增 /compact 检查点，SDD 支持内联 plan section，补充 clarification-loop 护栏，并通过 archive exclusion 排除 demo/tests/docs。
 
-## v6.3.1 (2026-07-07)
+## 6.3.1
 
 ### Changes
 
@@ -61,146 +62,146 @@ Optimize brainstorming skill clarification flow with frontier rounds, recommende
 - 补充大型计划 / 设计交接护栏：`brainstorming`、`writing-plans`、`harness-design` 增加针对超大计划和设计产物的约束，减少 agent 在长上下文中跑偏。
 - 扩展插件基础设施测试：新增 auto-loop CLI、worktree 行为、guard hook 与大型计划 guardrail 覆盖，防止上述行为回退。
 
-## v6.3.0 (2026-06-29)
+## 6.3.0
 
 ### Changes
 
 - README 新增 Harness Engineering 小节（中英双语），介绍可监测性 / 协议层契约 / 知识库 / 失败自愈四个子系统的咬合关系
 - bump-version.sh 升级为双面 CLI：agent-native 路径（JSON envelope / --dry-run / --yes / --notes / schema 自省），人类路径保持向后兼容
 
-## v6.2.0 (2026-06-26)
+## 6.2.0
 
 ### Changes
 
 - 双子分离 --dry-run/--fix-only + 两 skill
 
-## v6.1.0 (2026-06-25)
+## 6.1.0
 
 ### Changes
 
 - auto-loop 自我提升闭环脚本
 
-## v6.0.0 (2026-06-24)
+## 6.0.0
 
 ### Changes
 
 - 引入 gate-driven-test-design skill 并为全部 agent-harness skills 补齐 headless 行为测试套件，同时完成P0-P2 全业务域（地址/评价/收藏/优惠券/退款/商品规格/Banner/推荐位等）的端到端交付。
 
-## v5.0.21-beta.5 (2026-06-18)
+## 5.0.21-beta.5
 
 ### Changes
 
 - AI 编程中「写测试」很重要，测试领域有「测试金字塔」原则：底部多（单测）、顶部少（e2e）。常见做法是告诉 AI「请生成符合金字塔结构的测试用例」，但效果差——因为做的事（写用例）是微观的，校验的事（测试结构）是宏观的，两者抽象层级不匹配。
 
-## v5.0.21-beta.4 (2026-06-18)
+## 5.0.21-beta.4
 
 ### Changes
 
 - 把上游 v5.1.0 / v6.0.0 中与 **SDD 审查机制** 和 **bug/安全修复** 相关的变更，按需同步到 fork，同时**完整保留** fork 已有的魔改（ralph-loop 驱动、harness 系列、learnings 体系等）
 
-## v5.0.21-beta.3 (2026-06-18)
+## 5.0.21-beta.3
 
 ### Changes
 
 - 同步上游v6相关更新
 
-## v5.0.21-beta.2 (2026-06-05)
+## 5.0.21-beta.2
 
 ### Changes
 
 - 更新harness-design支持生成DESIGN.md
 
-## v5.0.21-beta.1 (2026-06-03)
+## 5.0.21-beta.1
 
 ### Changes
 
 - 移除了 Task 9（Reasoning Budget）、修改文件表中的 effort
 
-## v5.0.21-beta.0 (2026-06-02)
+## 5.0.21-beta.0
 
 ### Changes
 
 - harness优化更新
 
-## v5.0.21 (2026-06-01)
+## 5.0.21
 
 ### Changes
 
 - 将 design skill 重命名为 harness-design
 
-## v5.0.20 (2026-06-01)
+## 5.0.20
 
 ### Changes
 
 -  提升 React+Tailwind 为全局默认架构，精简 README
 
-## v5.0.19 (2026-06-01)
+## 5.0.19
 
 ### Changes
 
 - 剔除worktrees、剔除视觉预览，调整design命名
 
-## v5.0.18 (2026-04-23)
+## 5.0.18
 
 ### Changes
 
 - 新增/design skill
 
-## v5.0.17 (2026-04-16)
+## 5.0.17
 
 ### Changes
 
 - 新增会话分析、skill自我闭环优化
 
-## v5.0.16 (2026-04-16)
+## 5.0.16
 
 ### Changes
 
 - 统一完成信号与评审工作区说明、完成时提示记录会话经验
 
-## v5.0.15 (2026-04-15)
+## 5.0.15
 
 ### Changes
 
 - 新增决策层与 qa 测试技能
 
-## v5.0.14 (2026-04-14)
+## 5.0.14
 
 ### Changes
 
 - 补充session ID记录
 
-## v5.0.13 (2026-04-13)
+## 5.0.13
 
 ### Changes
 
 - 大幅优化更新
 
-## v5.0.12 (2026-04-10)
+## 5.0.12
 
 ### Changes
 
 - 融合了gstack内容，做了最新的迭代
 
-## v5.0.11 (2026-04-02)
+## 5.0.11
 
 ### Changes
 
 - 修复stop-hoo脚本获取路径问题
 
-## v5.0.10 (2026-04-02)
+## 5.0.10
 
 ### Changes
 
 - 更新executing-plans中的loo默认提示
 
-## v5.0.9 (2026-04-02)
+## 5.0.9
 
 ### Changes
 
 - 修复了日志需要空一行、loop相关提示
 
-## v5.0.8 (2026-04-02)
+## 5.0.8
 
 ### Changes
 
@@ -208,7 +209,7 @@ Optimize brainstorming skill clarification flow with frontier rounds, recommende
 
 - 哈哈哈哈
 
-## v5.0.7 (2026-03-31)
+## 5.0.7
 
 ### GitHub Copilot CLI Support
 
@@ -221,7 +222,7 @@ Optimize brainstorming skill clarification flow with frontier rounds, recommende
 - **Skills path consistency** — the bootstrap text no longer advertises a misleading `configDir/skills/agent-harness/` path that didn't match the runtime path. The agent should use the native `skill` tool, not navigate to files by path. Tests now use consistent paths derived from a single source of truth. (#847, #916)
 - **Bootstrap as user message** — moved bootstrap injection from `experimental.chat.system.transform` to `experimental.chat.messages.transform`, prepending to the first user message instead of adding a system message. Avoids token bloat from system messages repeated every turn (#750) and fixes compatibility with Qwen and other models that break on multiple system messages (#894).
 
-## v5.0.6 (2026-03-24)
+## 5.0.6
 
 ### Inline Self-Review Replaces Subagent Review Loops
 
@@ -247,7 +248,7 @@ The subagent review loop (dispatching a fresh agent to review plans/specs) doubl
 - **codex-tools** — added environment detection and Codex App finishing sections for worktree-aware skills (by @arittr)
 - **Design spec** — added Codex App compatibility design spec (PRI-823) covering read-only environment detection, worktree-safe skill behavior, and sandbox fallback patterns (by @arittr)
 
-## v5.0.5 (2026-03-17)
+## 5.0.5
 
 ### Bug Fixes
 
@@ -259,7 +260,7 @@ The subagent review loop (dispatching a fresh agent to review plans/specs) doubl
 
 - **Execution handoff** — restore user choice between subagent-driven and inline execution after plan writing. Subagent-driven is recommended but no longer mandatory.
 
-## v5.0.4 (2026-03-16)
+## 5.0.4
 
 ### Review Loop Refinements
 
@@ -280,7 +281,7 @@ Dramatically reduces token usage and speeds up spec and plan reviews by eliminat
 - **Verify server actually stopped** — `stop-server.sh` now confirms the process is dead before reporting success. SIGTERM + 2s wait + SIGKILL fallback. Reports failure if the process survives. (PR #751)
 - **Generic agent language** — brainstorm companion waiting page now says "the agent" instead of "Claude".
 
-## v5.0.3 (2026-03-15)
+## 5.0.3
 
 ### Cursor Support
 
@@ -295,7 +296,7 @@ Dramatically reduces token usage and speeds up spec and plan reviews by eliminat
 - **Brainstorm server on Windows** — auto-detect Windows/Git Bash (`OSTYPE=msys*`, `MSYSTEM`) and switch to foreground mode, fixing silent server failure caused by `nohup`/`disown` process reaping. (#737)
 - **Codex docs fix** — replaced deprecated `collab` flag with `multi_agent` in Codex documentation. (PR #749)
 
-## v5.0.2 (2026-03-11)
+## 5.0.2
 
 ### Zero-Dependency Brainstorm Server
 
@@ -319,7 +320,7 @@ Dramatically reduces token usage and speeds up spec and plan reviews by eliminat
 - All delegation skills (brainstorming, dispatching-parallel-agents, requesting-code-review, subagent-driven-development, writing-plans) now include context isolation principle
 - Subagents receive only the context they need, preventing context window pollution
 
-## v5.0.1 (2026-03-10)
+## 5.0.1
 
 ### Agentskills Compliance
 
@@ -408,7 +409,7 @@ Dramatically reduces token usage and speeds up spec and plan reviews by eliminat
 
 ---
 
-## v5.0.0 (2026-03-09)
+## 5.0.0
 
 ### Breaking Changes
 
@@ -502,7 +503,7 @@ Added `<SUBAGENT-STOP>` block to using-agent-harness. Subagents dispatched for s
 
 ---
 
-## v4.3.1 (2026-02-21)
+## 4.3.1
 
 ### Added
 
@@ -524,7 +525,7 @@ Claude Code's `.sh` auto-detection on Windows was prepending `bash` to the hook 
 
 This fixes SessionStart failures on Windows with spaces in paths, missing WSL, `set -euo pipefail` fragility on MSYS, and backslash mangling.
 
-## v4.3.0 (2026-02-12)
+## 4.3.0
 
 This fix should dramatically improve agent-harness skills compliance and should reduce the chances of Claude entering its native plan mode unintentionally.
 
@@ -550,7 +551,7 @@ Added an `EnterPlanMode` intercept to the skill flow graph. When the model is ab
 
 Changed `async: true` to `async: false` in hooks.json. When async, the hook could fail to complete before the model's first turn, meaning using-agent-harness instructions weren't in context for the first message.
 
-## v4.2.0 (2026-02-05)
+## 4.2.0
 
 ### Breaking Changes
 
@@ -615,7 +616,7 @@ Improved documentation of how Codex tools map to Claude Code equivalents for sub
 
 ---
 
-## v4.1.1 (2026-01-23)
+## 4.1.1
 
 ### Fixes
 
@@ -636,7 +637,7 @@ Changes:
 
 ---
 
-## v4.1.0 (2026-01-23)
+## 4.1.0
 
 ### Breaking Changes
 
@@ -666,7 +667,7 @@ Fix: hooks.json now calls session-start.sh directly. Claude Code 2.1.x handles t
 
 ---
 
-## v4.0.3 (2025-12-26)
+## 4.0.3
 
 ### Improvements
 
@@ -684,7 +685,7 @@ Changes:
 
 New test suite in `tests/explicit-skill-requests/` that verifies Claude correctly invokes skills when users request them by name. Includes single-turn and multi-turn test scenarios.
 
-## v4.0.2 (2025-12-23)
+## 4.0.2
 
 ### Fixes
 
@@ -694,7 +695,7 @@ Added `disable-model-invocation: true` to all three slash commands (`/brainstorm
 
 The underlying skills (`agent-harness:brainstorming`, `agent-harness:executing-plans`, `agent-harness:writing-plans`) remain available for Claude to invoke autonomously. This change prevents confusion when Claude would invoke a command that just redirects to a skill anyway.
 
-## v4.0.1 (2025-12-23)
+## 4.0.1
 
 ### Fixes
 
@@ -714,7 +715,7 @@ Added a note about replying to inline review comments in the original thread rat
 
 Added guidance that mechanical constraints should be automated, not documented—save skills for judgment calls.
 
-## v4.0.0 (2025-12-17)
+## 4.0.0
 
 ### New Features
 
@@ -800,7 +801,7 @@ Description changed to imperative: "You MUST use this before any creative work�
 
 ---
 
-## v3.6.2 (2025-12-03)
+## 3.6.2
 
 ### Fixed
 
@@ -811,7 +812,7 @@ Description changed to imperative: "You MUST use this before any creative work�
 
 ---
 
-## v3.5.1 (2025-11-24)
+## 3.5.1
 
 ### Changed
 
@@ -823,7 +824,7 @@ Description changed to imperative: "You MUST use this before any creative work�
 
 ---
 
-## v3.5.0 (2025-11-23)
+## 3.5.0
 
 ### Added
 
@@ -853,19 +854,19 @@ Description changed to imperative: "You MUST use this before any creative work�
 
 ---
 
-## v3.4.1 (2025-10-31)
+## 3.4.1
 
 ### Improvements
 
 - Optimized agent-harness bootstrap to eliminate redundant skill execution. The `using-agent-harness` skill content is now provided directly in session context, with clear guidance to use the Skill tool only for other skills. This reduces overhead and prevents the confusing loop where agents would execute `using-agent-harness` manually despite already having the content from session start.
 
-## v3.4.0 (2025-10-30)
+## 3.4.0
 
 ### Improvements
 
 - Simplified `brainstorming` skill to return to original conversational vision. Removed heavyweight 6-phase process with formal checklists in favor of natural dialogue: ask questions one at a time, then present design in 200-300 word sections with validation. Keeps documentation and implementation handoff features.
 
-## v3.3.1 (2025-10-28)
+## 3.3.1
 
 ### Improvements
 
@@ -876,7 +877,7 @@ Description changed to imperative: "You MUST use this before any creative work�
 
 - Clarified `writing-skills` guidance so it points to the correct agent-specific personal skill directories (`~/.claude/skills` for Claude Code, `~/.codex/skills` for Codex).
 
-## v3.3.0 (2025-10-28)
+## 3.3.0
 
 ### New Features
 
@@ -904,7 +905,7 @@ Description changed to imperative: "You MUST use this before any creative work�
 
 **Note:** Codex support is experimental. The integration provides core agent-harness functionality but may require refinement based on user feedback.
 
-## v3.2.3 (2025-10-23)
+## 3.2.3
 
 ### Improvements
 
@@ -919,7 +920,7 @@ The Skill tool is the proper mechanism for invoking skills in Claude Code. This 
 ### Files Changed
 - Updated: `skills/using-agent-harness/SKILL.md` - Changed tool references from Read to Skill
 
-## v3.2.2 (2025-10-21)
+## 3.2.2
 
 ### Improvements
 
@@ -941,7 +942,7 @@ These changes address observed agent behavior where they rationalize around skil
 ### Files Changed
 - Updated: `skills/using-agent-harness/SKILL.md` - Added three layers of enforcement to prevent skill-skipping rationalization
 
-## v3.2.1 (2025-10-20)
+## 3.2.1
 
 ### New Features
 
@@ -957,7 +958,7 @@ These changes address observed agent behavior where they rationalize around skil
 - Updated: `skills/requesting-code-review/SKILL.md` - References to `agent-harness:code-reviewer`
 - Updated: `skills/subagent-driven-development/SKILL.md` - References to `agent-harness:code-reviewer`
 
-## v3.2.0 (2025-10-18)
+## 3.2.0
 
 ### New Features
 
@@ -984,13 +985,13 @@ These changes address observed agent behavior where they rationalize around skil
 - Implementation plans continue using existing `YYYY-MM-DD-<feature-name>.md` format
 - Both stored in `docs/plans/` directory with clear naming distinction
 
-## v3.1.1 (2025-10-17)
+## 3.1.1
 
 ### Bug Fixes
 
 - **Fixed command syntax in README** (#44) - Updated all command references to use correct namespaced syntax (`/agent-harness:brainstorm` instead of `/brainstorm`). Plugin-provided commands are automatically namespaced by Claude Code to avoid conflicts between plugins.
 
-## v3.1.0 (2025-10-17)
+## 3.1.0
 
 ### Breaking Changes
 
@@ -1049,19 +1050,19 @@ These changes address observed agent behavior where they rationalize around skil
 - Added reference to Anthropic's official best practices
 - Improved examples showing proper skill reference format
 
-## v3.0.1 (2025-10-16)
+## 3.0.1
 
 ### Changes
 
 We now use Anthropic's first-party skills system!
 
-## v2.0.2 (2025-10-12)
+## 2.0.2
 
 ### Bug Fixes
 
 - **Fixed false warning when local skills repo is ahead of upstream** - The initialization script was incorrectly warning "New skills available from upstream" when the local repository had commits ahead of upstream. The logic now correctly distinguishes between three git states: local behind (should update), local ahead (no warning), and diverged (should warn).
 
-## v2.0.1 (2025-10-12)
+## 2.0.1
 
 ### Bug Fixes
 
