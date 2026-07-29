@@ -271,7 +271,6 @@ RESIDUAL=$(grep -rni 'superpowers' \
     --exclude=README_EN.md \
     --exclude=CLAUDE.md \
     --exclude=rebrand-to-agent-harness.sh \
-    --exclude=RELEASE-NOTES.md \
     . 2>/dev/null || true)
 
 if [[ -n "$RESIDUAL" ]]; then

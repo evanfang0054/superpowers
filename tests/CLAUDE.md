@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 | 目录 | 类型 | 运行入口 | 测什么 |
 |------|------|---------|--------|
-| `plugin-infrastructure/` | 纯脚本 | `./run-all.sh` | hooks 配置、plugin/marketplace manifest、commands/agents frontmatter、`bump-version.sh`、脚本冒烟 |
+| `plugin-infrastructure/` | 纯脚本 | `./run-all.sh` | hooks 配置、plugin/marketplace manifest、commands/agents frontmatter、`sync-plugin-versions.sh`、changesets 配置、脚本冒烟 |
 | `learnings-scripts/` | 纯脚本 | `./test-learnings.sh` | `scripts/*learnings.sh` 行为 |
 | `codex-plugin-sync/` | 纯脚本 | `./test-sync-to-codex-plugin.sh` | Codex plugin manifest 与 Claude Code 一致性 |
 | `sdd-scripts/` | 纯脚本 | `./test-cleanup-workspace.sh` | SDD 工作区清理脚本 |

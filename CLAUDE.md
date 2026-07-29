@@ -43,7 +43,9 @@
 > 注：`explicit-skill-requests` / `skill-triggering` / `subagent-driven-dev` 套件需要消耗 Claude API 配额并在 headless 模式下真实触发 skill 行为，结果取决于模型当前行为，非纯脚本断言。
 
 ### 发布
-- `pnpm run release`（执行 `./scripts/bump-version.sh`）
+- `pnpm changeset` — 交互式添加 changeset（选择 minor/major/patch + 写变更描述，生成 `.changeset/*.md`）
+- `pnpm release` — 消费 changesets（`changeset version` bump package.json + 生成 CHANGELOG.md），再 `./scripts/sync-plugin-versions.sh` 同步3个插件 manifest 版本
+- `./scripts/sync-plugin-versions.sh --check` — 检测4个版本文件是否 drift
 
 ### Auto-Loop（`scripts/auto-loop.sh`）
 
