@@ -370,6 +370,60 @@ Agent Harness 不仅是一组 skill 的集合，更在模型外搭建了一层�
 /plugin update agent-harness
 ```
 
+## 版本管理
+
+本项目使用 [Changesets](https://github.com/changesets/changesets) 进行版本管理。版本号在4个文件间保持同步：`package.json`、`.claude-plugin/plugin.json`、`.codex-plugin/plugin.json`、`.claude-plugin/marketplace.json`。
+
+### 发布版本
+
+1. **添加 changeset** 描述本次变更：
+
+   ```bash
+   pnpm changeset
+   ```
+
+   交互式提示：选择 `agent-harness` → 选择 `minor` / `major` / `patch` → 写一句变更摘要。生成 `.changeset/*.md` 文件。
+
+2. **提交 changeset：**
+
+   ```bash
+   git add .changeset/ && git commit -m "chore: add changeset"
+   ```
+
+3. **执行发布** — bump 版本、生成 CHANGELOG 条目、同步3个插件 manifest：
+
+   ```bash
+   pnpm release
+   ```
+
+   依次执行 `changeset version`（bump `package.json` + 用 GitHub PR 链接和贡献者致谢更新 `CHANGELOG.md` + 消费 changeset 文件）和 `./scripts/sync-plugin-versions.sh`（把新版本同步到3个插件 manifest）。
+
+4. **验证4个文件同步：**
+
+   ```bash
+   ./scripts/sync-plugin-versions.sh --check
+   ```
+
+   版本一致时 exit `0`，检测到 drift 时 exit `2`。
+
+5. **提交、打 tag、推送：**
+
+   ```bash
+   git add -A && git commit -m "chore(release): v6.5.0"
+   git tag v6.5.0
+   git push && git push --tags
+   ```
+
+### 命令速查
+
+| 命令 | 用途 |
+|------|------|
+| `pnpm changeset` | 编写变更描述（合并功能前） |
+| `pnpm release` | 消费 changesets → bump 版本 + 生成 changelog + 同步 manifest |
+| `./scripts/sync-plugin-versions.sh --check` | 检测4个文件间的版本 drift |
+
+`CHANGELOG.md` 由 `@changesets/changelog-github` 自动生成。历史发布记录（changesets 迁移前的64个版本）保留在 `CHANGELOG.md` 底部。包标记为 `private` —— 版本只记录在 git + 4个 manifest 文件中，不发布到 npm。
+
 ## 许可证
 
 MIT 许可证 - 详见 LICENSE 文件
