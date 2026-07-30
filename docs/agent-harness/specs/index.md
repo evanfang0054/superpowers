@@ -69,6 +69,9 @@
 ## brainstorming-optimization
 - [2026-07-21-brainstorming-optimization-design](2026-07-21-brainstorming-optimization-design.md)
 
+## changesets-migration
+- [2026-07-29-changesets-migration-design](2026-07-29-changesets-migration-design.md)
+
 ## domain-modeling
 - [2026-07-21-domain-modeling-design](2026-07-21-domain-modeling-design.md)
 
@@ -80,7 +83,4 @@
 
 ## upstream-v6-2-adaptation
 - [2026-07-29-upstream-v6-2-adaptation-design](2026-07-29-upstream-v6-2-adaptation-design.md)
-
-## changesets-migration
-- [2026-07-29-changesets-migration-design](2026-07-29-changesets-migration-design.md)
 

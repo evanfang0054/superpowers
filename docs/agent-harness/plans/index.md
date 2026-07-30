@@ -81,6 +81,9 @@
 ## brainstorming-optimization
 - [2026-07-21-brainstorming-optimization](2026-07-21-brainstorming-optimization.md)
 
+## changesets-migration
+- [2026-07-29-changesets-migration](2026-07-29-changesets-migration.md)
+
 ## domain-modeling
 - [2026-07-21-domain-modeling](2026-07-21-domain-modeling.md)
 
