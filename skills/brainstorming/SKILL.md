@@ -191,34 +191,6 @@ If unsure whether a change qualifies, default to running sprint contract.
 
 ## Clarification Loop Circuit-Breaker (issue #83)
 
-If the user rejects your proposed options or recommended frontier answers **3 times in a row** (clear rejection
-signals — "no" / "not what I meant" / "that's not it" / "try again" / any hesitant response followed by a different question / any
-response that says "this isn't what I want, try something else" regardless of
-language), **stop listing more options**. Listing more variants of the same
-shape does not converge — it inflates context with zero-output turns (hack
-session 90b1b2fd hit 45.6% no-tool turns this way).
-
-Judge by intent, not by keyword matching — a user can reject without using any
-of the example phrases. If you're unsure whether something was a rejection,
-ask directly ("is this a no?") rather than treating an ambiguous turn as
-neither yes nor no.
-
-**Switch strategy immediately:**
-
-1. Stop generating option lists.
-2. Ask one open-ended outcome question: "Describe the end result you want to see, ignoring
-   feasibility for now."
-3. If the user still can't describe it, recommend handoff:
-   - `agent-harness:office-hours` to re-align on goals, or
-   - pause and ask the user to gather more context before continuing.
-4. Only resume option-listing once the user has described the desired outcome
-   in their own words.
-
-This rule works together with `loop-detection`'s semantic-loop section,
-which cross-references this skill as the authoritative handler.
-
-## Clarification Loop Circuit-Breaker (issue #83)
-
 If the user rejects your proposed options **3 times in a row** (clear rejection
 signals — "不对" / "不行" / "重新" / "no" / "not what I meant" / "that's not
 it" / "try again" / a hesitant "嗯..." followed by a different question / any
@@ -243,9 +215,6 @@ neither yes nor no.
    - pause and ask the user to gather more context before continuing.
 4. Only resume option-listing once the user has described the desired outcome
    in their own words.
-
-This rule works together with `loop-detection`'s semantic-loop section,
-which cross-references this skill as the authoritative handler.
 
 ## Six Forcing Questions (Product Ideas)
 

@@ -25,3 +25,24 @@ Before considering a test useful, ask whether at least one test fails if a reali
 ## TDD order is non-negotiable
 
 Writing production code and then adding tests is still tests-after: it answers what the implementation does, not what it should do. Delete prewritten production code, choose the seam, write the failing behavior test, watch RED, then implement the minimum to reach GREEN.
+
+## Quick Reference
+
+| Rule | Check |
+|------|-------|
+| Named a realistic production break | Before writing the test |
+| Expected value is independent | Literal or hand-checked fixture, never computed by code under test |
+| Tests behavior, not source text | Run it, assert output/exit/side-effect — no grep on generated source |
+| Mocks only at real boundaries | Slow or external only; never assert mock calls as the behavior |
+| No test-only API on production | Cleanup lives in test utilities |
+| Mutation Check passes | At least one test fails under a realistic mutation |
+
+## Warning Signs
+
+- Test passes immediately after writing → it tests nothing
+- Expected value computed by the same code being tested → circular
+- Test asserts that generated source contains a string → testing text, not behavior
+- Mock setup is more complex than the real dependency → use integration test
+- Test never failed during development → you never saw it catch a bug
+- Production class grew a method "just for tests" → move it to test utils
+- Mutation changes nothing → the assertion is not observable enough
