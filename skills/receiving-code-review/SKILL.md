@@ -205,14 +205,6 @@ You understand 1,2,3,6. Unclear on 4,5.
 
 When replying to inline review comments on GitHub, reply in the comment thread (`gh api repos/{owner}/{repo}/pulls/{pr}/comments/{id}/replies`), not as a top-level PR comment.
 
-## The Bottom Line
-
-**External feedback = suggestions to evaluate, not orders to follow.**
-
-Verify. Question. Then implement.
-
-No performative agreement. Technical rigor always.
-
 ## Capture Learnings
 
 **After addressing review feedback**, if you learned something valuable:
