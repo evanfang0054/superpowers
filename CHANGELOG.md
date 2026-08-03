@@ -1,5 +1,24 @@
 # agent-harness
 
+## 6.5.2
+
+### Patch Changes
+
+- Disable auto-invocation for 6 low/zero-usage skills to reduce context noise.
+
+  Added `disable-model-invocation: true` to the following skills' frontmatter:
+  plan-ceo-review, plan-eng-review, post-deploy-monitoring, qa-testing,
+  loop-detection, harness-design.
+
+  These skills had 0–4 actual invocations across 3,494 session logs.
+  They remain available via explicit `Skill` tool or `/skill-name` invocation,
+  but will no longer trigger automatically based on context. Skill code is
+  preserved verbatim — only the auto-trigger flag is added (6 insertions, 0 deletions).
+
+  Prior art: office-hours, harness-init, harness-optimizer, using-agent-harness,
+  and brainstorming already use this flag. This change extends the same pattern
+  to other skills that are not part of the core development loop.
+
 ## 6.5.1
 
 ### Patch Changes

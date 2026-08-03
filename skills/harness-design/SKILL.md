@@ -1,6 +1,7 @@
 ---
 name: harness-design
 description: 用HTML做高保真原型、Demo、幻灯片、动画、设计变体。触发词：做原型、设计Demo、交互原型、UI mockup、prototype、app原型、iOS/移动端原型、设计风格/方向、配色/视觉风格、做个HTML页面、导出MP4/GIF、动画Demo、设计评审。
+disable-model-invocation: true
 ---
 
 # Design

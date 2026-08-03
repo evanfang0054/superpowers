@@ -2,6 +2,7 @@
 name: qa-testing
 description: Systematically QA test a web app and fix bugs. Trigger on "qa", "test this site", "find bugs", "fix what's broken", or "does this work?".
 requires: [agent-browser]
+disable-model-invocation: true
 ---
 
 # /qa: Test → Fix → Verify

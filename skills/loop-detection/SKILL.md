@@ -2,6 +2,7 @@
 name: loop-detection
 description: Use when an agent is stuck editing the same file repeatedly without converging, or when verification requires doom loop analysis.
 when_to_use: "[feedback] Triggered after multiple unsuccessful edits to the same file or when verification detects repeated changes without progress."
+disable-model-invocation: true
 ---
 
 # Loop Detection

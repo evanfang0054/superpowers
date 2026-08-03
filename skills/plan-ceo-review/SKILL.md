@@ -1,6 +1,7 @@
 ---
 name: plan-ceo-review
 description: CEO/founder-mode plan review — rethink the problem, challenge premises, find the 10-star product. Trigger on "think bigger", "expand scope", "strategy review", or "rethink this".
+disable-model-invocation: true
 ---
 
 # CEO Plan Review Mode
