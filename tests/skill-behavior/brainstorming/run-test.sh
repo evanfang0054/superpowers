@@ -36,3 +36,15 @@ assert_no_premature_action
 assert_response_contains "focused\|smallest\|narrow\|current user" "removes unnecessary approach features"
 assert_response_matches '(?ms)(?:^|\n)\s*1\..*?\?(?=.*(?:^|\n)\s*2\..*?\?)' "asks at least two clarification questions in one numbered batch"
 print_skill_summary "brainstorming (YAGNI approach pressure)"
+
+SKILL_PASS_COUNT=0
+SKILL_FAIL_COUNT=0
+
+echo ""
+echo "=== Test: brainstorming (Assumption Audit) ==="
+echo ""
+run_skill "brainstorming" "$SCRIPT_DIR/prompts/assumption-audit.txt" 5
+assert_skill_triggered "brainstorming"
+assert_no_premature_action
+assert_response_contains "assumption\|假设\|✅\|❓" "surfaces an assumption ledger"
+print_skill_summary "brainstorming (Assumption Audit)"
