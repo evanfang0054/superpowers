@@ -1,5 +1,16 @@
 # agent-harness
 
+## 6.5.3
+
+### Patch Changes
+
+- 补强 brainstorming skill 的"拷问"力度：参考 grill-me 理念引入假设审计门（Assumption Audit）与拷问式终止条件（Relentless termination），确保没有沉默假设进入 spec。
+
+  - 新增 Relentless termination：frontier 必须清空才能进入下一阶段，"我觉得够了"不是合法停止条件
+  - 新增 Assumption Audit 门：呈现设计前必须列出 ✅ 已确认 / ❓ 未确认假设清单，每个 ❓ 转为决策或显式 out-of-scope
+  - Checklist 与 Process Flow 同步插入审计节点
+  - 新增压力测试 prompt assumption-audit.txt 与对应断言
+
 ## 6.5.2
 
 ### Patch Changes
