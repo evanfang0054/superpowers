@@ -1,0 +1,1 @@
+Invoke the agent-harness:brainstorming skill via the Skill tool. I am building a full-stack blog platform: Next.js frontend, Node.js backend, Postgres database. I've narrowed auth to two options — JWT or session-based — and want your help deciding. Walk me through the design.

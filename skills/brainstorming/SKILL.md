@@ -97,6 +97,8 @@ digraph brainstorming {
 **Relentless termination (the frontier must be empty before you move on):**
 The questioning phase is done only when the frontier is empty — every branch of the decision tree has been visited and nothing is left silently assumed. "I think I have enough" is NOT a stopping condition if there are still unasked frontier questions. A common failure mode is declaring the design "clear enough" while decisions remain implicit; the grilling discipline is to keep asking until each assumption is either turned into an explicit decision or ruled out as out-of-scope. If you are tempted to skip a question because "the user probably meant X", ask the question instead — that is the silent assumption you are about to bake into the spec.
 
+**Hard rule:** If the frontier is not empty, you MUST NOT proceed to Propose approaches or Present design. "I think I have enough" is not a substitute for an empty frontier.
+
 **Fact-checking rules:**
 
 - Separate **facts** from **decisions**
@@ -105,6 +107,48 @@ The questioning phase is done only when the frontier is empty — every branch o
 - Facts are your job: use tools or dispatch subagents to check them; never ask the user for facts you can inspect
 - Do not block unnecessarily: while a fact-finding subagent runs, keep asking frontier questions that do not depend on that fact
 - Only questions downstream of an unresolved fact wait for the fact-finding result
+
+**When the user cannot answer a frontier question (to-questionnaire escape hatch):**
+
+A frontier question may require knowledge the user doesn't hold (domain SME, customer insight, product decision owned elsewhere). When the user clearly signals they cannot answer — "I need to ask X", "I'm not sure", "this depends on what the team decides" — do NOT guess, do NOT drop the question, and do NOT force the user to invent an answer. Instead, turn the unanswerable question into a questionnaire for whoever holds the knowledge.
+
+**Grill the send, not the subject.** Interview the user only about what they can always answer — who the questionnaire goes to, and what the user needs back. Then write a Markdown questionnaire that targets the gap.
+
+1. **Who is it going to?** Ask, in one exchange, the recipient's role, expertise, and relationship to the user. This fixes tone and how much context the document must carry. Done when you know who the recipient is and what they know that the user doesn't.
+2. **What do you need back?** Ask, in one exchange, the specific decisions or facts the user can't resolve alone and needs from this person. Done when you have a concrete list of what the user must walk away able to do or decide.
+3. **Write the questionnaire.** Draft questions aimed at the gap from steps 1–2, using the format below. Write it to `docs/agent-harness/handoffs/to-<recipient>-<slug>.md` where `<recipient>` is the recipient's role or team (e.g. `to-pm-`, `to-finance-`, `to-sre-`), not a personal name, and `<slug>` is kebab-cased from the topic. Create the directory if missing. Report the path to the user. Done when the file exists and every item the user named in step 2 is covered by a question.
+
+**Question format inside the questionnaire** (use these exact markers so the recipient can scan):
+
+~~~
+❓ **Q1** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
+
+➡️ <what the user needs from the recipient to decide>
+~~~
+
+**Pause, don't abandon.** The frontier node that triggered the questionnaire stays paused until the user returns with answers. Other unblocked frontier nodes may proceed in parallel. When the user comes back, recompute the frontier with the new answers.
+
+**Document skeleton** (adapt to context):
+
+~~~
+# Questionnaire: <topic>
+
+**Purpose:** why this questionnaire exists and the decision riding on it.
+**From:** <the user> — **To:** <recipient role> — **How answers will be used:** <where they go>
+**Deadline / effort:** <if known>
+
+## Context
+One paragraph orienting a recipient who wasn't in the user's head.
+
+## <Theme heading>
+### ❓ Q1 - **<title>**: <body>
+➡️ <what's needed>
+
+## Anything else?
+A closing catch-all.
+~~~
+
+**Do NOT trigger this branch speculatively.** Only when the user has clearly said they can't answer. If you're unsure whether the user can answer, ask them directly ("can you answer this, or should we turn it into a questionnaire for someone else?") rather than assuming either way.
 
 **Exploring approaches:**
 

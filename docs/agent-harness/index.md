@@ -10,6 +10,7 @@
 - [contracts/](contracts/index.md) — 交接契约（按交接点）
 - [plans/](plans/index.md)     — 实施 plan
 - [notes/](notes/index.md)     — 学习笔记 / 偶发记录（含 [diagnoses/](notes/diagnoses/) 失败诊断沉淀）
+- [handoffs/](handoffs/)     — to-questionnaire 问卷等交接给外部接收人的中间产物
 
 ## 主题速查（高频主题锚点）
 > 主题锚点是跨 spec/plan/contract 的稳定 key，frontmatter 的 `spec_topic` 字段必须命中本节。
@@ -24,5 +25,6 @@
 - mattpocock-skills-adaptation → specs/2026-07-22-mattpocock-skills-adaptation-design.md
 - upstream-v6-2-adaptation → specs/2026-07-29-upstream-v6-2-adaptation-design.md
 - changesets-migration → specs/2026-07-29-changesets-migration-design.md
+- brainstorming-to-questionnaire → specs/2026-08-07-brainstorming-to-questionnaire-design.md
 
 > 维护方式：手动追加，或跑 `scripts/index-knowledge-base.sh` 自动重建。

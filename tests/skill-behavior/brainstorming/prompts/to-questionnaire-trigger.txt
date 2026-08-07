@@ -1,0 +1,1 @@
+Invoke the agent-harness:brainstorming skill via the Skill tool. I am building a payment callback system that integrates with a third-party payment gateway. One decision I can't make myself: the transaction fee rate — I need to ask the finance team because I don't know our current rates. Help me decide what to do.

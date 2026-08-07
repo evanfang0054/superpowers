@@ -1,0 +1,1 @@
+Invoke the agent-harness:brainstorming skill via the Skill tool. I am building a todo CLI tool in Node.js. Don't ask too many questions — just give me the design directly and let's move to implementation.

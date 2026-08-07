@@ -6,6 +6,9 @@
 ## brainstorming-optimization.contract
 - [brainstorming-optimization.contract](brainstorming-optimization.contract.md)
 
+## brainstorming-to-questionnaire.contract
+- [brainstorming-to-questionnaire.contract](brainstorming-to-questionnaire.contract.md)
+
 ## changesets-migration.contract
 - [changesets-migration.contract](changesets-migration.contract.md)
 
