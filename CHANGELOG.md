@@ -1,5 +1,17 @@
 # agent-harness
 
+## 6.5.4
+
+### Patch Changes
+
+- 为 brainstorming skill 增加 to-questionnaire escape hatch 与 frontier 硬规则,参考 mattpocock/skills 的 `grilling` 和 `to-questionnaire`。
+
+  - 新增 "When the user cannot answer" 小节:用户明确表示答不了某个 frontier 决策时,不再强行逼用户假设或 skip,而是产出 `to-<recipient>-<slug>.md` 问卷到 `docs/agent-harness/handoffs/`,交由掌握知识的第三方填写后回填 frontier
+  - 新增 frontier 硬规则:frontier 未空时禁止进入 Propose approaches / Present design,"我觉得够了"不能替代空 frontier
+  - 问卷分支内部使用 `❓/➡️` 格式(对齐 grilling),不影响现有 frontier round 主线编号风格
+  - 在 `docs/agent-harness/index.md` 注册 handoffs/ 子目录
+  - 新增 3 个 headless 行为测试场景(frontier-hard-rule / to-questionnaire-trigger / no-speculative-trigger)
+
 ## 6.5.3
 
 ### Patch Changes
