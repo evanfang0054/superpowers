@@ -4,6 +4,9 @@ spec_topic: brainstorming-to-questionnaire
 task_count: 7
 estimated_phases: [tests-baseline, implementation, tests-verify, loading-verify]
 dod: "SKILL.md 含 4 条精确字符串;index.md 含 handoffs/ 链接;handoffs/.gitkeep 存在;3 个具名测试 fixture 存在;run-test.sh 引用三个场景名;run-skill-tests.sh 退出码=0;改后 behavior 三场景符合预期"
+status: completed
+completed_at: "2026-08-07T15:30:00+08:00"
+completion_commit: 6c19dfd
 ---
 
 # Brainstorming to-questionnaire Escape Hatch 实施计划
