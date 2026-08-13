@@ -21,6 +21,9 @@
 ## gate-driven-test-design.contract
 - [gate-driven-test-design.contract](gate-driven-test-design.contract.md)
 
+## learnings-removal.contract
+- [learnings-removal.contract](learnings-removal.contract.md)
+
 ## mattpocock-skills-adaptation.contract
 - [mattpocock-skills-adaptation.contract](mattpocock-skills-adaptation.contract.md)
 

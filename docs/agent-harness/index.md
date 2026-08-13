@@ -26,5 +26,6 @@
 - upstream-v6-2-adaptation → specs/2026-07-29-upstream-v6-2-adaptation-design.md
 - changesets-migration → specs/2026-07-29-changesets-migration-design.md
 - brainstorming-to-questionnaire → specs/2026-08-07-brainstorming-to-questionnaire-design.md
+- learnings-removal → specs/2026-08-13-learnings-removal-design.md
 
 > 维护方式：手动追加，或跑 `scripts/index-knowledge-base.sh` 自动重建。

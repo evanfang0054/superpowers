@@ -12,7 +12,7 @@
 
 ## 项目概述
 
-**Agent Harness** 是一套完整的 AI 辅助软件开发工作流，以插件形式分发，支持多个 AI 编码助手（Claude Code、Cursor、Codex、OpenCode、GitHub Copilot CLI、Gemini CLI）。核心是一组行为塑造型 "skills"（markdown 文件）加上基于 shell 的 hooks 和 learnings 基础设施——不是编译型应用。基于 Jesse Vincent 的原版 [Superpowers](https://github.com/obra/superpowers) 项目。
+**Agent Harness** 是一套完整的 AI 辅助软件开发工作流，以插件形式分发，支持多个 AI 编码助手（Claude Code、Cursor、Codex、OpenCode、GitHub Copilot CLI、Gemini CLI）。核心是一组行为塑造型 "skills"（markdown 文件）加上基于 shell 的 hooks 基础设施——不是编译型应用。基于 Jesse Vincent 的原版 [Superpowers](https://github.com/obra/superpowers) 项目。
 
 - 顶层 `package.json` 极简（仅一个 `release` 脚本）。无构建步骤、无顶层 lint、无顶层测试运行器。
 - `AGENTS.md` 是指向本文件的符号链接——编辑本文件即可同步。
@@ -31,7 +31,6 @@
 - `tests/codex-plugin-sync/test-sync-to-codex-plugin.sh` — Codex plugin manifest 一致性测试
 - `tests/explicit-skill-requests/run-all.sh` — 多轮显式 skill 调用测试（依赖 `claude -p` headless 模式实际调用 Claude API）
 - `tests/skill-triggering/run-all.sh` — 隐式 skill 触发测试（依赖 `claude -p` headless 模式实际调用 Claude API）
-- `tests/learnings-scripts/test-learnings.sh` — learnings shell 脚本测试
 - `tests/phase-metrics-scripts/run-all.sh` — phase-metrics 脚本测试
 - `tests/knowledge-base-scripts/run-all.sh` — knowledge-base 脚本测试
 - `tests/handoff-scripts/run-all.sh` — handoff schema 校验测试
@@ -103,19 +102,18 @@ Demo 是一个独立的全栈 monorepo（pnpm workspace）。在 demo 目录内�
 1. **决策层**（"要不要做？"）：`office-hours` → `plan-ceo-review` → `plan-eng-review`
 2. **执行层**（"怎么做？"）：`brainstorming` → `sprint-contract` → `writing-plans` → `subagent-driven-development` / `executing-plans`
    - 内循环：`test-driven-development` → `computational-sensors` → `requesting-code-review` → `verification-before-completion` → `finishing-a-development-branch`
-3. **质量层**（"做得好不好？"）：`qa-testing` → `post-deploy-monitoring` → `retrospective` → `trace-analysis`
+3. **质量层**（"做得好不好？"）：`qa-testing` → `post-deploy-monitoring` → `retrospective`
 
 ### 关键架构模式
 
 - **Skills（`skills/<name>/SKILL.md`）** — 每个 skill 是一个目录，包含 `SKILL.md`（YAML frontmatter：`name`、`description`、`when_to_use`，可选 `argument-hint`、`disable-model-invocation`、`effort`）加 markdown 指令。通过 `Skill` 工具调用，根据上下文自动触发。许多 skill 带有辅助文件（子代理提示、参考资料、脚本）。
 - **插件打包（`.claude-plugin/`）** — `plugin.json` + `marketplace.json` 使 agent-harness 可作为 Claude Code 插件安装。多平台支持内置于 hook 层。
-- **Hooks（`hooks/`）** — 会话生命周期管理。`hooks/hooks.json`（Claude Code）和 `hooks/hooks-cursor.json`（Cursor）定义 `sessionStart` 和 `Stop` 钩子。`hooks/session-start` 读取 `using-agent-harness` skill 内容及项目 learnings（`.agent-harness/learnings.jsonl`），以平台特定格式（Cursor / Claude Code / Copilot CLI）输出 JSON。`hooks/stop-hook.sh` 在会话结束时运行。
-- **Learnings（`.agent-harness/learnings.jsonl` + `scripts/*learnings.sh`）** — 持久化的项目知识，通过 session-start hook 注入每个新会话。使用 `session-learnings` skill 添加条目；不要手动编辑 JSONL 文件。
+- **Hooks（`hooks/`）** — 会话生命周期管理。`hooks/hooks.json`（Claude Code）和 `hooks/hooks-cursor.json`（Cursor）定义 `sessionStart` 和 `Stop` 钩子。`hooks/session-start` 读取 `using-agent-harness` skill 内容，以平台特定格式（Cursor / Claude Code / Copilot CLI）输出 JSON。`hooks/stop-hook.sh` 在会话结束时运行。
 - **子代理驱动开发（"Ralph Loop"）** — `skills/subagent-driven-development/` 编排专用子代理（implementer、spec reviewer、code quality reviewer）。通过 `scripts/setup-ralph-loop.sh` 设置。子代理提示与 SKILL.md 同目录存放。
 - **Slash 命令（`commands/`）** — 用户可调用：`ralph-loop`、`cancel-ralph`、`help`、`generate-issues`、`fix-issues-and-pr`。
 - **Agents（`agents/`）** — 专用 agent 定义，如 `code-reviewer.md`。
 - **Templates（`templates/）** — 技术栈起步模板（react-typescript、python-fastapi、go-cli）。
-- **Scripts（`scripts/`）** — Shell 工具：版本号管理、learnings 搜索/记录、循环检测、trace 分析、覆盖率指标。
+- **Scripts（`scripts/`）** — Shell 工具：版本号管理、循环检测、覆盖率指标。
 - **Auto-Loop（`scripts/auto-loop.sh` + `scripts/lib/*.sh` + `skills/auto-loop/`）** — 自动化「会话分析→提 issue→SDD 修复→PR」闭环。独立 worktree 隔离运行 Claude，stream-json 信号驱动主循环。详见下方「Auto-Loop」一节。
 
 ## 配置与验证地图
@@ -125,11 +123,11 @@ Demo 是一个独立的全栈 monorepo（pnpm workspace）。在 demo 目录内�
 - Cursor 兼容 hooks 配置：`hooks/hooks-cursor.json`
 - 项目本地配置入口：复制 `.claude/settings.local.json.example` → `.claude/settings.local.json`
 - 插件启用：`.claude/settings.json` 设置 `enabledPlugins.agent-harness@agent-harness`
-- 会话知识来源：`.agent-harness/learnings.jsonl`、`skills/session-learnings/`、`skills/retrospective/`、`scripts/*learnings.sh`
+- 会话知识来源：`docs/agent-harness/index.md`、`CONTEXT.md`、`skills/retrospective/`
 
 验证规则：
 - 涉及配置或会话注入的改动，需验证项目设置能正确引用 `hooks/hooks.json`。
-- 如果修改了 `SessionStart` / learnings 路径，需验证新会话能收到包含 `using-agent-harness` skill 和 learnings 块的 `hookSpecificOutput.additionalContext`。
+- 如果修改了 `SessionStart` 路径，需验证新会话能收到包含 `using-agent-harness` skill 的 `hookSpecificOutput.additionalContext`。
 - 仅当改动影响 brainstorming skill 本体或其执行流程时才参考相关 skill 文档进行验证。
 
 ## 核心贡献规则

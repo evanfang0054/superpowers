@@ -70,4 +70,4 @@ Remind user to customize `sensors.json` paths and thresholds for their specific 
 |---|---|
 | Copying without reviewing | Always review sensor commands match your project |
 | Using wrong template | Auto-detection is a hint, not a rule. Pick what fits. |
-| Skipping hooks-config | Hooks enable session-start learnings injection |
+| Skipping hooks-config | Hooks enable session-start context injection |

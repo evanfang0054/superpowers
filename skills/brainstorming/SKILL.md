@@ -312,12 +312,3 @@ When brainstorming a **new product idea** or **major new feature** (not bug fixe
 - Technical refactoring
 - Implementation of already-validated requirements
 
-## Capture Learnings
-
-**After design approval**, if you discovered something worth remembering:
-
-- User stated a strong preference (naming, style, architecture approach)
-- Discovered a project convention not documented elsewhere
-- Made an architectural decision with non-obvious rationale
-
-Record it using `session-learnings` skill so future sessions respect these decisions.

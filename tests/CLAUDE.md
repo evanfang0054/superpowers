@@ -16,7 +16,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | 目录 | 类型 | 运行入口 | 测什么 |
 |------|------|---------|--------|
 | `plugin-infrastructure/` | 纯脚本 | `./run-all.sh` | hooks 配置、plugin/marketplace manifest、commands/agents frontmatter、`sync-plugin-versions.sh`、changesets 配置、脚本冒烟 |
-| `learnings-scripts/` | 纯脚本 | `./test-learnings.sh` | `scripts/*learnings.sh` 行为 |
 | `codex-plugin-sync/` | 纯脚本 | `./test-sync-to-codex-plugin.sh` | Codex plugin manifest 与 Claude Code 一致性 |
 | `sdd-scripts/` | 纯脚本 | `./test-cleanup-workspace.sh` | SDD 工作区清理脚本 |
 | `ralph-loop-scripts/` | 纯脚本 | `./test-stop-hook-promise.sh` | stop hook 行为 |
@@ -32,7 +31,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 # 快速纯脚本全套（秒级）
 ./plugin-infrastructure/run-all.sh
-./learnings-scripts/test-learnings.sh
 ./codex-plugin-sync/test-sync-to-codex-plugin.sh
 npx tsx --test pi/test-pi-extension.mjs
 
@@ -82,5 +80,5 @@ cd claude-code && ./run-skill-tests.sh --integration
 
 ## Git 规范
 
-- Commit：`test(<scope>): <subject>`，scope 例如 `skill-behavior`、`plugin-infrastructure`、`learnings-scripts`。
+- Commit：`test(<scope>): <subject>`，scope 例如 `skill-behavior`、`plugin-infrastructure`、`ralph-loop-scripts`。
 - 分支：`feat/*` / `test/*`（参考当前 `feat/skill-tests`）。

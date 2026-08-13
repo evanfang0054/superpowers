@@ -95,4 +95,3 @@ cd tests/claude-code && ./run-skill-tests.sh
 - 不要为 "合规" 而重写已调优 skill 文案 —— 除非有评估证据。
 - 不要批量 / 捆绑无关 skill 改动到一个 PR。一个 PR 一个问题。
 - 不要伪造问题描述或虚构功能。
-- 不要手动编辑 `.agent-harness/learnings.jsonl`，用 `session-learnings` skill。

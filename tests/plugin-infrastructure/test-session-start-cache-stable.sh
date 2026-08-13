@@ -5,8 +5,8 @@
 # breakpoint invalidates downstream cache. This test verifies:
 #   1. Two consecutive startup invocations with identical inputs produce
 #      byte-equal additionalContext output.
-#   2. The using-agent-harness segment precedes the learnings segment so the
-#      stable prefix is unaffected by per-session learnings churn.
+#   2. The using-agent-harness segment forms a stable prefix (no per-session
+#      churn that would invalidate it).
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/_helpers.sh"
 
@@ -38,55 +38,11 @@ else
     diff <(echo "$OUT_1") <(echo "$OUT_2") | head -20
 fi
 
-# Assertion 2: using-agent-harness body precedes learnings in the stable prefix.
-# (learnings may legitimately vary across runs; we only assert ordering.)
-ua_line=$(echo "$OUT_1" | grep -n "using-agent-harness" | head -1 | cut -d: -f1)
-learnings_line=$(echo "$OUT_1" | grep -n "Project Learnings" | head -1 | cut -d: -f1)
-if [ -n "$ua_line" ] && [ -n "$learnings_line" ] && [ "$ua_line" -lt "$learnings_line" ]; then
-    pass "using-agent-harness precedes Project Learnings (cache-friendly ordering)"
-elif [ -n "$ua_line" ] && [ -z "$learnings_line" ]; then
-    pass "using-agent-harness present; no learnings injected (still cache-safe)"
+# Assertion 2: injected context contains no learnings segment (learnings removed).
+if echo "$OUT_1" | grep -q "Project Learnings"; then
+    fail "injected context should not contain Project Learnings segment"
 else
-    fail "using-agent-harness should precede Project Learnings (ua=$ua_line learnings=$learnings_line)"
-fi
-
-# Assertion 3: learnings summary output is deterministic (no ts-derived date,
-# no decay). C1+I3 fix: summary mode freezes confidence to original value so
-# output is stable across days.
-LEARNINGS_FILE="$REPO_ROOT/.agent-harness/learnings.jsonl"
-if [ -f "$LEARNINGS_FILE" ]; then
-    S1=$("$REPO_ROOT/scripts/search-learnings.sh" --summary 2>/dev/null || true)
-    S2=$("$REPO_ROOT/scripts/search-learnings.sh" --summary 2>/dev/null || true)
-    if [ "$S1" = "$S2" ]; then
-        pass "search-learnings.sh --summary is byte-stable across two runs"
-    else
-        fail "search-learnings.sh --summary is byte-stable across two runs"
-    fi
-
-    # Additional: verify that any confidence displayed in summary matches
-    # the raw confidence from the learnings JSONL (not decayed).
-    # This catches the C1+I3 bug where decayed values would differ cross-day.
-    RAW_CONF=$(python3 -c "
-import json, sys
-with open('$LEARNINGS_FILE') as f:
-    for line in f:
-        if line.strip():
-            e = json.loads(line)
-            if 'confidence' in e:
-                print(e['confidence'])
-                break
-" 2>/dev/null || true)
-    if [ -n "$RAW_CONF" ]; then
-        if echo "$S1" | grep -q "confidence: ${RAW_CONF}/10"; then
-            pass "summary confidence matches raw value (not decayed, C1+I3)"
-        else
-            fail "summary confidence should match raw value ${RAW_CONF}/10 (C1+I3)"
-        fi
-    else
-        pass "no confidence in learnings (skip C1+I3 check)"
-    fi
-else
-    pass "no learnings file present (skip summary determinism check)"
+    pass "no Project Learnings segment (learnings removed)"
 fi
 
 rm -f "$MOCK_ENV_FILE"
