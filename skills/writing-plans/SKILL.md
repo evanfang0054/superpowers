@@ -121,7 +121,7 @@ dod: "<definition of done from sprint contract>"
 Before generating tasks, determine the commit strategy:
 
 - **Ask the user:** "Should each task include a commit step, or do you prefer to commit manually at the end?"
-- **Default to manual-commit** if the user has previously expressed this preference (check session-learnings or project CLAUDE.md)
+- **Default to manual-commit** if the user has previously expressed this preference (check project CLAUDE.md)
 - If auto-commit: include "Step N: Commit" in each task as shown in the Task Structure below
 - If manual-commit: omit commit steps from all tasks; add a single "Final commit" reminder at the end of the plan
 

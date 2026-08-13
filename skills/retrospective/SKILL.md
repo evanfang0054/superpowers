@@ -1,6 +1,6 @@
 ---
 name: retrospective
-description: "Engineering retrospective for analyzing recent work. Use when asked to 'do a retro', 'review the week', 'what did we accomplish', or at the end of a sprint/milestone. Analyzes commits, learnings, and patterns to improve future work."
+description: "Engineering retrospective for analyzing recent work. Use when asked to 'do a retro', 'review the week', 'what did we accomplish', or at the end of a sprint/milestone. Analyzes commits and patterns to improve future work."
 when_to_use: "[feedback] Triggered at end of sprint or session to analyze what happened and improve."
 ---
 
@@ -47,35 +47,14 @@ git log --oneline --since="1 week ago" --author="$(git config user.email)"
 git log --stat --since="1 week ago" --author="$(git config user.email)" | tail -20
 ```
 
-**Learnings (if using session-learnings):**
-```bash
-# Check for captured learnings
-cat .agent-harness/learnings.jsonl 2>/dev/null | tail -20
-```
-
 **Files changed:**
 ```bash
 git diff --stat HEAD~50 --name-only | sort | uniq -c | sort -rn | head -20
 ```
 
-### Trace Analysis Input
-
-As part of data collection, run trace analyzer:
-
-```bash
-bash "${CLAUDE_PLUGIN_ROOT}/scripts/trace-analyzer.sh"
-```
-
-Use the output to identify:
-- Recurring failure patterns
-- Trends in agent behavior
-- Specific skills that may need improvement
-
-Reference: `agent-harness:trace-analysis` for interpretation guidance.
-
 ### Coverage Metrics Input
 
-Run coverage metrics alongside trace analysis:
+Run coverage metrics:
 
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/coverage-metrics.sh"
@@ -126,13 +105,6 @@ Files touched: Z
 - Problem encountered
 - Time sink or blocker
 - Mistake made
-```
-
-#### Learnings Captured
-```
-(From .agent-harness/learnings.jsonl)
-- key: insight
-- key: insight
 ```
 
 ### Step 4: Identify Patterns
@@ -251,19 +223,16 @@ If you do retros regularly, track these trends:
 - Same problems appearing in multiple retros
 - Action items never completed
 - "What went well" is always empty
-- No learnings being captured
 - Retros getting skipped
 
 **What to do:**
 - If same problem repeats: escalate priority of fixing it
 - If actions not completed: make them smaller/more specific
 - If no positives: actively look for wins, even small ones
-- If no learnings: start using session-learnings skill
 
 ## Integration
 
 **Works with:**
-- **session-learnings** — Source of captured insights
 - **systematic-debugging** — Incident retros use debugging insights
 - **writing-plans** — Action items can become planned work
 

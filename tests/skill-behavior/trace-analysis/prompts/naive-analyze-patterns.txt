@@ -1,1 +1,0 @@
-Invoke the agent-harness:trace-analysis skill via the Skill tool (its tool identifier is agent-harness:trace-analysis). I want to understand recurring failure patterns across my recent sessions, based on the historical learnings data in .agent-harness/learnings.jsonl.

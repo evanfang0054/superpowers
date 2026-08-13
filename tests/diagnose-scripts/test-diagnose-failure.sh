@@ -51,7 +51,8 @@ F=$(ls .agent-harness/diagnoses/*.json 2>/dev/null | head -1)
 import json
 d = json.load(open('$F'))
 assert d['failure_type']=='test'
-assert isinstance(d['evidence']['similar_learnings'], list)
+assert 'trace_classification' not in d['evidence']
+assert 'similar_learnings' not in d['evidence']
 print('OK')
 " 2>/dev/null && log_pass "graceful empty" || log_fail "crashed on empty"
 

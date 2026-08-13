@@ -52,15 +52,13 @@ try:
   d=json.load(sys.stdin); print(d.get("phase",""))
 except Exception: print("")' 2>/dev/null || true)
 
-TRACE=$(diagnose_trace "$CONTEXT")
 HIST="{}"
 [ -n "$PHASE" ] && HIST=$(diagnose_phase_history "$PHASE" "$SPEC_TOPIC")
-LEARN=$(diagnose_similar_learnings "${SPEC_TOPIC:-$TYPE}")
 
 TS_ISO=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
 TS_ISO="$TS_ISO" TYPE="$TYPE" SPEC_TOPIC="$SPEC_TOPIC" PHASE="$PHASE" \
-CONTEXT="$CONTEXT" TRACE="$TRACE" HIST="$HIST" LEARN="$LEARN" \
+CONTEXT="$CONTEXT" HIST="$HIST" \
 OUT="$OUT" python3 <<'PY'
 import json, os
 ts = os.environ["TS_ISO"]
@@ -73,11 +71,8 @@ try:
 except Exception:
     ctx = {"raw": ctx_raw}
 
-trace = os.environ["TRACE"]
 try: hist = json.loads(os.environ["HIST"] or "{}")
 except Exception: hist = {}
-try: learn = json.loads(os.environ["LEARN"] or "[]")
-except Exception: learn = []
 
 summary_bits = []
 if ftype == "loop":
@@ -89,18 +84,14 @@ elif ftype == "test":
 summary = " | ".join(summary_bits) or "未知失败"
 
 root_cause = ""
-if "schema" in trace.lower() or "schema" in str(ctx).lower():
+if "schema" in str(ctx).lower():
     root_cause = "frontmatter schema 与 spec #2 要求不匹配"
-elif "gate" in trace.lower():
-    root_cause = "门禁前置校验失败，需回到上一阶段"
-elif not trace:
+else:
     root_cause = "信号不足，需人工根因分析"
 
 fixes = []
 if root_cause.startswith("frontmatter"):
     fixes.append({"action": "revisit-brainstorming", "rationale": "补全 frontmatter 必填字段"})
-elif root_cause.startswith("门禁"):
-    fixes.append({"action": "revisit-prior-phase", "rationale": "回到失败阶段的上游"})
 if isinstance(hist, dict) and hist.get("failure_rate", 0) > 0.3:
     fixes.append({"action": "manual-intervention", "rationale": f"历史失败率 {hist.get('failure_rate')} 过高"})
 if not fixes:
@@ -112,9 +103,7 @@ out = {
     "spec_topic": topic,
     "failure_summary": summary,
     "evidence": {
-        "trace_classification": trace[:200] if trace else "",
         "phase_history": hist,
-        "similar_learnings": learn,
     },
     "root_cause_hypothesis": root_cause,
     "suggested_fixes": fixes,

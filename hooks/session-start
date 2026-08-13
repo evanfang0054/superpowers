@@ -67,7 +67,8 @@ fi
 
 # --- Source-aware injection (issue #66) ---
 # - startup / clear → full injection (the canonical case)
-# - resume          → only learnings delta; using-agent-harness already in context
+# - resume          → inject nothing extra beyond warning/checkpoint;
+#                     using-agent-harness already in context
 # - precompact      → inject nothing (compact is meant to free space; re-injecting
 #                     the same content defeats the purpose)
 if [ "$SESSION_SOURCE" = "precompact" ]; then
@@ -92,7 +93,6 @@ if [ "$SESSION_SOURCE" = "precompact" ]; then
             echo ""
             echo "- Sprint contract (if any): docs/agent-harness/contracts/*.contract.md"
             echo "- Active plans (max 2 recommended, see writing-plans): docs/agent-harness/plans/*.md"
-            echo "- Recent learnings: .agent-harness/learnings.jsonl (auto-injected next startup)"
             echo ""
             echo "## Recommended Next Steps"
             echo ""
@@ -120,34 +120,10 @@ if [ "$SESSION_SOURCE" = "startup" ] || [ "$SESSION_SOURCE" = "clear" ]; then
     using_agent_harness_content=$(cat "${PLUGIN_ROOT}/skills/using-agent-harness/SKILL.md" 2>&1 || echo "Error reading using-agent-harness skill")
 fi
 
-# Read project learnings if they exist (injected on every source except precompact).
-# On resume we still inject learnings (they may have grown since the session paused).
-learnings_content=""
-# Resolve project root the same way log/search-learnings.sh do (v2):
-# prefer CLAUDE_PROJECT_DIR, fall back to git rev-parse for manual/CI runs.
+# Resolve project root the same way scripts do (v2): prefer CLAUDE_PROJECT_DIR,
+# fall back to git rev-parse for manual/CI runs. Used by kb_hint and
+# context_md_hint below.
 LEARNINGS_DIR="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}"
-if [ -f "$LEARNINGS_DIR/.agent-harness/learnings.jsonl" ]; then
-    learnings_count=$(wc -l < "$LEARNINGS_DIR/.agent-harness/learnings.jsonl" | tr -d ' ')
-    if [ "$learnings_count" -gt 0 ]; then
-        # Get formatted summary using search script.
-        # Throttle: when learnings exceed 50 entries, only inject top-5 high-confidence
-        # entries from the last 30 days. Saves ~10KB per session (see issue #64).
-        if [ -x "${PLUGIN_ROOT}/scripts/search-learnings.sh" ]; then
-            if [ "$learnings_count" -ge 50 ]; then
-                formatted_learnings=$("${PLUGIN_ROOT}/scripts/search-learnings.sh" --summary \
-                    --max-entries 5 --min-confidence 7 --recent-within-days 30 2>/dev/null || true)
-            else
-                formatted_learnings=$("${PLUGIN_ROOT}/scripts/search-learnings.sh" --summary 2>/dev/null || true)
-            fi
-        else
-            # Fallback to raw JSON
-            formatted_learnings=$(tail -10 "$LEARNINGS_DIR/.agent-harness/learnings.jsonl" 2>/dev/null || true)
-        fi
-        if [ -n "$formatted_learnings" ]; then
-            learnings_content="\n\n## Project Learnings\n\n${formatted_learnings}\n\nReview these before making changes. Use 'session-learnings' skill to add new learnings."
-        fi
-    fi
-fi
 
 # Headless skill invocation tip — only on startup/clear, not resume.
 headless_tip=""
@@ -166,7 +142,7 @@ fi
 # Inject CONTEXT.md glossary summary (cache-friendly, issue #79).
 # Placed in static segment (with using-agent-harness, headless_tip, kb_hint)
 # so prompt cache prefix stays stable. CONTEXT.md is structural vocabulary,
-# not per-session churn like learnings.
+# not per-session churn.
 context_md_hint=""
 if { [ "$SESSION_SOURCE" = "startup" ] || [ "$SESSION_SOURCE" = "clear" ]; }; then
     if [ -f "$LEARNINGS_DIR/CONTEXT.md" ]; then
@@ -217,26 +193,25 @@ escape_for_json() {
 
 using_agent_harness_escaped=$(escape_for_json "$using_agent_harness_content")
 warning_escaped=$(escape_for_json "$warning_message")
-learnings_escaped=$(escape_for_json "$learnings_content")
 headless_tip_escaped=$(escape_for_json "$headless_tip")
 kb_hint_escaped=$(escape_for_json "$kb_hint")
 context_md_hint_escaped=$(escape_for_json "$context_md_hint")
 checkpoint_hint_escaped=$(escape_for_json "$checkpoint_hint")
 
 # Build the session context.
-# - startup / clear: full wrapper with using-agent-harness body + learnings + tip
+# - startup / clear: full wrapper with using-agent-harness body + tip
 # - resume: lean payload — using-agent-harness is already in the prior context,
-#   so we inject only the learnings refresh (and warning if present). No empty
+#   so we inject only the warning/checkpoint if present. No empty
 #   "Below is the full content..." heading.
 #
 # Cache-friendly ordering (issue #79): Anthropic prompt caching is prefix-match.
 # Static segments (using-agent-harness, headless_tip, kb_hint) are placed first
-# so they form a stable prefix; dynamic segments (warning, learnings) go last
+# so they form a stable prefix; dynamic segments (warning, checkpoint) go last
 # so their per-session churn does not invalidate the cache hit on the prefix.
 if [ "$SESSION_SOURCE" = "resume" ]; then
-    session_context="${warning_escaped}${learnings_escaped}${checkpoint_hint_escaped}"
+    session_context="${warning_escaped}${checkpoint_hint_escaped}"
 else
-    session_context="<EXTREMELY_IMPORTANT>\nYou have agent-harness.\n\n**Below is the full content of your 'agent-harness:using-agent-harness' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\n\n${using_agent_harness_escaped}${headless_tip_escaped}${kb_hint_escaped}${context_md_hint_escaped}\n\n${warning_escaped}${learnings_escaped}${checkpoint_hint_escaped}\n</EXTREMELY_IMPORTANT>"
+    session_context="<EXTREMELY_IMPORTANT>\nYou have agent-harness.\n\n**Below is the full content of your 'agent-harness:using-agent-harness' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\n\n${using_agent_harness_escaped}${headless_tip_escaped}${kb_hint_escaped}${context_md_hint_escaped}\n\n${warning_escaped}${checkpoint_hint_escaped}\n</EXTREMELY_IMPORTANT>"
 fi
 
 # Output context injection as JSON.

@@ -138,6 +138,3 @@ Only after that exact response may destructive commands run. For an eligible cap
 **Called by:**
 - **subagent-driven-development** after all tasks complete.
 - **executing-plans** after all tasks complete.
-
-**Pairs with:**
-- **session-learnings** to record reusable insights before completion.

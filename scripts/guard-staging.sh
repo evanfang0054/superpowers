@@ -7,7 +7,6 @@ set -uo pipefail
 
 # Protected runtime paths (relative to repo root)
 PROTECTED_PATHS=(
-    ".agent-harness/learnings.jsonl"
     ".agent-harness/sdd/"
     ".agent-harness/loop-tracker.json"
 )
