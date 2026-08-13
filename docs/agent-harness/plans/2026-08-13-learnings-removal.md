@@ -128,19 +128,23 @@ Seam: session-start 输出契约（合法 JSON、无 learnings 段）
 - Consumes: 无（仅移除）
 - Produces: 三分支（startup/resume/precompact）additionalContext 无 learnings 段
 
-- [ ] **Step 1: 移除 learnings 读取块**
+- [ ] **Step 1: 移除 learnings 读取逻辑（保留 LEARNINGS_DIR）**
 
-删除 `hooks/session-start` 中从 `# Read project learnings if they exist` 注释到 `learnings_content` 构造结束的整段（当前第 123-150 行），包含：LEARNINGS_DIR 解析、learnings_count 计数、search-learnings.sh --summary 调用（含 ≥50 条 throttle 分支）、fallback tail、`## Project Learnings` 拼装。
+删除 `hooks/session-start` 中 learnings 读取块的第 123-127 行注释与 `learnings_content` 变量、第 129-150 行 if 块（learnings.jsonl 存在性检查、learnings_count 计数、search-learnings.sh --summary 调用含 ≥50 条 throttle 分支、fallback tail、`## Project Learnings` 拼装）。**必须保留第 128 行 `LEARNINGS_DIR` 变量定义** —— 它同时被 kb_hint（第 162 行 `$LEARNINGS_DIR/docs/agent-harness/index.md`）与 context_md_hint（第 172/174/183 行）使用，删除会使 startup/clear 分支在 `set -euo pipefail` 下 unset 变量报错。第 126-127 行注释改为纯 project-root 解析说明（不再提及 log/search-learnings.sh）。
 
-- [ ] **Step 2: 移除注入变量与拼装**
+- [ ] **Step 2: 移除 precompact checkpoint 中的 learnings 提及**
+
+删除第 95 行 `echo "- Recent learnings: .agent-harness/learnings.jsonl (auto-injected next startup)"`（precompact checkpoint Recovery Hints 中 learnings 行不再存在）。
+
+- [ ] **Step 3: 移除注入变量与拼装**
 
 删除 `learnings_escaped=$(escape_for_json "$learnings_content")`（当前第 220 行）。在 resume 分支（第 237 行）与 startup 分支（第 239 行）的 session_context 拼装中移除 `${learnings_escaped}`。
 
-- [ ] **Step 3: 更新 resume 分支注释**
+- [ ] **Step 4: 更新 resume 分支注释**
 
 将第 68-72 行注释中 "resume → only learnings delta; using-agent-harness already in context" 改为 "resume → inject nothing extra beyond warning/checkpoint; using-agent-harness already in context"。保留 `[ "$SESSION_SOURCE" = "resume" ]` 分支结构（warning + checkpoint_hint 仍注入）。
 
-- [ ] **Step 4: 验证三分支输出合法且无 learnings**
+- [ ] **Step 5: 验证三分支输出合法且无 learnings**
 
 ```bash
 # startup
@@ -163,7 +167,7 @@ Slice type: refactor（移除 learnings 提示）
 Seam: stop-hook promise 检测行为（保持）
 
 **Files:**
-- Modify: `hooks/stop-hook.sh`（当前第 158-166 行）
+- Modify: `hooks/stop-hook.sh`（第 125、156-166、196 行）
 
 - [ ] **Step 1: 移除 learnings 提示并恢复正常结束**
 
@@ -175,11 +179,15 @@ if [[ -n "$PROMISE_TEXT" ]] && [[ "$PROMISE_TEXT" = "$COMPLETION_PROMISE" ]]; th
     exit 0
 fi
 ```
-即删除 "Prompt Claude to capture session learnings" 注释、三行 learnings 提示 echo、`exit 2` 改为 `exit 0`。
+即删除 "Prompt Claude to capture session learnings" 注释（第 159 行）、三行 learnings 提示 echo（第 161-164 行）、`exit 2` 改为 `exit 0`（第 165 行）。
 
-- [ ] **Step 2: 验证无 learnings 引用且测试通过**
+- [ ] **Step 2: 清理 learnings 注释残留**
 
-Run: `grep -n "learnings\|session-learnings" hooks/stop-hook.sh; cd tests/ralph-loop-scripts && ./test-stop-hook-promise.sh`
+第 125 行注释 "(e.g. \"logged N learnings\")" 改为 "(e.g. a trailing progress note)"（保留注释对 join("\n") 语义的说明，去掉 learnings 示例）。第 196 行注释 "trap already present in search-learnings.sh (#19)" 改为指向仍存在的脚本或删除 "#19" 引用（search-learnings.sh 已删除，悬空引用）。
+
+- [ ] **Step 3: 验证无 learnings 引用且测试通过**
+
+Run: `grep -n "learnings\|session-learnings\|search-learnings" hooks/stop-hook.sh; cd tests/ralph-loop-scripts && ./test-stop-hook-promise.sh`
 Expected: grep 无输出；测试 3/3 PASS（该测试仅测 jq+perl 提取逻辑，不受影响）。
 
 ### Task 6: 修改 guard-staging + 更新测试
@@ -242,13 +250,13 @@ Slice type: refactor（移除 learnings 记录引导句）
 Seam: none
 
 **Files:**
-- Modify: `skills/brainstorming/SKILL.md:323` — 删除 "Record it using `session-learnings` skill so future sessions respect these decisions."
-- Modify: `skills/test-driven-development/SKILL.md:347` — 删除 "Record it using `session-learnings` skill (type: `tool` or `pattern`)."
-- Modify: `skills/writing-plans/SKILL.md:128` — 默认 manual-commit 判断中删除 "(check session-learnings or project CLAUDE.md)" 改为 "(check project CLAUDE.md)"
-- Modify: `skills/finishing-a-development-branch/SKILL.md:157` — 删除 "**session-learnings** to record reusable insights before completion."
-- Modify: `skills/systematic-debugging/SKILL.md:301` — 删除 "echo '{"ts":...pitfall...}' >> .agent-harness/learnings.jsonl" 代码块及其说明句
-- Modify: `skills/receiving-code-review/SKILL.md:216` — 删除 "Record it using `session-learnings` skill."
-- Modify: `skills/post-deploy-monitoring/SKILL.md:151` — 删除 "**session-learnings** — Log operational insights discovered during monitoring"
+- Modify: `skills/brainstorming/SKILL.md:286` — 删除 "Record it using `session-learnings` skill so future sessions respect these decisions."
+- Modify: `skills/test-driven-development/SKILL.md:404` — 删除 "Record it using `session-learnings` skill (type: `tool` or `pattern`)."
+- Modify: `skills/writing-plans/SKILL.md:124` — 默认 manual-commit 判断中删除 "(check session-learnings or project CLAUDE.md)" 改为 "(check project CLAUDE.md)"
+- Modify: `skills/finishing-a-development-branch/SKILL.md:143` — 删除 "**session-learnings** to record reusable insights before completion."
+- Modify: `skills/systematic-debugging/SKILL.md:309` — 删除 "echo '{"ts":...pitfall...}' >> .agent-harness/learnings.jsonl" 代码块及其说明句
+- Modify: `skills/receiving-code-review/SKILL.md:224` — 删除 "Record it using `session-learnings` skill."
+- Modify: `skills/post-deploy-monitoring/SKILL.md:150` — 删除 "**session-learnings** — Log operational insights discovered during monitoring"
 
 - [ ] **Step 1: 逐个编辑 7 个 SKILL.md**
 
@@ -266,13 +274,14 @@ Slice type: refactor（移除 learnings 数据引用与集成说明）
 Seam: none
 
 **Files:**
-- Modify: `skills/retrospective/SKILL.md`（第 3、50-53、66、74、133、254-261、266 行）
+- Modify: `skills/retrospective/SKILL.md`（第 3、50-54、66、74、133、254-261、266 行）
 - Modify: `skills/harness-init/SKILL.md:73`
 - Modify: `skills/harness-optimizer/SKILL.md:214,232`
+- Modify: `tests/skill-behavior/retrospective/prompts/naive-do-retro.txt:1`
 
 - [ ] **Step 1: retrospective 移除 learnings 数据收集**
 
-删除第 50-53 行 "Learnings (if using session-learnings)" 小节（含 `cat .agent-harness/learnings.jsonl`）；删除第 66 行 trace-analyzer 调用 `bash "${CLAUDE_PLUGIN_ROOT}/scripts/trace-analyzer.sh"`；删除第 74 行 trace-analysis reference；删除第 133 行 "(From .agent-harness/learnings.jsonl)" 来源标注；删除第 254 行警示 "- No learnings being captured"；删除第 261 行 "If no learnings: start using session-learnings skill"；删除第 266 行 "**session-learnings** — Source of captured insights" integration 条目。第 3 行 description 中 "Analyzes commits, learnings, and patterns" 改为 "Analyzes commits and patterns"。
+删除第 50-54 行 "Learnings (if using session-learnings)" 小节（标题 + ```bash 开始 + cat learnings.jsonl 命令 + ``` 闭合，第 54 行闭合不可遗漏）；删除第 66 行 trace-analyzer 调用 `bash "${CLAUDE_PLUGIN_ROOT}/scripts/trace-analyzer.sh"`；删除第 74 行 trace-analysis reference；删除第 133 行 "(From .agent-harness/learnings.jsonl)" 来源标注；删除第 254 行警示 "- No learnings being captured"；删除第 261 行 "If no learnings: start using session-learnings skill"；删除第 266 行 "**session-learnings** — Source of captured insights" integration 条目。第 3 行 description 中 "Analyzes commits, learnings, and patterns" 改为 "Analyzes commits and patterns"。
 
 - [ ] **Step 2: harness-init 移除 learnings 说明**
 
@@ -282,7 +291,11 @@ Seam: none
 
 删除第 214 行 ASCII 图内 `│     └─► session-learnings 存储` 节点及其边框行调整；删除第 232 行 integration 条目 `- **session-learnings**: 将分析发现存储为学习记录`。
 
-- [ ] **Step 4: 验证 skills 目录整体干净**
+- [ ] **Step 4: 更新 retrospective 行为测试 prompt**
+
+`tests/skill-behavior/retrospective/prompts/naive-do-retro.txt:1` 中 "analyze patterns from commits and learnings" 改为 "analyze patterns from commits"（learnings 数据源已移除，prompt 不再要求分析 learnings）。
+
+- [ ] **Step 5: 验证 skills 目录整体干净**
 
 Run: `grep -rn "learnings\|session-learnings\|trace-analysis" skills/`
 Expected: 无输出（skills 目录全部干净）。
@@ -329,7 +342,7 @@ Seam: 无
 
 - [ ] **Step 2: README.md / README_EN.md 清理**
 
-删除 learnings 描述与 trace-analysis 相关行（README.md 第 173、179、324 行附近；README_EN.md 第 158、164、309 行附近）。
+删除 learnings 描述与 trace-analysis 相关行：README.md 第 173（质量层架构图 trace-analysis 行）、179（核心理念）、288（失败自愈信号源 learnings 索引）、324（trace-analysis 描述）、336（session-learnings 条目）；README_EN.md 第 158、164、273（失败自愈 learnings 索引）、309。用 grep 以实际命中为准（行号可能因编辑漂移）。
 
 - [ ] **Step 3: skills/CLAUDE.md 清理**
 
@@ -341,7 +354,7 @@ Seam: 无
 
 - [ ] **Step 5: CONTEXT.md 本地清理（gitignored）**
 
-删除 "## Learning"（第 63-66 行）、"## top-N summary"（第 73-76 行）、"## 就近解析"（第 78-81 行）三个术语条目；第 69 行 session-start 定义中 "the Learning summary" 删除；第 104 行闭环链路 "(phase-metrics, learnings, trace-analysis)" 改为 "(phase-metrics)"；第 165 行 relationship "**session-start** applies the **top-N summary** policy and **就近解析**..." 删除；第 176 行 "**闭环链路** consumes **Learnings**..." 改为仅 phase metrics。不提交该文件（gitignored）。
+删除 "## Learning"（第 63-66 行）、"## top-N summary"（第 73-76 行）、"## 就近解析"（第 78-81 行）三个术语条目；第 4 行 Agent Harness 定义中 "and learnings infrastructure" 删除（改为 "and shell hooks"）；第 14 行 Hook 定义中 "injects Skills and Learnings" 改为 "injects Skills"；第 69 行 session-start 定义中 "the Learning summary" 删除；第 104 行闭环链路 "(phase-metrics, learnings, trace-analysis)" 改为 "(phase-metrics)"；第 164 行 relationship "and injects **Learnings**" 删除；第 165 行 "**session-start** applies the **top-N summary** policy and **就近解析**..." 删除；第 176 行 "**闭环链路** consumes **Learnings**..." 改为仅 phase metrics。不提交该文件（gitignored）。
 
 - [ ] **Step 6: 验证现行文档白名单**
 
@@ -363,8 +376,8 @@ Expected: 全部 exit 0。
 
 - [ ] **Step 2: 全仓库 grep 白名单检查**
 
-Run: `grep -rn "learnings\|session-learnings\|trace-analyzer\|trace-analysis" --exclude-dir=.git --exclude=CHANGELOG.md . | grep -v "docs/agent-harness/plans/\|docs/agent-harness/specs/\|docs/agent-harness/contracts/\|CHANGELOG.md\|\.git/"`
-Expected: 无输出（仅剩历史快照与 CHANGELOG 提及）。
+Run: `grep -rn "learnings\|session-learnings\|trace-analyzer\|trace-analysis" --exclude-dir=.git --exclude=CHANGELOG.md . | grep -v "docs/agent-harness/plans/\|docs/agent-harness/specs/\|docs/agent-harness/contracts/\|CHANGELOG.md\|tests/ralph-loop-scripts/\|demo/fruit-shop/"`
+Expected: 无输出。白名单接受路径及理由：`docs/agent-harness/plans|specs|contracts` 与 `CHANGELOG.md`（历史快照，spec 决策保留）；`tests/ralph-loop-scripts/test-stop-hook-promise.sh:92`（"已记录 4 条 learnings" 模拟文本，contract 明确保留，非 learnings 能力引用）；`demo/fruit-shop/CLAUDE.md:95`（demo 文档提及，spec 非目标禁止改 demo）。若 grep 命中白名单外的路径，回到对应 task 修复。
 
 - [ ] **Step 3: 统一提交**
 
