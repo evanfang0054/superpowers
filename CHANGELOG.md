@@ -6,6 +6,39 @@
 
 - 移除 learnings 生态：session-learnings skill、log/search/index-learnings 脚本、trace-analysis skill 与 trace-analyzer.sh、session-start 注入及数据文件；连带清理 diagnose/retrospective/guard-staging/stop-hook 下游引用，同步更新测试套件与现行文档。
 
+## 6.5.1
+
+### Patch Changes
+
+- 同步上游 obra/superpowers v6.2.0 token 优化 sweep 并修复核验发现的漏网。
+
+  ## token 优化（同步上游 v6.1.0/v6.2.0 压缩 campaign）
+
+  - 删除 `testing-anti-patterns.md`（已被 `writing-good-tests.md` 替代）
+  - 删除 `copilot-tools.md`（上游 v6.1.0 已删，无 harness-specific 内容）
+  - 压缩 `codex-tools.md` 72→38 行（删除 verbose action-to-tool 表）
+  - 修复 `brainstorming/SKILL.md` 重复的 Circuit-Breaker 段（保留中文增强版）
+  - 删除 `test-driven-development` 的 Why Order Matters 段（已被 Common Rationalizations table 覆盖）
+  - 删除 `systematic-debugging` 的 Real-World Impact social proof 段
+  - 删除 `receiving-code-review` 的 The Bottom Line recap 段
+
+  ## bug 修复
+
+  - `hooks/hooks-codex.json` SessionStart matcher 移除 `resume`（防 Codex resume 时重复注入 bootstrap）
+  - `.codex-plugin/plugin.json` composerIcon 路径修正（指向实际存在的 svg 文件）
+  - 修复 `test-driven-development/SKILL.md` 对已删 `@testing-anti-patterns.md` 的悬空引用
+  - 修复 `using-agent-harness/SKILL.md` 对 codex-tools.md 的引用描述
+
+  ## 上游 v6.2.0 能力补全
+
+  - 补全 `re-review-prompt.md` 44→112 行（含 Scope/Tests/Output Format 行为约束）
+  - 补 `finishing-a-development-branch` 的 Common Rationalizations 表（9 行，防 force-push/flaky test 误判）
+  - 补 `writing-good-tests.md` 的 Quick Reference 表 + Warning Signs 清单
+  - 补 `writing-skills` 的 Match the Form to the Failure 决策表（核心方法论）
+  - 补 `writing-plans` 的 Task Right-Sizing 段
+
+  净效果：+159 / -522 行，注入体积净减约 360 行。
+
 ## 6.5.0
 
 ### Minor Changes

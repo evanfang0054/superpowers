@@ -288,14 +288,6 @@ These techniques are part of systematic debugging and available in this director
 - **agent-harness:test-driven-development** - For creating failing test case (Phase 4, Step 1)
 - **agent-harness:verification-before-completion** - Verify fix worked before claiming success
 
-## Real-World Impact
-
-From debugging sessions:
-- Systematic approach: 15-30 minutes to fix
-- Random fixes approach: 2-3 hours of thrashing
-- First-time fix rate: 95% vs 40%
-- New bugs introduced: Near zero vs common
-
 ## Capture Diagnosis Task
 
 **调试结束时**，把「这次怎么修的」沉淀为 task，避免下次同类问题重复根因分析（不自动执行修复，只生成 task 供人审）：

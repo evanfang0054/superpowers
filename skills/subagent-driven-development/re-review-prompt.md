@@ -1,44 +1,112 @@
 # Scoped Re-Review Prompt Template
 
-Use after a task fix, or after the single final-review fixer. This is not a
-whole-branch review.
+Use this template when dispatching a re-review after a fix round. The
+re-reviewer verifies the findings were addressed and checks the fix diff for
+new breakage. It is not a fresh review — the full review already happened.
+
+**Purpose:** Verify each finding from the previous review was addressed, and
+that the fix itself broke nothing.
 
 ```
 Subagent (general-purpose):
-  description: "Re-review Task N findings"
-  model: [MODEL — REQUIRED]
+  description: "Re-review Task N fix round R"
+  model: [MODEL — REQUIRED: choose per SKILL.md Model Selection; an omitted
+         model silently inherits the session's most expensive one]
   prompt: |
-    Re-review only the findings below after their attempted fix.
+    You are re-reviewing one task's fix round. A previous review produced
+    findings; an implementer has attempted to fix them. Your job is to
+    verdict each finding and inspect the fix diff — nothing else.
 
-    Read: [BRIEF_FILE], [REPORT_FILE], and [FIX_PACKAGE]. The package covers
-    `FIX_BASE..HEAD`; read it before judging the implementer's report. The
-    report is evidence to verify, never a substitute for reading the package.
+    ## The Task
 
-    ## Original open findings
-    [OPEN_FINDINGS]
+    Read the task brief: [BRIEF_FILE]
 
-    For every original finding, return exactly `ADDRESSED` or `NOT ADDRESSED`
-    with package evidence. Also report only Critical/Important breakage newly
-    introduced by the fix diff. Put anything else under `Out-of-scope
-    observations`; it must not enter this fix loop.
+    ## The Findings Under Verification
 
-    Do NOT turn this into a whole-branch review. Do NOT inspect unchanged code
-    except where a concrete risk from this fix diff requires one focused check.
+    [FINDINGS]
 
-    ## Output
-    ### Original findings
-    - [finding]: ADDRESSED | NOT ADDRESSED — [evidence]
+    ## The Fix
 
-    ### New Critical/Important breakage in fix diff
-    - [finding, or None]
+    Read the implementer's report (fix reports are appended at the end):
+    [REPORT_FILE]
 
-    ### Out-of-scope observations
-    - [observation, or None]
+    **Fix base:** [FIX_BASE_SHA] (the head the previous review saw)
+    **Head:** [HEAD_SHA]
+    **Diff file:** [DIFF_FILE]
 
-    ### Round verdict
-    [Clean | Needs fixes | BLOCKED]
+    Read the diff file once — it contains the fix commits, a stat summary,
+    and the fix diff with surrounding context. Do not re-run git commands.
+    If the diff file is missing, fetch the diff yourself:
+    `git diff --stat [FIX_BASE_SHA]..[HEAD_SHA]` and
+    `git diff [FIX_BASE_SHA]..[HEAD_SHA]`.
+
+    Your review is read-only on this checkout. Do not mutate the working
+    tree, the index, HEAD, or branch state in any way.
+
+    ## Scope
+
+    Your scope is the findings list and the fix diff. Verdict every finding.
+    Inspect the fix diff for new problems the fix itself introduced. Do NOT
+    re-review code the fix did not touch: if you notice an issue entirely
+    outside the fix diff, report it under Out-of-Scope Observations — it
+    does not block this task and does not extend the loop. A broad
+    whole-branch review happens after all tasks are complete.
+
+    ## Tests
+
+    The implementer re-ran the tests covering the amended code and appended
+    the results to the report file. Treat the report as unverified claims:
+    confirm the fix report names the covering tests and shows their output,
+    and verify the claims against the diff. Do not re-run the suite to
+    confirm their report. Run a test only when reading the code raises a
+    specific doubt that no existing run answers — and then a focused test,
+    never a package-wide suite.
+
+    ## Output Format
+
+    Your final message is the report itself: begin directly with the first
+    finding's verdict. Every line is a verdict, a finding with file:line,
+    or a check you ran — no preamble, no process narration.
+
+    ### Finding Verdicts
+
+    For each finding in The Findings Under Verification, in order:
+    - **[finding one-liner]** — ADDRESSED | NOT ADDRESSED, with file:line
+      evidence. "Attempted" is not addressed: the specific defect must no
+      longer exist.
+
+    ### New Breakage in the Fix Diff
+
+    Anything the fix itself broke or introduced, with severity
+    (Critical/Important/Minor) and file:line. "None" if clean.
+
+    ### Out-of-Scope Observations
+
+    Issues you noticed entirely outside the fix diff. Non-blocking; the
+    controller ledgers these for the final review. "None" if none.
+
+    ### Verdict
+
+    **Fix round:** [All findings addressed, no new Critical/Important
+    breakage | Findings remain open] — list the open ones.
 ```
 
-**Inputs:** `[OPEN_FINDINGS]`, brief path, the same task report path, and the
-`FIX_BASE..HEAD` review package path. The controller creates it with
-`"$SDD_SKILL_DIR/scripts/review-package" PLAN_FILE FIX_BASE HEAD`.
+**Placeholders:**
+- `[MODEL]` — REQUIRED: reviewer model per SKILL.md Model Selection; scoped
+  re-reviews of small fix diffs take a cheap-to-mid tier
+- `[BRIEF_FILE]` — the task brief file (same file the implementer worked from)
+- `[FINDINGS]` — the Critical/Important findings and spec gaps from the
+  previous review, copied verbatim, one per bullet
+- `[REPORT_FILE]` — the implementer's report file (fix reports appended)
+- `[FIX_BASE_SHA]` — the head the previous review saw (NEVER use `HEAD~1` —
+  always use the explicit FIX_BASE the controller passed)
+- `[HEAD_SHA]` — current commit
+- `[DIFF_FILE]` — the path `scripts/review-package PLAN_FILE FIX_BASE HEAD` printed
+
+**Controller creates the package with:**
+```
+"$SDD_SKILL_DIR/scripts/review-package" PLAN_FILE FIX_BASE HEAD
+```
+
+**Re-reviewer returns:** per-finding verdicts (ADDRESSED / NOT ADDRESSED),
+new breakage in the fix diff, out-of-scope observations, and a round verdict.

@@ -24,7 +24,7 @@ If you were dispatched as a subagent to execute a specific task, skip this skill
 - **Copilot CLI:** Use the `skill` tool (auto-discovered from plugins).
 - **Gemini CLI:** Use the `activate_skill` tool.
 
-Non-CC platforms: tool name mappings in `references/copilot-tools.md` and `references/codex-tools.md`.
+Codex: subagent setup, environment detection, and App finishing notes in `references/codex-tools.md`.
 
 ## Skill Selection
 
