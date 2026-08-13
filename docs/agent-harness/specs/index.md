@@ -69,6 +69,9 @@
 ## brainstorming-optimization
 - [2026-07-21-brainstorming-optimization-design](2026-07-21-brainstorming-optimization-design.md)
 
+## brainstorming-to-questionnaire
+- [2026-08-07-brainstorming-to-questionnaire-design](2026-08-07-brainstorming-to-questionnaire-design.md)
+
 ## changesets-migration
 - [2026-07-29-changesets-migration-design](2026-07-29-changesets-migration-design.md)
 

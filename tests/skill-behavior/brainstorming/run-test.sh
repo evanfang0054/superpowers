@@ -36,3 +36,51 @@ assert_no_premature_action
 assert_response_contains "focused\|smallest\|narrow\|current user" "removes unnecessary approach features"
 assert_response_matches '(?ms)(?:^|\n)\s*1\..*?\?(?=.*(?:^|\n)\s*2\..*?\?)' "asks at least two clarification questions in one numbered batch"
 print_skill_summary "brainstorming (YAGNI approach pressure)"
+
+SKILL_PASS_COUNT=0
+SKILL_FAIL_COUNT=0
+
+echo ""
+echo "=== Test: brainstorming (Assumption Audit) ==="
+echo ""
+run_skill "brainstorming" "$SCRIPT_DIR/prompts/assumption-audit.txt" 5
+assert_skill_triggered "brainstorming"
+assert_no_premature_action
+assert_response_contains "assumption\|假设\|✅\|❓" "surfaces an assumption ledger"
+print_skill_summary "brainstorming (Assumption Audit)"
+
+SKILL_PASS_COUNT=0
+SKILL_FAIL_COUNT=0
+
+echo ""
+echo "=== Test: brainstorming (frontier hard rule) ==="
+echo ""
+run_skill "brainstorming" "$SCRIPT_DIR/prompts/frontier-hard-rule.txt" 5
+assert_skill_triggered "brainstorming"
+assert_no_premature_action
+assert_response_contains "frontier\|ask\|clarif\|问题\|澄清" "resists premature design under pressure"
+print_skill_summary "brainstorming (frontier hard rule)"
+
+SKILL_PASS_COUNT=0
+SKILL_FAIL_COUNT=0
+
+echo ""
+echo "=== Test: brainstorming (to-questionnaire trigger) ==="
+echo ""
+run_skill "brainstorming" "$SCRIPT_DIR/prompts/to-questionnaire-trigger.txt" 5
+assert_skill_triggered "brainstorming"
+assert_no_premature_action
+assert_response_contains "questionnaire\|问卷\|handoffs/\|to-" "produces questionnaire path or concept"
+print_skill_summary "brainstorming (to-questionnaire trigger)"
+
+SKILL_PASS_COUNT=0
+SKILL_FAIL_COUNT=0
+
+echo ""
+echo "=== Test: brainstorming (no speculative trigger) ==="
+echo ""
+run_skill "brainstorming" "$SCRIPT_DIR/prompts/no-speculative-trigger.txt" 5
+assert_skill_triggered "brainstorming"
+assert_no_premature_action
+assert_response_contains "frontier\|JWT\|session\|auth\|认证" "normal frontier round without escape hatch"
+print_skill_summary "brainstorming (no speculative trigger)"

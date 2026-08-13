@@ -1,6 +1,7 @@
 ---
 name: plan-eng-review
 description: Eng manager-mode plan review — lock in architecture, data flow, edge cases, test coverage. Trigger on "review the architecture", "engineering review", or "lock in the plan".
+disable-model-invocation: true
 ---
 
 # Plan Review Mode

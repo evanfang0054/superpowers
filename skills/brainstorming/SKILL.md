@@ -28,12 +28,13 @@ You MUST create a task for each of these items and complete them in order:
 2. **Map decision tree** — optional, complex tasks only (3+ decision dimensions): sketch the key decision dependencies before questioning
 3. **Ask clarifying questions** — work the current frontier in rounds; ask all unblocked decision questions together, each with a recommended answer and reason
    - When domain terms crystallize (user defines a concept, or you propose a precise term to replace fuzzy language), invoke `agent-harness:domain-modeling` to update `CONTEXT.md` inline. If `CONTEXT.md` doesn't exist yet, the skill creates it lazily. Spec output should use `CONTEXT.md` vocabulary and include a `domain_terms` field in frontmatter listing the core terms.
-4. **Propose 2-3 approaches** — with trade-offs and your recommendation
-5. **Present design** — in sections scaled to their complexity, get user approval after each section
-6. **Write design doc** — save to `docs/agent-harness/specs/YYYY-MM-DD-<topic>-design.md` (check if target directory is gitignored before committing; if so, inform user and save anyway)
-7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
-8. **User reviews written spec** — ask user to review the spec file before proceeding
-9. **Transition to implementation** — invoke writing-plans skill to create implementation plan
+4. **Assumption Audit** — before proposing approaches, list every assumption you're carrying (✅ confirmed / ❓ unconfirmed); convert each ❓ to a decision or rule it out-of-scope
+5. **Propose 2-3 approaches** — with trade-offs and your recommendation
+6. **Present design** — in sections scaled to their complexity, get user approval after each section
+7. **Write design doc** — save to `docs/agent-harness/specs/YYYY-MM-DD-<topic>-design.md` (check if target directory is gitignored before committing; if so, inform user and save anyway)
+8. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
+9. **User reviews written spec** — ask user to review the spec file before proceeding
+10. **Transition to implementation** — invoke writing-plans skill to create implementation plan
 
 ## Process Flow
 
@@ -42,6 +43,7 @@ digraph brainstorming {
     "Explore project context" [shape=box];
     "Map decision tree\n(optional)" [shape=box];
     "Ask frontier questions\nin rounds" [shape=box];
+    "Assumption Audit\n(✅/❓ ledger)" [shape=box];
     "Propose 2-3 approaches" [shape=box];
     "Present design sections" [shape=box];
     "User approves design?" [shape=diamond];
@@ -54,7 +56,9 @@ digraph brainstorming {
 
     "Explore project context" -> "Map decision tree\n(optional)";
     "Map decision tree\n(optional)" -> "Ask frontier questions\nin rounds";
-    "Ask frontier questions\nin rounds" -> "Propose 2-3 approaches";
+    "Ask frontier questions\nin rounds" -> "Assumption Audit\n(✅/❓ ledger)";
+    "Assumption Audit\n(✅/❓ ledger)" -> "Propose 2-3 approaches";
+    "Assumption Audit\n(✅/❓ ledger)" -> "Ask frontier questions\nin rounds" [label="❓ items found,\nre-quiz frontier"];
     "Propose 2-3 approaches" -> "Present design sections";
     "Present design sections" -> "User approves design?";
     "User approves design?" -> "Present design sections" [label="no, revise"];
@@ -90,6 +94,11 @@ digraph brainstorming {
 - Do not force 3+ questions per round: when the real frontier has only one question, ask one question
 - Recommended answers are defaults, not constraints: the user may accept, modify, or reject them
 
+**Relentless termination (the frontier must be empty before you move on):**
+The questioning phase is done only when the frontier is empty — every branch of the decision tree has been visited and nothing is left silently assumed. "I think I have enough" is NOT a stopping condition if there are still unasked frontier questions. A common failure mode is declaring the design "clear enough" while decisions remain implicit; the grilling discipline is to keep asking until each assumption is either turned into an explicit decision or ruled out as out-of-scope. If you are tempted to skip a question because "the user probably meant X", ask the question instead — that is the silent assumption you are about to bake into the spec.
+
+**Hard rule:** If the frontier is not empty, you MUST NOT proceed to Propose approaches or Present design. "I think I have enough" is not a substitute for an empty frontier.
+
 **Fact-checking rules:**
 
 - Separate **facts** from **decisions**
@@ -99,12 +108,71 @@ digraph brainstorming {
 - Do not block unnecessarily: while a fact-finding subagent runs, keep asking frontier questions that do not depend on that fact
 - Only questions downstream of an unresolved fact wait for the fact-finding result
 
+**When the user cannot answer a frontier question (to-questionnaire escape hatch):**
+
+A frontier question may require knowledge the user doesn't hold (domain SME, customer insight, product decision owned elsewhere). When the user clearly signals they cannot answer — "I need to ask X", "I'm not sure", "this depends on what the team decides" — do NOT guess, do NOT drop the question, and do NOT force the user to invent an answer. Instead, turn the unanswerable question into a questionnaire for whoever holds the knowledge.
+
+**Grill the send, not the subject.** Interview the user only about what they can always answer — who the questionnaire goes to, and what the user needs back. Then write a Markdown questionnaire that targets the gap.
+
+1. **Who is it going to?** Ask, in one exchange, the recipient's role, expertise, and relationship to the user. This fixes tone and how much context the document must carry. Done when you know who the recipient is and what they know that the user doesn't.
+2. **What do you need back?** Ask, in one exchange, the specific decisions or facts the user can't resolve alone and needs from this person. Done when you have a concrete list of what the user must walk away able to do or decide.
+3. **Write the questionnaire.** Draft questions aimed at the gap from steps 1–2, using the format below. Write it to `docs/agent-harness/handoffs/to-<recipient>-<slug>.md` where `<recipient>` is the recipient's role or team (e.g. `to-pm-`, `to-finance-`, `to-sre-`), not a personal name, and `<slug>` is kebab-cased from the topic. Create the directory if missing. Report the path to the user. Done when the file exists and every item the user named in step 2 is covered by a question.
+
+**Question format inside the questionnaire** (use these exact markers so the recipient can scan):
+
+~~~
+❓ **Q1** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
+
+➡️ <what the user needs from the recipient to decide>
+~~~
+
+**Pause, don't abandon.** The frontier node that triggered the questionnaire stays paused until the user returns with answers. Other unblocked frontier nodes may proceed in parallel. When the user comes back, recompute the frontier with the new answers.
+
+**Document skeleton** (adapt to context):
+
+~~~
+# Questionnaire: <topic>
+
+**Purpose:** why this questionnaire exists and the decision riding on it.
+**From:** <the user> — **To:** <recipient role> — **How answers will be used:** <where they go>
+**Deadline / effort:** <if known>
+
+## Context
+One paragraph orienting a recipient who wasn't in the user's head.
+
+## <Theme heading>
+### ❓ Q1 - **<title>**: <body>
+➡️ <what's needed>
+
+## Anything else?
+A closing catch-all.
+~~~
+
+**Do NOT trigger this branch speculatively.** Only when the user has clearly said they can't answer. If you're unsure whether the user can answer, ask them directly ("can you answer this, or should we turn it into a questionnaire for someone else?") rather than assuming either way.
+
 **Exploring approaches:**
 
 - Propose 2-3 different approaches with trade-offs
 - Present options conversationally with your recommendation and reasoning
 - Lead with your recommended option and explain why
 - YAGNI ruthlessly — remove unnecessary features from every approach and design
+
+**Assumption Audit (mandatory gate before presenting the design):**
+
+Before you present a design, do one final pass over everything you think you know and produce an **assumption ledger**. For each assumption, mark it as one of:
+
+- ✅ **Confirmed** — the user explicitly decided this (cite the round/answer if useful)
+- ❓ **Unconfirmed** — you inferred this but never asked. Each ❓ MUST be asked before the design is presented; either convert it to a decision (ask the user now) or explicitly rule it out-of-scope.
+
+Format the ledger as a short bulleted list and put it in front of the user:
+
+> **Assumptions I'm carrying into the design:**
+> - ✅ <confirmed assumption>
+> - ❓ <unconfirmed assumption> — "is this correct?" → recommended answer + reason
+
+The audit is a forcing function, not theater. If you find yourself writing "✅ user obviously wants X" without a concrete prior answer, downgrade it to ❓ and ask. The goal of this gate is that **no silent assumption crosses into the spec** — every premise is either explicitly held by the user or explicitly carved out as out-of-scope. This is the single biggest difference between a spec that survives implementation and one that drifts.
+
+If the audit surfaces more than 2-3 ❓ items, return to the frontier-questioning phase for one more round rather than dumping a long audit list — the frontier mechanism exists precisely to batch these.
 
 **Presenting the design:**
 

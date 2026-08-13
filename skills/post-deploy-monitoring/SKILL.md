@@ -1,6 +1,7 @@
 ---
 name: post-deploy-monitoring
 description: "Verify production health after deploy. Monitor errors, performance, page failures. Trigger: 'monitor deploy', 'check production'."
+disable-model-invocation: true
 ---
 
 # Post-Deploy Monitoring

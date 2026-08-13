@@ -1,0 +1,3 @@
+# to-questionnaire 问卷文档存放于此(to-<recipient>-<slug>.md)。
+# 由 brainstorming skill 在 frontier 阻塞且用户答不了时产出。
+# 不是 spec/plan/contract/notes gate,不进入 validate-handoff.sh。

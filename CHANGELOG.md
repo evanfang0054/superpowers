@@ -1,5 +1,39 @@
 # agent-harness
 
+## 6.7.0
+
+### Minor Changes
+
+- 为 brainstorming skill 增加 to-questionnaire escape hatch 与 frontier 硬规则，参考 mattpocock/skills 的 `grilling` 和 `to-questionnaire`。
+
+  - 新增 "When the user cannot answer" 小节：用户明确表示答不了某个 frontier 决策时，不再强行逼用户假设或 skip，而是产出 `to-<recipient>-<slug>.md` 问卷到 `docs/agent-harness/handoffs/`，交由掌握知识的第三方填写后回填 frontier
+  - 新增 frontier 硬规则：frontier 未空时禁止进入 Propose approaches / Present design，"我觉得够了"不能替代空 frontier
+  - 问卷分支内部使用 `❓/➡️` 格式（对齐 grilling），不影响现有 frontier round 主线编号风格
+  - 在 `docs/agent-harness/index.md` 注册 handoffs/ 子目录
+  - 新增 3 个 headless 行为测试场景（frontier-hard-rule / to-questionnaire-trigger / no-speculative-trigger）
+
+- 补强 brainstorming skill 的"拷问"力度：参考 grill-me 理念引入假设审计门（Assumption Audit）与拷问式终止条件（Relentless termination），确保没有沉默假设进入 spec。
+
+  - 新增 Relentless termination：frontier 必须清空才能进入下一阶段，"我觉得够了"不是合法停止条件
+  - 新增 Assumption Audit 门：呈现设计前必须列出 ✅ 已确认 / ❓ 未确认假设清单，每个 ❓ 转为决策或显式 out-of-scope
+  - Checklist 与 Process Flow 同步插入审计节点
+  - 新增压力测试 prompt assumption-audit.txt 与对应断言
+
+- Disable auto-invocation for 6 low/zero-usage skills to reduce context noise.
+
+  Added `disable-model-invocation: true` to the following skills' frontmatter:
+  plan-ceo-review, plan-eng-review, post-deploy-monitoring, qa-testing,
+  loop-detection, harness-design.
+
+  These skills had 0–4 actual invocations across 3,494 session logs.
+  They remain available via explicit `Skill` tool or `/skill-name` invocation,
+  but will no longer trigger automatically based on context. Skill code is
+  preserved verbatim — only the auto-trigger flag is added (6 insertions, 0 deletions).
+
+  Prior art: office-hours, harness-init, harness-optimizer, using-agent-harness,
+  and brainstorming already use this flag. This change extends the same pattern
+  to other skills that are not part of the core development loop.
+
 ## 6.6.0
 
 ### Minor Changes
