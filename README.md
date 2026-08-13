@@ -169,14 +169,11 @@ Agent Harness 采用分层架构：**决策层**确保"做对的事"，**执行�
 │   │ "找bug修bug"│      │   "部署后监控"      │      │   "复盘改进"    │    │
 │   └─────────────┘      └─────────────────────┘      └─────────────────┘    │
 │                                                                             │
-│   ┌─────────────────────────────────────────────────────────────────────┐  │
-│   │ trace-analysis (跨 Session 失败模式分析)                             │  │
-│   └─────────────────────────────────────────────────────────────────────┘  │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-**核心理念：** 决策层把关"前门"（确保方向正确），执行层管"车间"（确保实现规范），质量层守"后门"（确保交付质量）。`sprint-contract` 确保设计到计划间有明确的完成标准，`computational-sensors` 在代码审查前跑确定性检查，`trace-analysis` 从历史数据中发现反复出现的失败模式。
+**核心理念：** 决策层把关"前门"（确保方向正确），执行层管"车间"（确保实现规范），质量层守"后门"（确保交付质量）。`sprint-contract` 确保设计到计划间有明确的完成标准，`computational-sensors` 在代码审查前跑确定性检查。
 
 ## 基本工作流程
 
@@ -285,7 +282,7 @@ Agent Harness 不仅是一组 skill 的集合，更在模型外搭建了一层�
 
 - 协议层的 `gate_result` 由 `validate-handoff.sh` 驱动，emit 到 phase-metrics
 - 协议层的 `spec_topic` 必须命中知识库的 `index.md`，否则硬前置退回
-- 失败自愈的信号源复用 phase-metrics 与知识库的 learnings 索引，命中相似历史故障
+- 失败自愈的信号源复用 phase-metrics，命中相似历史故障
 
 设计文档见 `docs/agent-harness/specs/2026-06-29-harness-engineering-improvements-design.md`，四个实施 plan 在 `docs/agent-harness/plans/2026-06-29-*.md`。
 
@@ -321,7 +318,6 @@ Agent Harness 不仅是一组 skill 的集合，更在模型外搭建了一层�
 
 **质量保证**
 - **qa-testing** - 系统化 QA 测试 Web 应用，自动修复 bug 并提交
-- **trace-analysis** - 跨 Session 失败模式分析，基于历史 learnings 数据
 
 **文档与运维**
 - **documentation-sync** - 代码变更后自动同步文档
@@ -331,9 +327,6 @@ Agent Harness 不仅是一组 skill 的集合，更在模型外搭建了一层�
 **自动化**
 - **generate-issues** - 分析 Claude Code 会话并生成 GitHub issues（封装 auto-loop --dry-run）
 - **fix-issues-and-pr** - 拉取已有 issues 并用 SDD 修复，多 issue 单 PR（封装 auto-loop --fix-only）
-
-**知识管理**
-- **session-learnings** - 跨 Session 知识积累和复用
 
 **元技能**
 - **writing-skills** - 按照最佳实践创建新技能（包含测试方法论）

@@ -99,6 +99,9 @@
 ## knowledge-base
 - [2026-06-29-knowledge-base](2026-06-29-knowledge-base.md)
 
+## learnings-removal
+- [2026-08-13-learnings-removal](2026-08-13-learnings-removal.md)
+
 ## mattpocock-skills-adaptation
 - [2026-07-22-mattpocock-skills-adaptation](2026-07-22-mattpocock-skills-adaptation.md)
 

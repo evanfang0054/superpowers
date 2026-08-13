@@ -28,11 +28,11 @@ run_guard '{"tool_input":{"command":"git add -A"}}'
 if [ $? -eq 2 ]; then pass "git add -A blocked"; else fail "git add -A blocked (got $?)"; fi
 
 # Case 4: git add with protected path → exit 2
-run_guard '{"tool_input":{"command":"git add .agent-harness/learnings.jsonl"}}'
+run_guard '{"tool_input":{"command":"git add .agent-harness/loop-tracker.json"}}'
 if [ $? -eq 2 ]; then pass "git add protected path blocked"; else fail "git add protected path blocked (got $?)"; fi
 
 # Case 5: git add -f with protected path → exit 0 (force allowed)
-run_guard '{"tool_input":{"command":"git add -f .agent-harness/learnings.jsonl"}}'
+run_guard '{"tool_input":{"command":"git add -f .agent-harness/loop-tracker.json"}}'
 if [ $? -eq 0 ]; then pass "git add -f protected path allowed"; else fail "git add -f protected path allowed (got $?)"; fi
 
 # Case 6: git add normal file → exit 0
@@ -58,7 +58,7 @@ if [ $? -eq 2 ]; then pass "git add . still blocked after fix"; else fail "git a
 
 # Case 7: stderr contains reason when blocked
 run_guard '{"tool_input":{"command":"git add ."}}' >/dev/null 2>&1
-if grep -q "learnings\|agent-harness\|protected\|staging" /tmp/guard-stderr.txt; then
+if grep -q "agent-harness\|protected\|staging" /tmp/guard-stderr.txt; then
     pass "stderr contains block reason"
 else
     fail "stderr contains block reason (stderr was empty or generic)"

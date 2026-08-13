@@ -210,9 +210,6 @@ python -m skill_creator.scripts.run_eval \
 │  5. VERIFY: 验证测试                                        │
 │     └─► skill-creator eval 系统                            │
 │                                                             │
-│  6. LOOP: 记录学习                                          │
-│     └─► session-learnings 存储                             │
-│                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -229,7 +226,6 @@ python "${CLAUDE_PLUGIN_ROOT}/skills/harness-optimizer/scripts/extract-session.p
 ## Integration
 
 **与其他 skill 协作：**
-- **session-learnings**: 将分析发现存储为学习记录
 - **skill-creator**: 使用其 eval 系统验证优化
 - **retrospective**: 纳入定期回顾
 

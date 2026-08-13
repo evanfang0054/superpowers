@@ -78,6 +78,9 @@
 ## harness-engineering-improvements
 - [2026-06-29-harness-engineering-improvements-design](2026-06-29-harness-engineering-improvements-design.md)
 
+## learnings-removal
+- [2026-08-13-learnings-removal-design](2026-08-13-learnings-removal-design.md)
+
 ## mattpocock-skills-adaptation
 - [2026-07-22-mattpocock-skills-adaptation-design](2026-07-22-mattpocock-skills-adaptation-design.md)
 

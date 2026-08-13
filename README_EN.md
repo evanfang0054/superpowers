@@ -154,14 +154,11 @@ Agent Harness uses a layered architecture: **Decision Layer** ensures "doing the
 │   │ "Find/fix"  │      │   "Monitor deploy"  │      │   "Improve"     │    │
 │   └─────────────┘      └─────────────────────┘      └─────────────────┘    │
 │                                                                             │
-│   ┌─────────────────────────────────────────────────────────────────────┐  │
-│   │ trace-analysis (cross-session failure pattern analysis)              │  │
-│   └─────────────────────────────────────────────────────────────────────┘  │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-**Core philosophy:** Decision layer guards the "front door" (ensure right direction), Execution layer runs the "workshop" (ensure disciplined implementation), Quality layer guards the "back door" (ensure delivery quality). `sprint-contract` ensures clear Definition of Done between design and planning, `computational-sensors` runs deterministic checks before code review, `trace-analysis` surfaces recurring failure patterns from historical data.
+**Core philosophy:** Decision layer guards the "front door" (ensure right direction), Execution layer runs the "workshop" (ensure disciplined implementation), Quality layer guards the "back door" (ensure delivery quality). `sprint-contract` ensures clear Definition of Done between design and planning, `computational-sensors` runs deterministic checks before code review.
 
 ## The Basic Workflow
 
@@ -270,7 +267,7 @@ Around the three-layer workflow, agent-harness provides four interlocking subsys
 
 - The protocol layer's `gate_result` is driven by `validate-handoff.sh` and emitted to phase-metrics
 - The protocol layer's `spec_topic` must be present in the knowledge base's `index.md`, otherwise the hard precondition rejects it
-- Failure self-healing reuses phase-metrics and the knowledge base's learnings index as signal sources to match similar historical failures
+- Failure self-healing reuses phase-metrics as a signal source to match similar historical failures
 
 Design spec: `docs/agent-harness/specs/2026-06-29-harness-engineering-improvements-design.md`. Four implementation plans: `docs/agent-harness/plans/2026-06-29-*.md`.
 
@@ -306,7 +303,6 @@ Design spec: `docs/agent-harness/specs/2026-06-29-harness-engineering-improvemen
 
 **Quality Assurance**
 - **qa-testing** - Systematically QA test web apps, auto-fix bugs with atomic commits
-- **trace-analysis** - Cross-session failure pattern analysis based on historical learnings data
 
 **Automation**
 - **generate-issues** - Analyze Claude Code sessions and generate GitHub issues (wraps auto-loop --dry-run)

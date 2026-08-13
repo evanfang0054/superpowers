@@ -288,25 +288,6 @@ These techniques are part of systematic debugging and available in this director
 - **agent-harness:test-driven-development** - For creating failing test case (Phase 4, Step 1)
 - **agent-harness:verification-before-completion** - Verify fix worked before claiming success
 
-## Capture Learnings
-
-**After resolving the bug**, if you discovered something non-obvious, record it:
-
-```bash
-# Using the log-learning script
-${CLAUDE_PLUGIN_ROOT}/scripts/log-learning.sh pitfall "SHORT_KEY" "WHAT_YOU_LEARNED" 8 error
-
-# Or manually
-mkdir -p .agent-harness
-echo '{"ts":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","type":"pitfall","key":"SHORT_KEY","insight":"WHAT_YOU_LEARNED","confidence":8,"source":"error"}' >> .agent-harness/learnings.jsonl
-```
-
-**Record when:**
-- Root cause was non-obvious (took investigation to find)
-- Bug was caused by project-specific convention
-- Fix required understanding undocumented behavior
-- Same mistake could happen again without this knowledge
-
 ## Capture Diagnosis Task
 
 **调试结束时**，把「这次怎么修的」沉淀为 task，避免下次同类问题重复根因分析（不自动执行修复，只生成 task 供人审）：

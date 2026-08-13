@@ -147,7 +147,6 @@ Recommendation: Consider rollback or hotfix.
 
 **Works with:**
 - **systematic-debugging** — If issues found, use for root cause analysis
-- **session-learnings** — Log operational insights discovered during monitoring
 
 ## Limitations
 

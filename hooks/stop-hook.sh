@@ -122,7 +122,7 @@ fi
 
 # Join all text blocks from the last 100 assistant lines, not just the last
 # one. When Claude emits <promise>COMPLETE</promise> followed by other text
-# (e.g. "logged N learnings"), `last` misses the promise; join("\n") lets
+# (e.g. a trailing progress note), `last` misses the promise; join("\n") lets
 # the perl regex below find it anywhere in the captured output.
 # (Briefly disable errexit so a jq failure can be caught by the $? check.)
 set +e
@@ -156,13 +156,7 @@ if [[ "$COMPLETION_PROMISE" != "null" ]] && [[ -n "$COMPLETION_PROMISE" ]]; then
   if [[ -n "$PROMISE_TEXT" ]] && [[ "$PROMISE_TEXT" = "$COMPLETION_PROMISE" ]]; then
     echo "✅ Ralph loop: Detected <promise>$COMPLETION_PROMISE</promise>"
     rm "$RALPH_STATE_FILE"
-    # Prompt Claude to capture session learnings before exiting
-    # exit 2 blocks stop and sends stderr as feedback to Claude
-    echo "" >&2
-    echo "🧠 Ralph loop complete! Use the session-learnings skill to capture important insights from this session." >&2
-    echo "   Tip: Only log non-obvious discoveries, pitfalls, or architectural insights—skip trivial details." >&2
-    echo "   You may end the session normally after logging." >&2
-    exit 2
+    exit 0
   fi
 fi
 
@@ -192,8 +186,7 @@ fi
 # Create temp file, then atomically replace
 TEMP_FILE="${RALPH_STATE_FILE}.tmp.$$"
 # Ensure temp file is removed if sed fails (set -e exits) or the hook is
-# signaled (SIGHUP/SIGINT/SIGTERM are common for Stop hooks). Mirrors the
-# _AGENT_HARNESS_TMP_CLEANUP trap already present in search-learnings.sh (#19).
+# signaled (SIGHUP/SIGINT/SIGTERM are common for Stop hooks).
 trap 'rm -f "$TEMP_FILE"' INT TERM HUP
 sed "s/^iteration: .*/iteration: $NEXT_ITERATION/" "$RALPH_STATE_FILE" > "$TEMP_FILE"
 mv "$TEMP_FILE" "$RALPH_STATE_FILE"

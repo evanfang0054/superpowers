@@ -1,1 +1,1 @@
-Invoke the agent-harness:retrospective skill via the Skill tool (its tool identifier is agent-harness:retrospective). Let's do a retro on this week's work — review what we accomplished, analyze patterns from commits and learnings, and improve future work at the end of this sprint.
+Invoke the agent-harness:retrospective skill via the Skill tool (its tool identifier is agent-harness:retrospective). Let's do a retro on this week's work — review what we accomplished, analyze patterns from commits, and improve future work at the end of this sprint.
