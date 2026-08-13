@@ -1,8 +1,0 @@
-{
-  "sensors": [
-    { "name": "lint", "command": "npx eslint . --max-warnings 0", "timeout": 60 },
-    { "name": "typecheck", "command": "npx tsc --noEmit", "timeout": 120 },
-    { "name": "test", "command": "npx vitest run --reporter=verbose", "timeout": 180 },
-    { "name": "build", "command": "npx vite build", "timeout": 120 }
-  ]
-}
