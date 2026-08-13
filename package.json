@@ -1,6 +1,6 @@
 {
   "name": "agent-harness",
-  "version": "6.5.0",
+  "version": "6.6.0",
   "private": true,
   "description": "Agent Harness skills and runtime bootstrap for coding agents",
   "type": "module",

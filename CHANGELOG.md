@@ -1,5 +1,11 @@
 # agent-harness
 
+## 6.6.0
+
+### Minor Changes
+
+- 移除 learnings 生态：session-learnings skill、log/search/index-learnings 脚本、trace-analysis skill 与 trace-analyzer.sh、session-start 注入及数据文件；连带清理 diagnose/retrospective/guard-staging/stop-hook 下游引用，同步更新测试套件与现行文档。
+
 ## 6.5.0
 
 ### Minor Changes
