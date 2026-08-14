@@ -78,6 +78,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # annotated tag 需要提交者身份，CI 环境无全局 git 配置
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           VERSION="v$(node -p "require('./package.json').version")"
           if git rev-parse "$VERSION" >/dev/null 2>&1; then
             echo "tag $VERSION 已存在，跳过发布"
