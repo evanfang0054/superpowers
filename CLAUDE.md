@@ -12,7 +12,7 @@
 
 ## 项目概述
 
-**Agent Harness** 是一套完整的 AI 辅助软件开发工作流，以插件形式分发，支持多个 AI 编码助手（Claude Code、Cursor、Codex、OpenCode、GitHub Copilot CLI、Gemini CLI）。核心是一组行为塑造型 "skills"（markdown 文件）加上基于 shell 的 hooks 基础设施——不是编译型应用。基于 Jesse Vincent 的原版 [Superpowers](https://github.com/obra/superpowers) 项目。
+**Agent Harness** 是一套完整的 AI 辅助软件开发工作流，以插件形式分发，支持多个 AI 编码助手（Claude Code、Codex、Pi、DeepSeek Harness）。核心是一组行为塑造型 "skills"（markdown 文件）加上基于 shell 的 hooks 基础设施——不是编译型应用。基于 Jesse Vincent 的原版 [Superpowers](https://github.com/obra/superpowers) 项目。
 
 - 顶层 `package.json` 极简（仅一个 `release` 脚本）。无构建步骤、无顶层 lint、无顶层测试运行器。
 - `AGENTS.md` 是指向本文件的符号链接——编辑本文件即可同步。
@@ -108,7 +108,7 @@ Demo 是一个独立的全栈 monorepo（pnpm workspace）。在 demo 目录内�
 
 - **Skills（`skills/<name>/SKILL.md`）** — 每个 skill 是一个目录，包含 `SKILL.md`（YAML frontmatter：`name`、`description`、`when_to_use`，可选 `argument-hint`、`disable-model-invocation`、`effort`）加 markdown 指令。通过 `Skill` 工具调用，根据上下文自动触发。许多 skill 带有辅助文件（子代理提示、参考资料、脚本）。
 - **插件打包（`.claude-plugin/`）** — `plugin.json` + `marketplace.json` 使 agent-harness 可作为 Claude Code 插件安装。多平台支持内置于 hook 层。
-- **Hooks（`hooks/`）** — 会话生命周期管理。`hooks/hooks.json`（Claude Code）和 `hooks/hooks-cursor.json`（Cursor）定义 `sessionStart` 和 `Stop` 钩子。`hooks/session-start` 读取 `using-agent-harness` skill 内容，以平台特定格式（Cursor / Claude Code / Copilot CLI）输出 JSON。`hooks/stop-hook.sh` 在会话结束时运行。
+- **Hooks（`hooks/`）** — 会话生命周期管理。`hooks/hooks.json`（Claude Code）定义 `SessionStart` 和 `Stop` 钩子。`hooks/session-start` 读取 `using-agent-harness` skill 内容，输出 JSON。`hooks/stop-hook.sh` 在会话结束时运行。
 - **子代理驱动开发（"Ralph Loop"）** — `skills/subagent-driven-development/` 编排专用子代理（implementer、spec reviewer、code quality reviewer）。通过 `scripts/setup-ralph-loop.sh` 设置。子代理提示与 SKILL.md 同目录存放。
 - **Slash 命令（`commands/`）** — 用户可调用：`ralph-loop`、`cancel-ralph`、`help`、`generate-issues`、`fix-issues-and-pr`。
 - **Agents（`agents/`）** — 专用 agent 定义，如 `code-reviewer.md`。
@@ -120,7 +120,6 @@ Demo 是一个独立的全栈 monorepo（pnpm workspace）。在 demo 目录内�
 
 - 仓库贡献规则：`CLAUDE.md`（本文件）
 - Claude Code hooks 配置：`hooks/hooks.json`
-- Cursor 兼容 hooks 配置：`hooks/hooks-cursor.json`
 - 项目本地配置入口：复制 `.claude/settings.local.json.example` → `.claude/settings.local.json`
 - 插件启用：`.claude/settings.json` 设置 `enabledPlugins.agent-harness@agent-harness`
 - 会话知识来源：`docs/agent-harness/index.md`、`CONTEXT.md`、`skills/retrospective/`

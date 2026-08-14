@@ -1,0 +1,362 @@
+#!/usr/bin/env python3
+"""
+Extract session data from Claude Code JSONL files.
+
+Usage:
+    python extract-session.py --session-id <id> [--project-path <path>] [--output <file>]
+    python extract-session.py --list [--project-path <path>] [--limit 10]
+"""
+
+import argparse
+import json
+import os
+import sys
+from datetime import datetime
+from pathlib import Path
+
+
+def get_claude_projects_dir() -> Path:
+    """Get the Claude projects directory."""
+    return Path.home() / ".claude" / "projects"
+
+
+def encode_project_path(path: str) -> str:
+    """Encode a project path to Claude's directory format."""
+    return path.replace("/", "-").lstrip("-")
+
+
+def find_project_dir(project_path: str | None = None) -> Path | None:
+    """Find the project directory in Claude's storage."""
+    projects_dir = get_claude_projects_dir()
+
+    if project_path:
+        if "/" not in project_path and "\\" not in project_path:
+            raw_candidate = projects_dir / project_path
+            if raw_candidate.exists():
+                return raw_candidate
+
+        encoded = encode_project_path(project_path)
+        candidate = projects_dir / encoded
+        if candidate.exists():
+            return candidate
+    
+    # Try current working directory
+    cwd = os.getcwd()
+    encoded_cwd = encode_project_path(cwd)
+    candidate = projects_dir / encoded_cwd
+    if candidate.exists():
+        return candidate
+    
+    # List available projects
+    if projects_dir.exists():
+        for d in projects_dir.iterdir():
+            if d.is_dir() and encoded_cwd in d.name:
+                return d
+    
+    return None
+
+
+def list_sessions(project_dir: Path, limit: int = 10) -> list[dict]:
+    """List available sessions in a project directory."""
+    sessions = []
+
+    for f in sorted(project_dir.glob("*.jsonl"), key=lambda x: x.stat().st_mtime, reverse=True):
+        if limit and len(sessions) >= limit:
+            break
+
+        session_id = f.stem
+        stat = f.stat()
+
+        # Read first and last lines for timestamps
+        first_ts = None
+        last_ts = None
+        message_count = 0
+
+        try:
+            with open(f, 'r') as fp:
+                for line in fp:
+                    message_count += 1
+                    try:
+                        data = json.loads(line)
+                        ts = data.get("timestamp") or data.get("ts")
+                        if ts:
+                            if first_ts is None:
+                                first_ts = ts
+                            last_ts = ts
+                    except json.JSONDecodeError:
+                        continue
+        except Exception:
+            pass
+
+        sessions.append({
+            "session_id": session_id,
+            "file_path": str(f),
+            "file_size_kb": round(stat.st_size / 1024, 1),
+            "modified": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+            "message_count": message_count,
+            "first_timestamp": first_ts,
+            "last_timestamp": last_ts,
+        })
+
+    return sessions
+
+
+def classify_message_origin(role: str, content: str) -> str:
+    """Classify message content so analysis can filter session noise later."""
+    lowered = content.strip().lower()
+    if lowered.startswith("stop hook feedback:"):
+        return "hook_feedback"
+    if lowered.startswith("this session is being continued from a previous conversation"):
+        return "resume_summary"
+    if lowered.startswith("base directory for this skill:") or "<command-message>" in lowered:
+        return "skill_payload"
+    if not content.strip():
+        return "empty"
+    return "user_input" if role == "user" else "assistant_input"
+
+
+def find_session_file(session_id: str, project_dir: Path | None = None) -> dict | None:
+    """Find a session file, optionally falling back to all Claude project directories."""
+    candidate_dirs = []
+    if project_dir:
+        candidate_dirs.append(project_dir)
+
+    projects_dir = get_claude_projects_dir()
+    if projects_dir.exists():
+        candidate_dirs.extend(
+            d for d in sorted(projects_dir.iterdir())
+            if d.is_dir() and d not in candidate_dirs
+        )
+
+    target_name = f"{session_id}.jsonl"
+    for index, directory in enumerate(candidate_dirs):
+        candidate = directory / target_name
+        if candidate.exists():
+            return {
+                "path": candidate,
+                "actual_project_dir": directory,
+                "session_source": "requested-project" if index == 0 and project_dir else "fallback-global-search",
+            }
+
+    prefix_matches = []
+    for index, directory in enumerate(candidate_dirs):
+        for candidate in sorted(directory.glob(f"{session_id}*.jsonl")):
+            prefix_matches.append({
+                "path": candidate,
+                "actual_project_dir": directory,
+                "session_source": "requested-project" if index == 0 and project_dir else "fallback-global-search",
+            })
+
+    if len(prefix_matches) == 1:
+        return prefix_matches[0]
+    if len(prefix_matches) > 1:
+        candidates = ", ".join(match["path"].stem for match in prefix_matches[:5])
+        raise ValueError(f"Multiple session matches for prefix {session_id}: {candidates}")
+
+    return None
+
+
+def extract_session(
+    session_file: Path,
+    requested_project_path: str | None = None,
+    actual_project_dir: str | Path | None = None,
+    session_source: str = "requested-project",
+) -> dict:
+    """Extract and structure data from a session JSONL file."""
+    messages = []
+    tool_calls = []
+    skills_used = set()
+    total_tokens = 0
+    start_time = None
+    end_time = None
+    
+    with open(session_file, 'r') as fp:
+        for line in fp:
+            try:
+                data = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            
+            msg_type = data.get("type")
+            timestamp = data.get("timestamp") or data.get("ts")
+            
+            if timestamp:
+                if start_time is None:
+                    start_time = timestamp
+                end_time = timestamp
+            
+            # Extract user/assistant messages
+            if msg_type in ("user", "assistant"):
+                message_data = data.get("message", {})
+                content = message_data.get("content", "")
+                
+                # Handle content that's a list (Claude format)
+                if isinstance(content, list):
+                    text_parts = []
+                    for part in content:
+                        if isinstance(part, dict):
+                            if part.get("type") == "text":
+                                text_parts.append(part.get("text", ""))
+                            elif part.get("type") == "tool_use":
+                                # Extract tool call info
+                                tool_call = {
+                                    "tool": part.get("name", "unknown"),
+                                    "input": part.get("input", {}),
+                                    "timestamp": timestamp,
+                                    "id": part.get("id"),
+                                }
+                                tool_calls.append(tool_call)
+                                if tool_call["tool"] == "Skill":
+                                    skill_name = tool_call["input"].get("skill")
+                                    if skill_name:
+                                        skills_used.add(skill_name)
+                            elif part.get("type") == "tool_result":
+                                # Match with tool call by ID
+                                tool_id = part.get("tool_use_id")
+                                for tc in tool_calls:
+                                    if tc.get("id") == tool_id:
+                                        tc["output"] = part.get("content", "")[:500]  # Truncate
+                                        tc["success"] = not part.get("is_error", False)
+                                        if part.get("is_error"):
+                                            tc["error"] = part.get("content", "")[:200]
+                        elif isinstance(part, str):
+                            text_parts.append(part)
+                    content = "\n".join(text_parts)
+                
+                messages.append({
+                    "role": msg_type,
+                    "content": content[:2000] if content else "",  # Truncate long content
+                    "timestamp": timestamp,
+                    "message_origin_hint": classify_message_origin(msg_type, content if isinstance(content, str) else ""),
+                })
+                
+                # Detect skill usage from content
+                if msg_type == "assistant" and content:
+                    if "using the" in content.lower() and "skill" in content.lower():
+                        # Try to extract skill name
+                        import re
+                        match = re.search(r"using (?:the )?(\w+(?:-\w+)*) skill", content.lower())
+                        if match:
+                            skills_used.add(match.group(1))
+            
+            # Extract tool results
+            elif msg_type == "tool_result":
+                tool_id = data.get("tool_use_id")
+                for tc in tool_calls:
+                    if tc.get("id") == tool_id:
+                        tc["output"] = str(data.get("content", ""))[:500]
+                        tc["success"] = not data.get("is_error", False)
+                        if data.get("is_error"):
+                            tc["error"] = str(data.get("content", ""))[:200]
+            
+            # Track tokens
+            if "usage" in data:
+                usage = data["usage"]
+                total_tokens += usage.get("input_tokens", 0) + usage.get("output_tokens", 0)
+    
+    # Calculate duration
+    duration_minutes = None
+    if start_time and end_time:
+        try:
+            start_dt = datetime.fromisoformat(start_time.replace("Z", "+00:00"))
+            end_dt = datetime.fromisoformat(end_time.replace("Z", "+00:00"))
+            duration_minutes = round((end_dt - start_dt).total_seconds() / 60, 1)
+        except Exception:
+            pass
+    
+    return {
+        "session_id": session_file.stem,
+        "file_path": str(session_file),
+        "actual_session_file_path": str(session_file),
+        "requested_project_path": requested_project_path,
+        "actual_project_dir": str(actual_project_dir) if actual_project_dir else str(session_file.parent),
+        "session_source": session_source,
+        "start_time": start_time,
+        "end_time": end_time,
+        "duration_minutes": duration_minutes,
+        "messages": messages,
+        "tool_calls": tool_calls,
+        "skills_used": list(skills_used),
+        "total_tokens": total_tokens,
+        "stats": {
+            "total_messages": len(messages),
+            "user_messages": len([m for m in messages if m["role"] == "user"]),
+            "assistant_messages": len([m for m in messages if m["role"] == "assistant"]),
+            "total_tool_calls": len(tool_calls),
+            "successful_tool_calls": len([t for t in tool_calls if t.get("success", True)]),
+            "failed_tool_calls": len([t for t in tool_calls if not t.get("success", True)]),
+        }
+    }
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Extract Claude Code session data")
+    parser.add_argument("--session-id", "-s", help="Session ID to extract")
+    parser.add_argument("--project-path", "-p", help="Project path (will be encoded)")
+    parser.add_argument("--output", "-o", help="Output file path")
+    parser.add_argument("--list", "-l", action="store_true", help="List available sessions")
+    parser.add_argument("--limit", type=int, default=10, help="Limit for --list")
+    parser.add_argument("--json", action="store_true", help="Output as JSON")
+    
+    args = parser.parse_args()
+    
+    # Find project directory
+    project_dir = find_project_dir(args.project_path)
+    if not project_dir:
+        print(f"Error: Could not find project directory", file=sys.stderr)
+        print(f"Available projects in {get_claude_projects_dir()}:", file=sys.stderr)
+        for d in sorted(get_claude_projects_dir().iterdir())[:10]:
+            print(f"  {d.name}", file=sys.stderr)
+        sys.exit(1)
+    
+    # List sessions
+    if args.list:
+        sessions = list_sessions(project_dir, args.limit)
+        if args.json:
+            print(json.dumps(sessions, indent=2))
+        else:
+            print(f"Sessions in {project_dir.name}:\n")
+            for s in sessions:
+                print(f"  {s['session_id']}")
+                print(f"    Modified: {s['modified']}")
+                print(f"    Size: {s['file_size_kb']} KB, Messages: {s['message_count']}")
+                print()
+        return
+    
+    # Extract specific session
+    if not args.session_id:
+        print("Error: --session-id required (use --list to see available sessions)", file=sys.stderr)
+        sys.exit(1)
+
+    try:
+        session_match = find_session_file(args.session_id, project_dir)
+    except ValueError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        sys.exit(1)
+
+    if not session_match:
+        print(f"Error: Session file not found: {args.session_id}.jsonl", file=sys.stderr)
+        sys.exit(1)
+
+    result = extract_session(
+        session_match["path"],
+        requested_project_path=args.project_path,
+        actual_project_dir=session_match["actual_project_dir"],
+        session_source=session_match["session_source"],
+    )
+    
+    # Output
+    output_json = json.dumps(result, indent=2, ensure_ascii=False)
+    
+    if args.output:
+        output_path = Path(args.output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, 'w') as fp:
+            fp.write(output_json)
+        print(f"Extracted to: {output_path}")
+    else:
+        print(output_json)
+
+
+if __name__ == "__main__":
+    main()

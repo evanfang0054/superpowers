@@ -21,8 +21,7 @@ If you were dispatched as a subagent to execute a specific task, skip this skill
 ## How to Access Skills
 
 - **Claude Code:** Use the `Skill` tool. Never Read skill files directly.
-- **Copilot CLI:** Use the `skill` tool (auto-discovered from plugins).
-- **Gemini CLI:** Use the `activate_skill` tool.
+- **DeepSeek Harness:** Use the `skill` tool (auto-discovered from the installed preset or `~/.dsh/skills`).
 
 Codex: subagent setup, environment detection, and App finishing notes in `references/codex-tools.md`.
 

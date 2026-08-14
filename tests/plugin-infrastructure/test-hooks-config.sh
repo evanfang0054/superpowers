@@ -4,9 +4,7 @@ source "$SCRIPT_DIR/_helpers.sh"
 
 echo "=== Test: Hooks Config ==="
 
-# Claude Code 格式: hooks.json 用 PascalCase（SessionStart, Stop）
-# Cursor 格式: hooks-cursor.json 用 camelCase（sessionStart），且可能没有 Stop
-# 两个文件的 session-start/stop 事件用不同 key 名，这是平台差异而非缺陷。
+# hooks.json 用 PascalCase（SessionStart, Stop）
 
 # --- hooks.json (Claude Code) ---
 CLAUDE_HOOKS="$REPO_ROOT/hooks/hooks.json"
@@ -18,17 +16,6 @@ if jq -e '.hooks.SessionStart[] | select(.matcher == "startup|clear|compact") | 
     pass "SessionStart uses run-hook.cmd session-start with bash shell"
 else
     fail "SessionStart uses run-hook.cmd session-start with bash shell"
-fi
-
-# --- hooks-cursor.json (Cursor) ---
-CURSOR_HOOKS="$REPO_ROOT/hooks/hooks-cursor.json"
-assert_file_exists "$CURSOR_HOOKS" "hooks-cursor.json exists"
-if jq empty "$CURSOR_HOOKS" 2>/dev/null; then pass "hooks-cursor.json is valid JSON"; else fail "hooks-cursor.json is valid JSON"; fi
-# Cursor 用 camelCase sessionStart
-if jq -e '.hooks.sessionStart' "$CURSOR_HOOKS" >/dev/null 2>&1; then
-    pass "hooks-cursor.json has sessionStart"
-else
-    fail "hooks-cursor.json has sessionStart"
 fi
 
 # --- PreToolUse + SubagentStop (new in session-log-optimization) ---
