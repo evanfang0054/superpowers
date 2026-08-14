@@ -19,7 +19,14 @@ There's a bunch more to it, but that's the core of the system. And because the s
 
 ## Installation
 
-**Note:** Installation differs by platform. Claude Code or Cursor have built-in plugin marketplaces. Codex and OpenCode require manual setup.
+**Supported platforms:**
+
+| Platform | Status |
+|---|---|
+| Claude Code | ✅ Supported |
+| Codex | ✅ Supported |
+| Pi | ✅ Supported |
+| DeepSeek Harness | ✅ Supported |
 
 ### Claude Code Official Marketplace
 
@@ -45,54 +52,54 @@ Then install the plugin from this marketplace:
 /plugin install agent-harness@agent-harness-marketplace
 ```
 
-### Cursor (via Plugin Marketplace)
-
-In Cursor Agent chat, install from marketplace:
-
-```text
-/add-plugin agent-harness
-```
-
-or search for "agent-harness" in the plugin marketplace.
-
 ### Codex
 
-Tell Codex:
+**Codex App:** Open the **Plugins** panel in the Codex App sidebar, find `Agent Harness` under **Coding**, and click `+` to install.
 
-```
-Fetch and follow instructions from https://raw.githubusercontent.com/evanfang0054/agent-harness/refs/heads/main/.codex/INSTALL.md
-```
+**Codex CLI:** Open the plugin search interface with `/plugins`, search for `agent-harness`, and select `Install Plugin`.
 
 **Detailed docs:** [docs/README.codex.md](docs/README.codex.md)
 
-### OpenCode
+### Pi
 
-Tell OpenCode:
-
-```
-Fetch and follow instructions from https://raw.githubusercontent.com/evanfang0054/agent-harness/refs/heads/main/.opencode/INSTALL.md
-```
-
-**Detailed docs:** [docs/README.opencode.md](docs/README.opencode.md)
-
-### GitHub Copilot CLI
+Install from the GitHub repository:
 
 ```bash
-copilot plugin marketplace add evanfang0054/agent-harness-marketplace
-copilot plugin install agent-harness@agent-harness-marketplace
+pi install git:github.com/evanfang0054/agent-harness
 ```
 
-### Gemini CLI
+Local development mode:
 
 ```bash
-gemini extensions install https://github.com/evanfang0054/agent-harness
+pi -e /path/to/agent-harness
 ```
 
-To update:
+**Detailed docs:** [docs/README.pi.md](docs/README.pi.md)
+
+### DeepSeek Harness
+
+[DeepSeek Harness (dsh)](https://github.com/deepseek-ai/deepseek-harness) natively supports this project's skills directory format and agent preset mechanism — no other platform's files are touched.
+
+Use inside the repository (zero install):
 
 ```bash
-gemini extensions update agent-harness
+cd agent-harness
+dsh web
 ```
+
+DSH auto-discovers the project-level skills directory (`.dsh/skills`); 19 skills are directly invocable there. The other 11 process skills (brainstorming, etc.) carry top-level `disable-model-invocation` semantics, so the full 30 require the preset or `--user-skills`.
+
+Global install (usable in any project):
+
+```bash
+bash scripts/install-dsh.sh                # register the "Agent Harness workflow" preset
+bash scripts/install-dsh.sh --user-skills  # additionally install user-level skills (available in any preset)
+bash scripts/install-dsh.sh --uninstall    # uninstall
+```
+
+After installing, start `dsh web` and select the **Agent Harness workflow** preset.
+
+**Detailed docs:** [.dsh/README_EN.md](.dsh/README_EN.md)
 
 ### Verify Installation
 

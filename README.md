@@ -18,7 +18,14 @@ Agent Harness 是一套完整的软件开发工作流，专为 AI 编程助手�
 
 ## 安装
 
-**注意：** 不同平台的安装方式不同。Claude Code 和 Cursor 有内置的插件市场，Codex 和 OpenCode 需要手动设置。
+**支持平台：**
+
+| 平台 | 状态 |
+|---|---|
+| Claude Code | ✅ 已支持 |
+| Codex | ✅ 已支持 |
+| Pi | ✅ 已支持 |
+| DeepSeek Harness | ✅ 已支持 |
 
 ### Claude Code 官方市场
 
@@ -43,16 +50,6 @@ Agent Harness 可通过 [Claude 官方插件市场](https://claude.com/plugins/a
 ```bash
 /plugin install agent-harness@agent-harness-marketplace
 ```
-
-### Cursor（通过插件市场）
-
-在 Cursor Agent 聊天中，从市场安装：
-
-```text
-/add-plugin agent-harness
-```
-
-或在插件市场中搜索 "agent-harness"。
 
 ### Codex App
 
@@ -80,34 +77,30 @@ pi -e /path/to/agent-harness
 
 **详细文档：** [docs/README.pi.md](docs/README.pi.md)
 
-### OpenCode
+### DeepSeek Harness
 
-告诉 OpenCode：
+[DeepSeek Harness（dsh）](https://github.com/deepseek-ai/deepseek-harness) 原生支持本项目的 skills 目录格式与 agent preset 机制，无需改动其他平台的文件。
 
-```
-Fetch and follow instructions from https://raw.githubusercontent.com/evanfang0054/agent-harness/refs/heads/main/.opencode/INSTALL.md
-```
-
-**详细文档：** [docs/README.opencode.md](docs/README.opencode.md)
-
-### GitHub Copilot CLI
+仓库内即用（零安装）：
 
 ```bash
-copilot plugin marketplace add evanfang0054/agent-harness-marketplace
-copilot plugin install agent-harness@agent-harness-marketplace
+cd agent-harness
+dsh web
 ```
 
-### Gemini CLI
+DSH 自动发现项目级 skills 目录（`.dsh/skills`），其中 19 个 skill 立即可调用；其余 11 个流程类 skill（brainstorming 等）因顶层 `disable-model-invocation` 语义需通过 preset 或 `--user-skills` 获取完整 30 个。
+
+全局安装（任何项目可用）：
 
 ```bash
-gemini extensions install https://github.com/evanfang0054/agent-harness
+bash scripts/install-dsh.sh                # 注册「Agent Harness 工作流」preset
+bash scripts/install-dsh.sh --user-skills  # 额外安装用户级 skills（任何 preset 下可用）
+bash scripts/install-dsh.sh --uninstall    # 卸载
 ```
 
-更新：
+安装后启动 `dsh web`，在预设列表中选择 **Agent Harness 工作流**。
 
-```bash
-gemini extensions update agent-harness
-```
+**详细文档：** [.dsh/README.md](.dsh/README.md)
 
 ### 验证安装
 

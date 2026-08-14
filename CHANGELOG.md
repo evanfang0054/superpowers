@@ -1,5 +1,17 @@
 # agent-harness
 
+## 6.8.0
+
+### Minor Changes
+
+- feat: 新增 DeepSeek Harness 支持
+
+  - 新增 `.dsh/` 适配层：agent preset（`preset.yml` + `agent.cordis.yml` + DSH 化 skills 副本）、项目级 `.dsh/skills` 软链、双语文档
+  - 新增 `scripts/sync-dsh-skills.sh`：从顶层 `skills/` 生成 DSH 化副本（`when_to_use` → `whenToUse`，移除 `disable-model-invocation: true`，跳过 `auto-loop`），顶层保持唯一真相源
+  - 新增 `scripts/install-dsh.sh`：一键安装 preset 到 `~/.dsh/.agent-presets/`，`--user-skills` 平铺安装用户级 skills，支持 `--uninstall` / `--check`
+  - 新增 `tests/dsh-plugin-sync/run-all.sh`：副本与顶层一致性测试（纯脚本断言）
+  - 文档：README/README_EN 增加 DSH 安装小节与支持平台矩阵；清理不支持的平台（Cursor/OpenCode/Copilot CLI/Gemini CLI）的安装指引与适配文件（`hooks/hooks-cursor.json`、`docs/README.opencode.md`、`gemini-tools.md`），`CLAUDE.md` 支持列表同步
+
 ## 6.7.0
 
 ### Minor Changes

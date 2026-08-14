@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Clean the SDD working tree's short-lived artifacts: task briefs, implementer
+# reports, review packages, and the progress ledger. Keeps the directory itself
+# (empty) so sdd-workspace doesn't need to recreate it on next use.
+#
+# Failure does NOT block callers: warnings go to stderr, exit code is always 0.
+# Rationale: this is best-effort cleanup after finishing a development branch;
+# a cleanup error should not undo an otherwise-successful merge/PR.
+#
+# Usage: cleanup-workspace PLAN_FILE
+set -euo pipefail
+
+if [ $# -ne 1 ]; then
+  echo "usage: cleanup-workspace PLAN_FILE" >&2
+  exit 2
+fi
+
+script_dir="$(cd "$(dirname "$0")" && pwd)"
+if ! workspace=$("$script_dir/sdd-workspace" "$1"); then
+  echo "warning: cleanup-workspace failed to resolve current plan workspace" >&2
+elif rm -rf "$workspace"; then
+  echo "cleaned: $workspace"
+else
+  echo "warning: cleanup-workspace failed to remove $workspace" >&2
+fi
+
+exit 0
