@@ -9,6 +9,10 @@ echo "=== Test: auto-loop worktree.sh ==="
 # 用临时 git 仓库测试，避免污染主仓库
 TEST_REPO="$(mktemp -d)"
 git init -q "$TEST_REPO"
+# CI 环境没有全局 git user 配置，未配置时 commit 会失败导致仓库无 HEAD，
+# 进而让后续 worktree 用例全部失败
+git -C "$TEST_REPO" config user.name "test"
+git -C "$TEST_REPO" config user.email "test@test.local"
 git -C "$TEST_REPO" commit -q --allow-empty -m "init"
 TEST_STATE_DIR="$TEST_REPO/.claude/auto-loop"
 
@@ -54,6 +58,8 @@ rm -rf "$NO_HEAD_REPO"
 # Case 8: git worktree add 的底层 stderr 不被吞掉
 CONFLICT_REPO="$(mktemp -d)"
 git init -q "$CONFLICT_REPO"
+git -C "$CONFLICT_REPO" config user.name "test"
+git -C "$CONFLICT_REPO" config user.email "test@test.local"
 git -C "$CONFLICT_REPO" commit -q --allow-empty -m "init"
 CONFLICT_WT=$(worktree_create "$CONFLICT_REPO" "test-conflict-a" "feat/conflict")
 OUTPUT=$(worktree_create "$CONFLICT_REPO" "test-conflict-b" "feat/conflict" 2>&1) && EXIT=0 || EXIT=$?
