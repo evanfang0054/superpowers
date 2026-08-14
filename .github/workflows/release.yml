@@ -1,0 +1,92 @@
+name: release
+
+# 自动发包：main 分支收到 push 后——
+#   1. 若 .changeset/ 下有未消费的 changeset，运行 `pnpm release`
+#      （changeset version 消费 changeset：bump 版本 + 生成 CHANGELOG，
+#      再 sync-plugin-versions.sh 同步 3 个插件 manifest），提交并推送；
+#   2. 若 package.json 的版本还没有对应的 git tag，自动打 tag 并创建
+#      GitHub Release（GitHub 内部版本发包；本包为 private，不发布 npm）。
+#
+# 循环安全：版本提交由 GITHUB_TOKEN 推送，GitHub 不会为它递归触发本
+# workflow；changeset 被消费后 .changeset/*.md 清空，再次触发时跳过步骤 1。
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # changelog-github 需要完整提交历史生成 CHANGELOG 条目
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 快速纯脚本测试（秒级，不依赖任何 CLI 配额），守护 main 质量
+      - name: Run pure-script test suites
+        run: |
+          bash tests/dsh-plugin-sync/run-all.sh
+          bash tests/plugin-infrastructure/run-all.sh
+
+      - name: Check for pending changesets
+        id: changesets
+        run: |
+          PENDING=$(ls .changeset/*.md 2>/dev/null | wc -l | tr -d ' ')
+          echo "pending=$([ "$PENDING" -gt 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+      - name: Version packages (consume changesets)
+        if: steps.changesets.outputs.pending == 'true'
+        run: pnpm release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit and push version bump
+        if: steps.changesets.outputs.pending == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore(release): v$(node -p "require('./package.json').version")"
+          git pull --rebase origin main
+          git push
+
+      # GitHub 内部版本发包：版本未打 tag 则打 tag 并创建 Release
+      - name: Tag and create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="v$(node -p "require('./package.json').version")"
+          if git rev-parse "$VERSION" >/dev/null 2>&1; then
+            echo "tag $VERSION 已存在，跳过发布"
+          else
+            git tag -a "$VERSION" -m "release $VERSION"
+            git push origin "$VERSION"
+            gh release create "$VERSION" \
+              --generate-notes \
+              --title "$VERSION" \
+              --target "$(git rev-parse HEAD)"
+            echo "已发布 $VERSION"
+          fi
